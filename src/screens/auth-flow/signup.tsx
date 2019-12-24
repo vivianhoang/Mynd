@@ -13,13 +13,13 @@ export default () => {
       <TextInput placeholder="Password" value={password} onChangeText={(password) => {setPassword(password)}} />
       <TouchableOpacity style={styles.button} onPress={async() => {
         try {
-          await sharedAuthService.login(email, password);
+          await sharedAuthService.signup(email, password);
           sharedNavigationService.navigate('MainFlow');
         } catch (error) {
           Alert.alert("Uh oh!", error.message)
         }
       }}>
-        <Text>{"Login"}</Text>
+        <Text>{"Signup"}</Text>
       </TouchableOpacity>
     </View>
   )

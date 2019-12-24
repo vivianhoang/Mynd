@@ -8,7 +8,8 @@ import landing from './screens/auth-flow/landing';
 import login from './screens/auth-flow/login';
 import category from './screens/main-flow/category-flow/category';
 import categorySettings from './screens/main-flow/category-flow/category-settings';
-
+import signup from './screens/auth-flow/signup';
+import sharedNavigationService from './services/navigation-service';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -31,6 +32,7 @@ function AuthFlow() {
       <AuthStack.Screen name='Splash' component={splash} options={{headerShown: false}}></AuthStack.Screen>
       <AuthStack.Screen name='Landing' component={landing} options={{headerShown: false}}></AuthStack.Screen>
       <AuthStack.Screen name='Login' component={login} ></AuthStack.Screen>
+      <AuthStack.Screen name='Signup' component={signup} ></AuthStack.Screen>
     </AuthStack.Navigator>
   )
 }
@@ -46,7 +48,7 @@ function CategoryFlow() {
 
 export default () => {
   return (
-    <NavigationNativeContainer>
+    <NavigationNativeContainer ref={sharedNavigationService.navRef}>
       <RootStack.Navigator initialRouteName="AuthFlow" screenOptions={{headerShown: false}}>
         <RootStack.Screen name="AuthFlow" component={AuthFlow} />
         <RootStack.Screen name="MainFlow" component={MainFlow} />

@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+@import Firebase;
 #import "AppDelegate.h"
 
 #import <React/RCTBridge.h>
@@ -27,6 +28,10 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
+  if ([FIRApp defaultApp] == nil) {
+    [FIRApp configure];
+  }
   return YES;
 }
 

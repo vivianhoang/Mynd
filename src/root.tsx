@@ -10,6 +10,8 @@ import category from './screens/main-flow/category-flow/category';
 import categorySettings from './screens/main-flow/category-flow/category-settings';
 import signup from './screens/auth-flow/signup';
 import sharedNavigationService from './services/navigation-service';
+import { Provider } from 'react-redux';
+import store from './services/redux-service';
 
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -19,40 +21,68 @@ const CategoryStack = createStackNavigator();
 function MainFlow() {
   return (
     <MainStack.Navigator initialRouteName="Home">
-      <MainStack.Screen name='Home' component={home}></MainStack.Screen>
-      <MainStack.Screen name='CreateNote' component={createNote}></MainStack.Screen>
-      <MainStack.Screen name='CategoryFlow' component={CategoryFlow}></MainStack.Screen>
+      <MainStack.Screen name="Home" component={home}></MainStack.Screen>
+      <MainStack.Screen
+        name="CreateNote"
+        component={createNote}
+      ></MainStack.Screen>
+      <MainStack.Screen
+        name="CategoryFlow"
+        component={CategoryFlow}
+      ></MainStack.Screen>
     </MainStack.Navigator>
-  )
+  );
 }
 
 function AuthFlow() {
   return (
-    <AuthStack.Navigator initialRouteName='Splash'>
-      <AuthStack.Screen name='Splash' component={splash} options={{headerShown: false}}></AuthStack.Screen>
-      <AuthStack.Screen name='Landing' component={landing} options={{headerShown: false}}></AuthStack.Screen>
-      <AuthStack.Screen name='Login' component={login} ></AuthStack.Screen>
-      <AuthStack.Screen name='Signup' component={signup} ></AuthStack.Screen>
+    <AuthStack.Navigator initialRouteName="Splash">
+      <AuthStack.Screen
+        name="Splash"
+        component={splash}
+        options={{ headerShown: false }}
+      ></AuthStack.Screen>
+      <AuthStack.Screen
+        name="Landing"
+        component={landing}
+        options={{ headerShown: false }}
+      ></AuthStack.Screen>
+      <AuthStack.Screen name="Login" component={login}></AuthStack.Screen>
+      <AuthStack.Screen name="Signup" component={signup}></AuthStack.Screen>
     </AuthStack.Navigator>
-  )
+  );
 }
 
 function CategoryFlow() {
   return (
-    <CategoryStack.Navigator initialRouteName="Category">
-      <CategoryStack.Screen name="Category" component={category}></CategoryStack.Screen>
-      <CategoryStack.Screen name="CategorySetting" component={categorySettings}></CategoryStack.Screen>
+    <CategoryStack.Navigator
+      initialRouteName="Category"
+      screenOptions={{ headerShown: false }}
+    >
+      <CategoryStack.Screen
+        name="Category"
+        component={category}
+      ></CategoryStack.Screen>
+      <CategoryStack.Screen
+        name="CategorySetting"
+        component={categorySettings}
+      ></CategoryStack.Screen>
     </CategoryStack.Navigator>
-  )
+  );
 }
 
 export default () => {
   return (
-    <NavigationNativeContainer ref={sharedNavigationService.navRef}>
-      <RootStack.Navigator initialRouteName="AuthFlow" screenOptions={{headerShown: false}}>
-        <RootStack.Screen name="AuthFlow" component={AuthFlow} />
-        <RootStack.Screen name="MainFlow" component={MainFlow} />
-      </RootStack.Navigator>
-    </NavigationNativeContainer>
+    <Provider store={store}>
+      <NavigationNativeContainer ref={sharedNavigationService.navRef}>
+        <RootStack.Navigator
+          initialRouteName="AuthFlow"
+          screenOptions={{ headerShown: false }}
+        >
+          <RootStack.Screen name="AuthFlow" component={AuthFlow} />
+          <RootStack.Screen name="MainFlow" component={MainFlow} />
+        </RootStack.Navigator>
+      </NavigationNativeContainer>
+    </Provider>
   );
-}
+};

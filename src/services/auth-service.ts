@@ -1,12 +1,15 @@
 import FirebaseAuth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { Alert } from 'react-native';
 import sharedNavigationService from './navigation-service';
+import FirebaseFirestore from '@react-native-firebase/firestore';
 
 class AuthService {
+  userId: string;
+
   async initialize() {
     const user = FirebaseAuth().currentUser;
 
     if (user) {
+      this.userId = user.uid;
       // user is signed in
       sharedNavigationService.navigate('MainFlow');
     } else {
@@ -15,17 +18,25 @@ class AuthService {
     }
   }
 
-  signup(email: string, password: string): Promise<FirebaseAuthTypes.UserCredential> {
-    return FirebaseAuth().createUserWithEmailAndPassword(email, password);
+  async signup(email: string, password: string) {
+    const userCredential = await FirebaseAuth().createUserWithEmailAndPassword(email, password);
+    await this.createNewUser(userCredential.user.uid);
   }
 
-  login(email: string, password: string): Promise<FirebaseAuthTypes.UserCredential> {
-    return FirebaseAuth().signInWithEmailAndPassword(email, password);
+  async login(email: string, password: string) {
+    const userCredential = await FirebaseAuth().signInWithEmailAndPassword(email, password);
+    this.userId = userCredential.user.uid;
   }
 
   logout() {
     FirebaseAuth().signOut();
+    this.userId = undefined;
     sharedNavigationService.navigate('Landing');
+  }
+
+  async createNewUser(userId: string) {
+    await FirebaseFirestore().collection("users").doc(userId).set({});
+    this.userId = userId;
   }
 }
 

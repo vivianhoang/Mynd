@@ -36,6 +36,7 @@ export default (props: CreateNoteProps) => {
             type: 'CREATE_NOTE',
             categoryName: categoryName,
             categoryId: category?.id,
+            noteDescription: note,
           });
         }}
       >

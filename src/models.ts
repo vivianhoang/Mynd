@@ -34,6 +34,7 @@ export interface CreateCategoriesAction {
   type: 'CREATE_NOTE';
   categoryName: string;
   categoryId: string;
+  noteDescription: string;
 }
 
 export type ReduxActions = SetCategoriesAction | CreateCategoriesAction;

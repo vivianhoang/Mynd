@@ -1,8 +1,9 @@
-import { all, take, put } from 'redux-saga/effects';
+import { all, take, put, call } from 'redux-saga/effects';
 import FirebaseFirestore from '@react-native-firebase/firestore';
 import sharedAuthService from './auth-service';
 import { Category, ReduxActions } from '../models';
 import { channel } from 'redux-saga';
+import { createNote } from './firebase-service';
 
 function* initialize() {
   console.log('Initialize app');
@@ -42,6 +43,8 @@ function* watchCategoriesChannel() {
 function* takeCreateNote() {
   while (true) {
     const action = yield take('CREATE_NOTE');
+    const { categoryId, noteDescription, categoryName } = action;
+    yield call(() => createNote(categoryId, categoryName, noteDescription));
     console.log(action, 'Create note saga triggered');
   }
 }

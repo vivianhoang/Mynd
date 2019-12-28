@@ -2,17 +2,21 @@ import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import * as _ from 'lodash';
 import saga from './saga-service';
+import { ReduxState, ReduxActions } from '../models';
 
 const sagaMiddleware = createSagaMiddleware();
-const initialState = {
+const initialState: ReduxState = {
   categories: [],
+  notesByCategoryId: {},
 };
 
-const reducer = (state, action) => {
+const reducer = (state: ReduxState, action: ReduxActions) => {
   let newState = _.cloneDeep(state);
   switch (action.type) {
-    case 'GET_CATEGORIES':
-      console.log(action);
+    case 'SET_CATEGORIES':
+      {
+        newState.categories = action.categories;
+      }
       return newState;
     default:
       return newState;
@@ -25,6 +29,8 @@ const store = createStore(
   applyMiddleware(sagaMiddleware),
 );
 
-sagaMiddleware.run(saga);
+export const startSaga = () => {
+  sagaMiddleware.run(saga);
+};
 
 export default store;

@@ -5,12 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  Alert,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import FirebaseFirestore from '@react-native-firebase/firestore';
-import sharedAuthService from '../../services/auth-service';
-import sharedNavigationService from '../../services/navigation-service';
+import { useDispatch, useSelector } from 'react-redux';
+import { ReduxState, Categories, DispatchAction } from '../../models';
+import * as _ from 'lodash';
 
 interface CreateNoteProps {
   navigation: StackNavigationProp<any>;
@@ -20,31 +19,24 @@ export default (props: CreateNoteProps) => {
   const [categoryName, setCategoryName] = useState('');
   const [note, setNote] = useState('');
 
+  const existingCategories = useSelector<ReduxState, Categories>(
+    state => state.categories,
+  );
+
+  const dispatch = useDispatch<DispatchAction>();
+
   props.navigation.setOptions({
     headerRight: () => (
       <TouchableOpacity
-        onPress={async () => {
-          const categoriesRef = FirebaseFirestore().collection(
-            `users/${sharedAuthService.userId}/categories`,
-          );
-          const newCategoryId = categoriesRef.doc().id;
-          const noteRef = FirebaseFirestore().collection(
-            `users/${sharedAuthService.userId}/categories/${newCategoryId}/notes`,
-          );
-          const newNoteId = noteRef.doc().id;
-          try {
-            await categoriesRef
-              .doc(newCategoryId)
-              .set({ count: 1, id: newCategoryId, title: categoryName });
-            await noteRef
-              .doc(newNoteId)
-              .set({ description: note, id: newNoteId });
-
-            sharedNavigationService.goBack();
-          } catch (error) {
-            Alert.alert('Uh oh!', error.message);
-          }
-          // await FirebaseFirestore().collection(`users/${sharedAuthService.userId}/categories/`).doc(userId).set({});
+        onPress={() => {
+          const category = _.find(existingCategories, category => {
+            return category.title === categoryName;
+          });
+          dispatch({
+            type: 'CREATE_NOTE',
+            categoryName: categoryName,
+            categoryId: category?.id,
+          });
         }}
       >
         <Text>{'Save'}</Text>

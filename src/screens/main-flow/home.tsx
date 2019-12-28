@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   StyleSheet,
@@ -7,26 +7,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
-import FirebaseFirestore from '@react-native-firebase/firestore';
 import sharedNavigationService from '../../services/navigation-service';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-interface Category {
-  id: string;
-  title: string;
-  count: number;
-}
-
-type Categories = Category[];
-
-interface HomeProps {
-  navigation: StackNavigationProp<any>;
-}
+import { Categories, HomeProps, ReduxState } from '../../models';
 
 export default (props: HomeProps) => {
-  const [categoryList, setCategoryList] = useState<Categories>([]);
-  const dispatch = useDispatch();
+  const categoryList = useSelector<ReduxState, Categories>(
+    state => state.categories,
+  );
 
   props.navigation.setOptions({
     headerRight: () => (
@@ -40,30 +29,7 @@ export default (props: HomeProps) => {
     ),
   });
 
-  const getCategories: () => () => void = () => {
-    const path = `users/${sharedAuthService.userId}/categories`;
-    const categoriesSnapshot = FirebaseFirestore()
-      .collection(path)
-      .onSnapshot(snapshot => {
-        if (!snapshot.empty) {
-          // adding type to the returned snapshot
-          const newCategoryList = snapshot.docs.map(snapshot => {
-            const category = snapshot.data() as Category;
-            return category;
-          });
-          setCategoryList(newCategoryList);
-        }
-      });
-    return categoriesSnapshot;
-  };
-
-  useEffect(() => {
-    const unsubscribe = getCategories();
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  console.log('RE RENDER HOME, TODO, MEMOIZE USE SELECTOR');
 
   return (
     <View style={styles.container}>
@@ -87,12 +53,6 @@ export default (props: HomeProps) => {
         onPress={() => sharedAuthService.logout()}
       >
         <Text>{'Logout'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => dispatch({ type: 'GET_CATEGORIES', payload: ['abc'] })}
-      >
-        <Text>{'trigger action'}</Text>
       </TouchableOpacity>
     </View>
   );

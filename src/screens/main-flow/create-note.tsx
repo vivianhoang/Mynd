@@ -6,44 +6,90 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { ReduxState, CategoriesById, DispatchAction } from '../../models';
+import {
+  ReduxState,
+  CategoriesById,
+  DispatchAction,
+  CreateNoteProps,
+} from '../../models';
 import * as _ from 'lodash';
-
-interface CreateNoteProps {
-  navigation: StackNavigationProp<any>;
-}
+import NavButton from '../../componets/nav-button';
+import sharedNavigationService from '../../services/navigation-service';
 
 export default (props: CreateNoteProps) => {
-  const [categoryName, setCategoryName] = useState('');
-  const [note, setNote] = useState('');
+  const existingNote = props.route.params?.note;
+  const existingCategory = props.route.params?.category;
+
+  const [categoryName, setCategoryName] = useState(
+    existingCategory?.title || '',
+  );
+  const [noteDescription, setNoteDescription] = useState(
+    existingNote?.description || '',
+  );
 
   const existingCategoriesById = useSelector<ReduxState, CategoriesById>(
     state => state.categoriesById,
   );
 
   const dispatch = useDispatch<DispatchAction>();
+  const rightNavLabel = existingNote ? 'Save' : 'Create';
+
+  const rightNavOnPress = () => {
+    if (existingNote) {
+      dispatch({
+        type: 'UPDATE_NOTE',
+        note: { id: existingNote.id, description: noteDescription },
+        categoryId: existingCategory.id,
+      });
+    } else {
+      const category = _.find(existingCategoriesById, category => {
+        return category.title === categoryName;
+      });
+      dispatch({
+        type: 'CREATE_NOTE',
+        categoryName: categoryName,
+        categoryId: category?.id,
+        noteDescription: noteDescription,
+      });
+    }
+  };
 
   props.navigation.setOptions({
     headerRight: () => (
-      <TouchableOpacity
+      <NavButton
+        onPress={rightNavOnPress}
+        title={rightNavLabel}
+        position={'right'}
+      />
+    ),
+    headerTitle: null,
+    headerLeft: () => (
+      <NavButton
         onPress={() => {
-          const category = _.find(existingCategoriesById, category => {
-            return category.title === categoryName;
-          });
-          dispatch({
-            type: 'CREATE_NOTE',
-            categoryName: categoryName,
-            categoryId: category?.id,
-            noteDescription: note,
-          });
+          sharedNavigationService.goBack();
         }}
-      >
-        <Text>{'Save'}</Text>
-      </TouchableOpacity>
+        title={'Back'}
+        position={'left'}
+      />
     ),
   });
+
+  const deleteButton = existingNote ? (
+    <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={() => {
+        dispatch({
+          type: 'DELETE_NOTE',
+          categoryId: existingCategory.id,
+          noteId: existingNote.id,
+        });
+      }}
+    >
+      <Text>{'Delete'}</Text>
+    </TouchableOpacity>
+  ) : null;
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -53,9 +99,10 @@ export default (props: CreateNoteProps) => {
       ></TextInput>
       <TextInput
         style={styles.noteInput}
-        value={note}
-        onChangeText={text => setNote(text)}
+        value={noteDescription}
+        onChangeText={text => setNoteDescription(text)}
       ></TextInput>
+      {deleteButton}
     </View>
   );
 };
@@ -72,5 +119,11 @@ const styles = StyleSheet.create({
   noteInput: {
     height: 50,
     backgroundColor: 'blue',
+  },
+  deleteButton: {
+    height: 50,
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
   },
 });

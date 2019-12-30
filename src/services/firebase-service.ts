@@ -19,17 +19,54 @@ export const createNote = async (
     `users/${userId}/categories/${newCategoryId}/notes`,
   );
   const newNoteId = noteRef.doc().id;
-  try {
-    await categoriesRef
-      .doc(newCategoryId)
-      .set({ id: newCategoryId, title: categoryName });
-    await noteRef
-      .doc(newNoteId)
-      .set({ description: noteDescription, id: newNoteId });
 
-    sharedNavigationService.goBack();
+  const batch = FirebaseFirestore().batch();
+  batch.set(categoriesRef.doc(newCategoryId), {
+    id: newCategoryId,
+    title: categoryName,
+  });
+  batch.set(noteRef.doc(newNoteId), {
+    description: noteDescription,
+    id: newNoteId,
+  });
+  try {
+    await batch.commit();
   } catch (error) {
     console.log('Failed to create note!', error.message);
+  }
+};
+
+export const updateNote = async (
+  categoryId: string,
+  note: Note,
+  userId: string,
+) => {
+  const noteRef = FirebaseFirestore().doc(
+    `users/${userId}/categories/${categoryId}/notes/${note.id}`,
+  );
+
+  try {
+    await noteRef.update(note);
+  } catch (error) {
+    console.log('Failed to update note!', error.message);
+  }
+};
+
+export const deleteNote = async (
+  noteId: string,
+  categoryId: string,
+  userId: string,
+) => {
+  const noteRef = FirebaseFirestore().doc(
+    `users/${userId}/categories/${categoryId}/notes/${noteId}`,
+  );
+
+  try {
+    console.log(noteRef);
+    await noteRef.delete();
+    console.log(noteRef, 'AfterDelete');
+  } catch (error) {
+    console.log('Failed to update note!', error.message);
   }
 };
 
@@ -54,6 +91,7 @@ export const subscribeToCategories = (
         );
         onTrigger(catgoriesById);
       } else {
+        onTrigger({});
         console.log('No categories!');
       }
     });
@@ -77,6 +115,7 @@ export const subscribeToCategory = (
         onTrigger(newNotesList);
         console.log('ANTHING');
       } else {
+        onTrigger([]);
         console.log('No notes!');
       }
     });

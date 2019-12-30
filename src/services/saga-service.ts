@@ -6,7 +6,10 @@ import {
   subscribeToCategories,
   subscribeToCategory,
   unsubscribeFromId,
+  updateNote,
+  deleteNote,
 } from './firebase-service';
+import sharedNavigationService from './navigation-service';
 
 const categoriesChannel = channel();
 function* getCategories() {
@@ -34,6 +37,17 @@ function* takeCreateNote() {
     yield call(() =>
       createNote(categoryId, categoryName, noteDescription, userId),
     );
+    sharedNavigationService.goBack();
+  }
+}
+
+function* takeUpdateNote() {
+  while (true) {
+    const action = yield take('UPDATE_NOTE');
+    const { note, categoryId } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => updateNote(categoryId, note, userId));
+    sharedNavigationService.goBack();
   }
 }
 
@@ -73,11 +87,23 @@ function* takeUnsubscribeCategory() {
   }
 }
 
+function* takeDeleteNote() {
+  while (true) {
+    const action = yield take('DELETE_NOTE');
+    const { noteId, categoryId } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => deleteNote(noteId, categoryId, userId));
+    sharedNavigationService.goBack();
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     takeCategoriesChannel(),
     getCategories(),
     takeCreateNote(),
+    takeUpdateNote(),
+    takeDeleteNote(),
     takeSubscribeToCategory(),
     takeCategoryChannel(),
     takeUnsubscribeCategory(),

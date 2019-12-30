@@ -6,6 +6,7 @@ import {
   ReduxState,
   Notes,
   CategoryProps,
+  Category,
 } from '../../../models';
 import sharedNavigationService from '../../../services/navigation-service';
 
@@ -15,12 +16,12 @@ export default (props: CategoryProps) => {
   const noteList = useSelector<ReduxState, Notes>(
     state => state.notesByCategoryId[categoryId],
   );
-  const categoryName = useSelector<ReduxState, string>(state => {
-    return state.categoriesById[categoryId].title;
+  const category = useSelector<ReduxState, Category>(state => {
+    return state.categoriesById[categoryId];
   });
 
   props.navigation.setOptions({
-    headerTitle: categoryName,
+    headerTitle: category.title,
     headerLeft: () => (
       <TouchableOpacity
         onPress={() => {
@@ -28,6 +29,18 @@ export default (props: CategoryProps) => {
         }}
       >
         <Text>{'Back'}</Text>
+      </TouchableOpacity>
+    ),
+    headerRight: () => (
+      <TouchableOpacity
+        onPress={() => {
+          sharedNavigationService.navigate({
+            page: 'CreateNote',
+            props: { category },
+          });
+        }}
+      >
+        <Text>{'Add'}</Text>
       </TouchableOpacity>
     ),
   });
@@ -48,10 +61,13 @@ export default (props: CategoryProps) => {
         <TouchableOpacity
           style={{ height: 50, backgroundColor: 'red' }}
           onPress={() => {
-            // sharedNavigationService.navigate({
-            //   page: 'CategoryFlow',
-            //   props: { categoryId: item.id },
-            // });
+            sharedNavigationService.navigate({
+              page: 'CreateNote',
+              props: {
+                category,
+                note: item,
+              },
+            });
           }}
         >
           <Text>{item.description}</Text>

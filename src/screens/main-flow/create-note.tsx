@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useDispatch, useSelector } from 'react-redux';
-import { ReduxState, Categories, DispatchAction } from '../../models';
+import { ReduxState, CategoriesById, DispatchAction } from '../../models';
 import * as _ from 'lodash';
 
 interface CreateNoteProps {
@@ -19,8 +19,8 @@ export default (props: CreateNoteProps) => {
   const [categoryName, setCategoryName] = useState('');
   const [note, setNote] = useState('');
 
-  const existingCategories = useSelector<ReduxState, Categories>(
-    state => state.categories,
+  const existingCategoriesById = useSelector<ReduxState, CategoriesById>(
+    state => state.categoriesById,
   );
 
   const dispatch = useDispatch<DispatchAction>();
@@ -29,7 +29,7 @@ export default (props: CreateNoteProps) => {
     headerRight: () => (
       <TouchableOpacity
         onPress={() => {
-          const category = _.find(existingCategories, category => {
+          const category = _.find(existingCategoriesById, category => {
             return category.title === categoryName;
           });
           dispatch({

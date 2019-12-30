@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, TouchableOpacity, Text, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  Alert,
+} from 'react-native';
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 
@@ -9,21 +16,36 @@ export default () => {
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Email" value={email} onChangeText={(text) => { setEmail(text) }} />
-      <TextInput placeholder="Password" value={password} onChangeText={(password) => {setPassword(password)}} />
-      <TouchableOpacity style={styles.button} onPress={async() => {
-        try {
-          await sharedAuthService.login(email, password);
-          sharedNavigationService.navigate('MainFlow');
-        } catch (error) {
-          Alert.alert("Uh oh!", error.message)
-        }
-      }}>
-        <Text>{"Login"}</Text>
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={text => {
+          setEmail(text);
+        }}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={password => {
+          setPassword(password);
+        }}
+      />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={async () => {
+          try {
+            await sharedAuthService.login(email, password);
+            sharedNavigationService.navigate({ page: 'MainFlow' });
+          } catch (error) {
+            Alert.alert('Uh oh!', error.message);
+          }
+        }}
+      >
+        <Text>{'Login'}</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -35,6 +57,6 @@ const styles = StyleSheet.create({
     height: 50,
     backgroundColor: 'red',
     justifyContent: 'center',
-    alignItems: 'center'
-  }
-})
+    alignItems: 'center',
+  },
+});

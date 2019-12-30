@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, InteractionManager } from 'react-native';
-import sharedAuthService from '../../services/auth-service'
+import sharedAuthService from '../../services/auth-service';
 
 export default () => {
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
       // Run after animation or navigation system is mounted
-      sharedAuthService.initialize()
+      sharedAuthService.initialize();
     });
-  }, [])
+  }, []);
 
-  return <View style={styles.container}></View>
-}
+  return <View style={styles.container}></View>;
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'teal',
-  }
-})
+  },
+});

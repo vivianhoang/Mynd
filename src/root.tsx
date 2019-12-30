@@ -29,6 +29,9 @@ function MainFlow() {
       <MainStack.Screen
         name="CategoryFlow"
         component={CategoryFlow}
+        options={{
+          headerShown: false,
+        }}
       ></MainStack.Screen>
     </MainStack.Navigator>
   );
@@ -53,15 +56,13 @@ function AuthFlow() {
   );
 }
 
-function CategoryFlow() {
+function CategoryFlow(props) {
   return (
-    <CategoryStack.Navigator
-      initialRouteName="Category"
-      screenOptions={{ headerShown: false }}
-    >
+    <CategoryStack.Navigator initialRouteName="Category">
       <CategoryStack.Screen
         name="Category"
         component={category}
+        initialParams={props.route.params}
       ></CategoryStack.Screen>
       <CategoryStack.Screen
         name="CategorySetting"

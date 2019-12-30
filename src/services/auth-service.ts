@@ -1,22 +1,25 @@
-import FirebaseAuth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import FirebaseAuth from '@react-native-firebase/auth';
 import sharedNavigationService from './navigation-service';
 import FirebaseFirestore from '@react-native-firebase/firestore';
 import { startSaga } from './redux-service';
+import store from './redux-service';
 
 class AuthService {
-  userId: string;
+  setUser(userId: string) {
+    store.dispatch({ type: 'SET_USER', userId });
+  }
 
   async initialize() {
     const user = FirebaseAuth().currentUser;
 
     if (user) {
-      this.userId = user.uid;
+      this.setUser(user.uid);
       // user is signed in
-      sharedNavigationService.navigate('MainFlow');
+      sharedNavigationService.navigate({ page: 'MainFlow' });
       startSaga();
     } else {
       // user is not signed in
-      sharedNavigationService.navigate('Landing');
+      sharedNavigationService.navigate({ page: 'Landing' });
     }
   }
 
@@ -33,14 +36,14 @@ class AuthService {
       email,
       password,
     );
-    this.userId = userCredential.user.uid;
+    this.setUser(userCredential.user.uid);
     startSaga();
   }
 
   logout() {
     FirebaseAuth().signOut();
-    this.userId = undefined;
-    sharedNavigationService.navigate('Landing');
+    this.setUser(undefined);
+    sharedNavigationService.navigate({ page: 'Landing' });
   }
 
   async createNewUser(userId: string) {
@@ -48,7 +51,7 @@ class AuthService {
       .collection('users')
       .doc(userId)
       .set({});
-    this.userId = userId;
+    this.setUser(userId);
     startSaga();
   }
 }

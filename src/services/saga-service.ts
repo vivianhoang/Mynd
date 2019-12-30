@@ -1,39 +1,25 @@
-import { all, take, put, call } from 'redux-saga/effects';
-import FirebaseFirestore from '@react-native-firebase/firestore';
-import sharedAuthService from './auth-service';
-import { Category, ReduxActions } from '../models';
+import { all, take, put, call, select } from 'redux-saga/effects';
+import { ReduxState, ReduxActions } from '../models';
 import { channel } from 'redux-saga';
-import { createNote } from './firebase-service';
-
-function* initialize() {
-  console.log('Initialize app');
-  subscribeToCategories();
-}
+import {
+  createNote,
+  subscribeToCategories,
+  subscribeToCategory,
+  unsubscribeFromId,
+} from './firebase-service';
 
 const categoriesChannel = channel();
-function subscribeToCategories() {
-  const path = `users/${sharedAuthService.userId}/categories`;
-  const categoriesSnapshot = FirebaseFirestore()
-    .collection(path)
-    .onSnapshot(snapshot => {
-      if (!snapshot.empty) {
-        // adding type to the returned snapshot
-        const newCategoryList = snapshot.docs.map(snapshot => {
-          const category = snapshot.data() as Category;
-          return category;
-        });
-        categoriesChannel.put({
-          type: 'SET_CATEGORIES',
-          categories: newCategoryList,
-        } as ReduxActions);
-      } else {
-        console.log('No categories!');
-      }
-    });
-  return categoriesSnapshot;
+function* getCategories() {
+  const userId: string = yield select((state: ReduxState) => state.userId);
+  subscribeToCategories(categoriesById => {
+    categoriesChannel.put({
+      type: 'SET_CATEGORIES_BY_ID',
+      categoriesById,
+    } as ReduxActions);
+  }, userId);
 }
 
-function* watchCategoriesChannel() {
+function* takeCategoriesChannel() {
   while (true) {
     const action = yield take(categoriesChannel);
     yield put(action);
@@ -44,11 +30,56 @@ function* takeCreateNote() {
   while (true) {
     const action = yield take('CREATE_NOTE');
     const { categoryId, noteDescription, categoryName } = action;
-    yield call(() => createNote(categoryId, categoryName, noteDescription));
-    console.log(action, 'Create note saga triggered');
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() =>
+      createNote(categoryId, categoryName, noteDescription, userId),
+    );
+  }
+}
+
+const categoryChannel = channel();
+function* takeSubscribeToCategory() {
+  while (true) {
+    const action = yield take('SUBSCRIBE_TO_CATEGORY');
+    const { categoryId } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+
+    subscribeToCategory(
+      notes => {
+        categoryChannel.put({
+          type: 'SET_NOTES_BY_CATEGORY_ID',
+          notes,
+          categoryId,
+        } as ReduxActions);
+      },
+      userId,
+      categoryId,
+    );
+  }
+}
+
+function* takeCategoryChannel() {
+  while (true) {
+    const action = yield take(categoryChannel);
+    yield put(action);
+  }
+}
+
+function* takeUnsubscribeCategory() {
+  while (true) {
+    const action = yield take('UNSUBSCRIBE_FROM_CATEGORY');
+    const { categoryId } = action;
+    unsubscribeFromId(categoryId);
   }
 }
 
 export default function* rootSaga() {
-  yield all([initialize(), watchCategoriesChannel(), takeCreateNote()]);
+  yield all([
+    takeCategoriesChannel(),
+    getCategories(),
+    takeCreateNote(),
+    takeSubscribeToCategory(),
+    takeCategoryChannel(),
+    takeUnsubscribeCategory(),
+  ]);
 }

@@ -9,19 +9,20 @@ import {
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 import { useSelector } from 'react-redux';
+import * as _ from 'lodash';
 
-import { Categories, HomeProps, ReduxState } from '../../models';
+import { CategoriesById, HomeProps, ReduxState } from '../../models';
 
 export default (props: HomeProps) => {
-  const categoryList = useSelector<ReduxState, Categories>(
-    state => state.categories,
+  const categoriesById = useSelector<ReduxState, CategoriesById>(
+    state => state.categoriesById,
   );
 
   props.navigation.setOptions({
     headerRight: () => (
       <TouchableOpacity
         onPress={() => {
-          sharedNavigationService.navigate('CreateNote');
+          sharedNavigationService.navigate({ page: 'CreateNote' });
         }}
       >
         <Text>{'Add'}</Text>
@@ -34,19 +35,26 @@ export default (props: HomeProps) => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={categoryList}
-        keyExtractor={category => category.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={{ height: 50, backgroundColor: 'red' }}
-            onPress={() => {
-              sharedNavigationService.navigate('CategoryFlow');
-            }}
-          >
-            <Text>{item.title}</Text>
-            <Text>{item.count}</Text>
-          </TouchableOpacity>
-        )}
+        data={Object.keys(categoriesById)}
+        keyExtractor={id => id}
+        renderItem={({ item }) => {
+          const category = categoriesById[item];
+          return (
+            <TouchableOpacity
+              style={{ height: 50, backgroundColor: 'red' }}
+              onPress={() => {
+                sharedNavigationService.navigate({
+                  page: 'CategoryFlow',
+                  props: {
+                    categoryId: item,
+                  },
+                });
+              }}
+            >
+              <Text>{category.title}</Text>
+            </TouchableOpacity>
+          );
+        }}
       ></FlatList>
       <TouchableOpacity
         style={styles.button}

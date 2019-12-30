@@ -62,11 +62,21 @@ export const deleteNote = async (
   );
 
   try {
-    console.log(noteRef);
     await noteRef.delete();
-    console.log(noteRef, 'AfterDelete');
   } catch (error) {
     console.log('Failed to update note!', error.message);
+  }
+};
+
+export const deleteCategory = async (categoryId: string, userId: string) => {
+  const categoryRef = FirebaseFirestore().doc(
+    `users/${userId}/categories/${categoryId}`,
+  );
+
+  try {
+    await categoryRef.delete();
+  } catch (error) {
+    console.log('Failed to delete category!', error.message);
   }
 };
 

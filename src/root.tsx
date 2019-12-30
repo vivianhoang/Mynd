@@ -63,7 +63,7 @@ function CategoryFlow(props: CategoryProps) {
         initialParams={props.route.params}
       ></CategoryStack.Screen>
       <CategoryStack.Screen
-        name="CategorySetting"
+        name="CategorySettings"
         component={categorySettings}
       ></CategoryStack.Screen>
     </CategoryStack.Navigator>

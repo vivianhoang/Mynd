@@ -54,6 +54,11 @@ export interface DeleteNote {
   categoryId: string;
 }
 
+export interface DeleteCategory {
+  type: 'DELETE_CATEGORY';
+  categoryId: string;
+}
+
 export interface SetUser {
   type: 'SET_USER';
   userId: string;
@@ -80,6 +85,7 @@ export type ReduxActions =
   | CreateNote
   | UpdateNote
   | DeleteNote
+  | DeleteCategory
   | SetUser
   | SubscribeToCategory
   | UnsubscribeFromCategory
@@ -97,8 +103,12 @@ export interface LoginPage {
   page: 'Login';
 }
 
-export interface HomePage {
+export interface MainPage {
   page: 'MainFlow';
+}
+
+export interface HomePage {
+  page: 'Home';
 }
 
 export interface LandingPage {
@@ -114,17 +124,25 @@ export interface SignupPage {
   page: 'Signup';
 }
 
+export interface CategorySettingsPage {
+  page: 'CategorySettings';
+  props: RouteParams['CategorySettings'];
+}
+
 export type NavigationActions =
   | CategoryPage
   | LoginPage
+  | MainPage
   | HomePage
   | LandingPage
   | CreateNotePage
-  | SignupPage;
+  | SignupPage
+  | CategorySettingsPage;
 
 type RouteParams = {
   Category: { categoryId: string };
   CreateNote: { category?: Category; note?: Note };
+  CategorySettings: { category: Category };
 };
 
 //---------Component-based interfaces-----------//
@@ -141,4 +159,9 @@ export interface CategoryProps {
 export interface CreateNoteProps {
   navigation: StackNavigationProp<any>;
   route: RouteProp<RouteParams, 'CreateNote'>;
+}
+
+export interface CategorySettingsProps {
+  navigation: StackNavigationProp<any>;
+  route: RouteProp<RouteParams, 'CategorySettings'>;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FlatList, TouchableOpacity, Text } from 'react-native';
+import { FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DispatchAction,
@@ -9,6 +9,7 @@ import {
   Category,
 } from '../../../models';
 import sharedNavigationService from '../../../services/navigation-service';
+import NavButton from '../../../componets/nav-button';
 
 export default (props: CategoryProps) => {
   const categoryId: string = props.route.params.categoryId;
@@ -20,16 +21,30 @@ export default (props: CategoryProps) => {
     return state.categoriesById[categoryId];
   });
 
+  const categorySettingsButton = (
+    <TouchableOpacity
+      style={styles.categorySettingsButton}
+      onPress={() => {
+        sharedNavigationService.navigate({
+          page: 'CategorySettings',
+          props: { category },
+        });
+      }}
+    >
+      <Text style={styles.categoryLabel}>{`${category?.title} v`}</Text>
+    </TouchableOpacity>
+  );
+
   props.navigation.setOptions({
-    headerTitle: category.title,
+    headerTitle: () => categorySettingsButton,
     headerLeft: () => (
-      <TouchableOpacity
+      <NavButton
         onPress={() => {
           sharedNavigationService.goBack();
         }}
-      >
-        <Text>{'Back'}</Text>
-      </TouchableOpacity>
+        title={'Back'}
+        position={'left'}
+      />
     ),
     headerRight: () => (
       <TouchableOpacity
@@ -76,3 +91,12 @@ export default (props: CategoryProps) => {
     ></FlatList>
   );
 };
+
+const styles = StyleSheet.create({
+  categorySettingsButton: {
+    justifyContent: 'center',
+  },
+  categoryLabel: {
+    fontWeight: 'bold',
+  },
+});

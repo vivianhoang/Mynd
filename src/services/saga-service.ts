@@ -8,6 +8,7 @@ import {
   unsubscribeFromId,
   updateNote,
   deleteNote,
+  deleteCategory,
 } from './firebase-service';
 import sharedNavigationService from './navigation-service';
 
@@ -97,6 +98,16 @@ function* takeDeleteNote() {
   }
 }
 
+function* takeDeleteCategory() {
+  while (true) {
+    const action = yield take('DELETE_CATEGORY');
+    const { categoryId } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => deleteCategory(categoryId, userId));
+    sharedNavigationService.navigate({ page: 'Home' });
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     takeCategoriesChannel(),
@@ -104,6 +115,7 @@ export default function* rootSaga() {
     takeCreateNote(),
     takeUpdateNote(),
     takeDeleteNote(),
+    takeDeleteCategory(),
     takeSubscribeToCategory(),
     takeCategoryChannel(),
     takeUnsubscribeCategory(),

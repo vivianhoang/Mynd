@@ -165,3 +165,11 @@ export interface CategorySettingsProps {
   navigation: StackNavigationProp<any>;
   route: RouteProp<RouteParams, 'CategorySettings'>;
 }
+
+export interface LoginProps {
+  navigation: StackNavigationProp<any>;
+}
+
+export interface SignupProps {
+  navigation: StackNavigationProp<any>;
+}

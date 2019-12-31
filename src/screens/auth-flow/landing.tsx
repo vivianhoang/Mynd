@@ -1,22 +1,29 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
+import colors from '../../utils/colors';
+import BigButton from '../../componets/big-button';
 
 export default () => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.button}
+      <View style={styles.logoContainer}>
+        <Image
+          style={styles.logo}
+          source={require('../../assets/logo.png')}
+          resizeMode={'contain'}
+        />
+      </View>
+      <BigButton
+        title={'Login'}
         onPress={() => sharedNavigationService.navigate({ page: 'Login' })}
-      >
-        <Text>{'Login'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
+      />
+      <View style={{ height: 8 }} />
+      <BigButton
+        title={'Signup'}
+        type={'third'}
         onPress={() => sharedNavigationService.navigate({ page: 'Signup' })}
-      >
-        <Text>{'Signup'}</Text>
-      </TouchableOpacity>
+      />
     </View>
   );
 };
@@ -24,14 +31,18 @@ export default () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'blue',
+    backgroundColor: colors.white,
     justifyContent: 'flex-end',
+    padding: 16,
   },
-  button: {
-    height: 50,
-    marginBottom: 16,
-    backgroundColor: 'red',
+  logoContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  logo: {
+    height: 100,
+    width: 100,
+    marginBottom: 200,
   },
 });

@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { DispatchAction } from '../../../models';
 import { CategorySettingsProps } from '../../../models';
+import HiveText from '../../../componets/hive-text';
 
 export default (props: CategorySettingsProps) => {
   const category = props.route.params.category;
@@ -10,8 +11,8 @@ export default (props: CategorySettingsProps) => {
 
   const headerLabel = (
     <View style={styles.headerLabelContainer}>
-      <Text style={styles.headerLabel}>{`${category.title}`}</Text>
-      <Text style={styles.headerSubTitleLabel}>{'Settings'}</Text>
+      <HiveText style={styles.headerLabel}>{`${category.title}`}</HiveText>
+      <HiveText style={styles.headerSubTitleLabel}>{'Settings'}</HiveText>
     </View>
   );
 
@@ -48,7 +49,7 @@ export default (props: CategorySettingsProps) => {
           );
         }}
       >
-        <Text style={styles.deleteLabel}>{'Delete'}</Text>
+        <HiveText style={styles.deleteLabel}>{'Delete'}</HiveText>
       </TouchableOpacity>
     </View>
   );

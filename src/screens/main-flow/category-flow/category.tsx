@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DispatchAction,
@@ -10,6 +10,7 @@ import {
 } from '../../../models';
 import sharedNavigationService from '../../../services/navigation-service';
 import NavButton from '../../../componets/nav-button';
+import HiveText from '../../../componets/hive-text';
 
 export default (props: CategoryProps) => {
   const categoryId: string = props.route.params.categoryId;
@@ -31,7 +32,7 @@ export default (props: CategoryProps) => {
         });
       }}
     >
-      <Text style={styles.categoryLabel}>{`${category?.title} v`}</Text>
+      <HiveText style={styles.categoryLabel}>{`${category?.title} v`}</HiveText>
     </TouchableOpacity>
   );
 
@@ -55,7 +56,7 @@ export default (props: CategoryProps) => {
           });
         }}
       >
-        <Text>{'Add'}</Text>
+        <HiveText>{'Add'}</HiveText>
       </TouchableOpacity>
     ),
   });
@@ -85,7 +86,7 @@ export default (props: CategoryProps) => {
             });
           }}
         >
-          <Text>{item.description}</Text>
+          <HiveText>{item.description}</HiveText>
         </TouchableOpacity>
       )}
     ></FlatList>

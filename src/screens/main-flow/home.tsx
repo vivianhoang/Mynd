@@ -5,6 +5,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
@@ -27,6 +28,13 @@ export default (props: HomeProps) => {
       >
         <Text>{'Add'}</Text>
       </TouchableOpacity>
+    ),
+    headerTitle: () => (
+      <Image
+        style={styles.logo}
+        source={require('../../assets/logo.png')}
+        resizeMode={'contain'}
+      />
     ),
   });
 
@@ -76,5 +84,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'blue',
+  },
+  logo: {
+    height: 44,
+    width: 44,
   },
 });

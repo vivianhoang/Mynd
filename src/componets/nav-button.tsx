@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import HiveText from './hive-text';
 
 export interface NavButtonProps {
   onPress: () => void;
@@ -15,7 +16,7 @@ export default (props: NavButtonProps) => {
       onPress={props.onPress}
       style={[style.common, positionStyle]}
     >
-      <Text>{props.title}</Text>
+      <HiveText style={style.label}>{props.title}</HiveText>
     </TouchableOpacity>
   );
 };
@@ -30,5 +31,8 @@ const style = StyleSheet.create({
   rightButton: {
     alignItems: 'flex-end',
     paddingRight: 16,
+  },
+  label: {
+    fontSize: 18,
   },
 });

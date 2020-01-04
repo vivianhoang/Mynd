@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, InteractionManager } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
+import colors from '../../utils/colors';
 
 export default () => {
   useEffect(() => {
@@ -16,6 +17,6 @@ export default () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'teal',
+    backgroundColor: colors.white,
   },
 });

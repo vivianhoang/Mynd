@@ -13,6 +13,7 @@ import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
 import { CategoryProps } from './models';
+import colors from './utils/colors';
 
 const ModalStack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -22,7 +23,10 @@ const CategoryStack = createStackNavigator();
 
 function MainFlow() {
   return (
-    <MainStack.Navigator initialRouteName="Home">
+    <MainStack.Navigator
+      initialRouteName="Home"
+      screenOptions={{ headerStyle: { shadowColor: 'transparent' } }}
+    >
       <MainStack.Screen name="Home" component={home}></MainStack.Screen>
       <MainStack.Screen
         name="CategoryFlow"
@@ -37,7 +41,10 @@ function MainFlow() {
 
 function AuthFlow() {
   return (
-    <AuthStack.Navigator initialRouteName="Splash">
+    <AuthStack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
+    >
       <AuthStack.Screen
         name="Splash"
         component={splash}
@@ -56,7 +63,10 @@ function AuthFlow() {
 
 function CategoryFlow(props: CategoryProps) {
   return (
-    <CategoryStack.Navigator initialRouteName="Category">
+    <CategoryStack.Navigator
+      initialRouteName="Category"
+      screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
+    >
       <CategoryStack.Screen
         name="Category"
         component={category}
@@ -84,7 +94,11 @@ function RootFlow() {
 
 function ModalFlow() {
   return (
-    <ModalStack.Navigator initialRouteName={'RootFlow'} mode={'modal'}>
+    <ModalStack.Navigator
+      initialRouteName={'RootFlow'}
+      mode={'modal'}
+      screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
+    >
       <ModalStack.Screen
         name={'RootFlow'}
         component={RootFlow}

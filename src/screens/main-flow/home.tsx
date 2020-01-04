@@ -2,7 +2,6 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Text,
   FlatList,
   TouchableOpacity,
   Image,
@@ -13,6 +12,11 @@ import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 
 import { CategoriesById, HomeProps, ReduxState } from '../../models';
+import NavButton from '../../componets/nav-button';
+import colors from '../../utils/colors';
+import HiveText from '../../componets/hive-text';
+import HiveTextInput from '../../componets/hive-text-input';
+import Icon from 'react-native-vector-icons/Feather';
 
 export default (props: HomeProps) => {
   const categoriesById = useSelector<ReduxState, CategoriesById>(
@@ -20,20 +24,18 @@ export default (props: HomeProps) => {
   );
 
   props.navigation.setOptions({
-    headerRight: () => (
-      <TouchableOpacity
-        onPress={() => {
-          sharedNavigationService.navigate({ page: 'CreateNote' });
-        }}
-      >
-        <Text>{'Add'}</Text>
-      </TouchableOpacity>
-    ),
     headerTitle: () => (
       <Image
         style={styles.logo}
         source={require('../../assets/logo.png')}
         resizeMode={'contain'}
+      />
+    ),
+    headerLeft: () => (
+      <NavButton
+        onPress={() => sharedAuthService.logout()}
+        icon={'log-out'}
+        position={'left'}
       />
     ),
   });
@@ -44,12 +46,25 @@ export default (props: HomeProps) => {
     <View style={styles.container}>
       <FlatList
         data={Object.keys(categoriesById)}
+        ListHeaderComponent={() => (
+          <HiveTextInput style={styles.searchInput} placeholder={'Search...'} />
+        )}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         keyExtractor={id => id}
-        renderItem={({ item }) => {
+        contentContainerStyle={{ padding: 16 }}
+        numColumns={2}
+        renderItem={({ item, index }) => {
           const category = categoriesById[item];
+          const isLeft = index % 2 == 0;
           return (
             <TouchableOpacity
-              style={{ height: 50, backgroundColor: 'red' }}
+              style={[
+                styles.categoryCard,
+                {
+                  marginLeft: isLeft ? 0 : 4,
+                  marginRight: isLeft ? 8 : 4,
+                },
+              ]}
               onPress={() => {
                 sharedNavigationService.navigate({
                   page: 'CategoryFlow',
@@ -59,16 +74,26 @@ export default (props: HomeProps) => {
                 });
               }}
             >
-              <Text>{category.title}</Text>
+              <View style={styles.cardBackground} />
+              <Image
+                source={require('../../assets/honey-comb.png')}
+                style={styles.cardBackgroundImage}
+                resizeMode={'cover'}
+              />
+              <HiveText numberOfLines={1} style={styles.cardLabel}>
+                {category.title.toUpperCase()}
+              </HiveText>
             </TouchableOpacity>
           );
         }}
       ></FlatList>
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => sharedAuthService.logout()}
+        onPress={() => {
+          sharedNavigationService.navigate({ page: 'CreateNote' });
+        }}
+        style={styles.addButton}
       >
-        <Text>{'Logout'}</Text>
+        <Icon name={'edit-3'} color={colors.offBlack} size={26} />
       </TouchableOpacity>
     </View>
   );
@@ -77,16 +102,47 @@ export default (props: HomeProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'yellow',
-  },
-  button: {
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'blue',
+    backgroundColor: colors.white,
   },
   logo: {
     height: 44,
     width: 44,
+  },
+  cardBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.honeyOrange,
+    borderRadius: 8,
+    opacity: 0.75,
+  },
+  cardBackgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.25,
+    height: null,
+    width: null,
+  },
+  categoryCard: {
+    height: 100,
+    justifyContent: 'flex-end',
+    padding: 16,
+    flex: 1,
+  },
+  cardLabel: {
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  searchInput: {
+    marginBottom: 16,
+  },
+  addButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    height: 60,
+    width: 60,
+    borderRadius: 999,
+    backgroundColor: colors.honeyOrange,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

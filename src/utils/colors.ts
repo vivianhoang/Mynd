@@ -5,4 +5,5 @@ export default {
   honeyYellow: '#feff3f',
   lightGray: '#ededed',
   white: '#ffffff',
+  teal: '#5ce6ba',
 };

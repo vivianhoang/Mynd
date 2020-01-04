@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { FlatList, TouchableOpacity, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DispatchAction,
@@ -11,6 +11,8 @@ import {
 import sharedNavigationService from '../../../services/navigation-service';
 import NavButton from '../../../componets/nav-button';
 import HiveText from '../../../componets/hive-text';
+import Icon from 'react-native-vector-icons/Feather';
+import colors from '../../../utils/colors';
 
 export default (props: CategoryProps) => {
   const categoryId: string = props.route.params.categoryId;
@@ -32,7 +34,13 @@ export default (props: CategoryProps) => {
         });
       }}
     >
-      <HiveText style={styles.categoryLabel}>{`${category?.title} v`}</HiveText>
+      <HiveText style={styles.categoryLabel}>{category?.title}</HiveText>
+      <Icon
+        name={'chevron-down'}
+        style={{ top: 2 }}
+        color={colors.darkGray}
+        size={20}
+      />
     </TouchableOpacity>
   );
 
@@ -43,21 +51,21 @@ export default (props: CategoryProps) => {
         onPress={() => {
           sharedNavigationService.goBack();
         }}
-        title={'Back'}
+        icon={'arrow-left'}
         position={'left'}
       />
     ),
     headerRight: () => (
-      <TouchableOpacity
+      <NavButton
         onPress={() => {
           sharedNavigationService.navigate({
             page: 'CreateNote',
             props: { category },
           });
         }}
-      >
-        <HiveText>{'Add'}</HiveText>
-      </TouchableOpacity>
+        icon={'edit-3'}
+        position={'right'}
+      />
     ),
   });
 
@@ -73,9 +81,14 @@ export default (props: CategoryProps) => {
     <FlatList
       data={noteList}
       keyExtractor={note => note.id}
+      contentContainerStyle={{ padding: 16 }}
+      style={styles.container}
+      ItemSeparatorComponent={() => {
+        return <View style={{ height: 8 }}></View>;
+      }}
       renderItem={({ item }) => (
         <TouchableOpacity
-          style={{ height: 50, backgroundColor: 'red' }}
+          style={styles.noteContainer}
           onPress={() => {
             sharedNavigationService.navigate({
               page: 'CreateNote',
@@ -86,6 +99,7 @@ export default (props: CategoryProps) => {
             });
           }}
         >
+          <View style={styles.noteBackground} />
           <HiveText>{item.description}</HiveText>
         </TouchableOpacity>
       )}
@@ -94,10 +108,27 @@ export default (props: CategoryProps) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
   categorySettingsButton: {
     justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   categoryLabel: {
     fontWeight: 'bold',
+    fontSize: 20,
+  },
+  noteContainer: {
+    minHeight: 80,
+    padding: 16,
+  },
+  noteBackground: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.honeyOrange,
+    borderRadius: 8,
+    opacity: 0.75,
   },
 });

@@ -4,6 +4,9 @@ import { useDispatch } from 'react-redux';
 import { DispatchAction } from '../../../models';
 import { CategorySettingsProps } from '../../../models';
 import HiveText from '../../../componets/hive-text';
+import NavButton from '../../../componets/nav-button';
+import sharedNavigationService from '../../../services/navigation-service';
+import colors from '../../../utils/colors';
 
 export default (props: CategorySettingsProps) => {
   const category = props.route.params.category;
@@ -11,13 +14,24 @@ export default (props: CategorySettingsProps) => {
 
   const headerLabel = (
     <View style={styles.headerLabelContainer}>
-      <HiveText style={styles.headerLabel}>{`${category.title}`}</HiveText>
+      <HiveText
+        style={styles.headerLabel}
+      >{`${category.title.toUpperCase()}`}</HiveText>
       <HiveText style={styles.headerSubTitleLabel}>{'Settings'}</HiveText>
     </View>
   );
 
   props.navigation.setOptions({
     headerTitle: () => headerLabel,
+    headerLeft: () => (
+      <NavButton
+        onPress={() => {
+          sharedNavigationService.goBack();
+        }}
+        icon={'arrow-left'}
+        position={'left'}
+      />
+    ),
   });
 
   return (
@@ -74,12 +88,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerLabel: {
-    fontWeight: 'bold',
+    fontSize: 12,
     textAlign: 'center',
   },
   headerSubTitleLabel: {
-    fontSize: 14,
-    color: 'grey',
+    fontSize: 16,
+    fontWeight: '700',
     textAlign: 'center',
   },
 });

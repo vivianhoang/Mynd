@@ -18,7 +18,7 @@ export default (props: LoginProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => sharedNavigationService.goBack()}
-        title={'Back'}
+        icon={'arrow-left'}
         position={'left'}
       />
     ),

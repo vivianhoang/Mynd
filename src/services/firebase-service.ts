@@ -21,10 +21,12 @@ export const createNote = async (
   const newNoteId = noteRef.doc().id;
 
   const batch = FirebaseFirestore().batch();
+
   batch.set(categoriesRef.doc(newCategoryId), {
     id: newCategoryId,
     title: categoryName,
   });
+
   batch.set(noteRef.doc(newNoteId), {
     description: noteDescription,
     id: newNoteId,

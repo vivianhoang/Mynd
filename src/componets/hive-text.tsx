@@ -8,12 +8,17 @@ interface Props extends TextProps {
 
 export default (props: Props) => {
   const { children, style } = props;
-  return <Text style={[styles.textLabel as any, style]}>{children}</Text>;
+  return (
+    <Text numberOfLines={4} style={[styles.textLabel as any, style]}>
+      {children}
+    </Text>
+  );
 };
 
 const styles = StyleSheet.create({
   textLabel: {
     fontFamily: 'Helvetica',
     color: colors.offBlack,
+    fontSize: 16,
   },
 });

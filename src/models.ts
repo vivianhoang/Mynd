@@ -37,9 +37,9 @@ export interface SetCategoriesById {
 
 export interface CreateNote {
   type: 'CREATE_NOTE';
-  categoryName: string;
+  categoryTitle: string;
   categoryId: string;
-  noteDescription: string;
+  noteDescription?: string;
 }
 
 export interface UpdateNote {
@@ -52,6 +52,11 @@ export interface DeleteNote {
   type: 'DELETE_NOTE';
   noteId: string;
   categoryId: string;
+}
+
+export interface UpdateCategory {
+  type: 'UPDATE_CATEGORY';
+  category: Category;
 }
 
 export interface DeleteCategory {
@@ -85,6 +90,7 @@ export type ReduxActions =
   | CreateNote
   | UpdateNote
   | DeleteNote
+  | UpdateCategory
   | DeleteCategory
   | SetUser
   | SubscribeToCategory

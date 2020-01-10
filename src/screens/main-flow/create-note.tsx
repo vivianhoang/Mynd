@@ -49,9 +49,10 @@ export default (props: CreateNoteProps) => {
       const category = _.find(existingCategoriesById, category => {
         return category.title === categoryName;
       });
+
       dispatch({
         type: 'CREATE_NOTE',
-        categoryName: categoryName,
+        categoryTitle: categoryName,
         categoryId: category?.id,
         noteDescription: noteDescription,
       });
@@ -74,6 +75,7 @@ export default (props: CreateNoteProps) => {
         title={rightNavLabel}
         position={'right'}
         color={colors.white}
+        isDisabled={categoryName.length == 0}
       />
     ),
     headerTitle: () => headerTitle,

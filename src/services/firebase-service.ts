@@ -1,5 +1,4 @@
 import FirebaseFirestore from '@react-native-firebase/firestore';
-import sharedNavigationService from './navigation-service';
 import { Category, CategoriesById, Notes, Note } from '../models';
 import * as _ from 'lodash';
 
@@ -15,22 +14,24 @@ export const createNote = async (
     `users/${userId}/categories`,
   );
   const newCategoryId = categoryId || categoriesRef.doc().id;
-  const noteRef = FirebaseFirestore().collection(
-    `users/${userId}/categories/${newCategoryId}/notes`,
-  );
-  const newNoteId = noteRef.doc().id;
 
   const batch = FirebaseFirestore().batch();
-
   batch.set(categoriesRef.doc(newCategoryId), {
     id: newCategoryId,
     title: categoryName,
   });
 
-  batch.set(noteRef.doc(newNoteId), {
-    description: noteDescription,
-    id: newNoteId,
-  });
+  if (noteDescription.length) {
+    const noteRef = FirebaseFirestore().collection(
+      `users/${userId}/categories/${newCategoryId}/notes`,
+    );
+    const newNoteId = noteRef.doc().id;
+    batch.set(noteRef.doc(newNoteId), {
+      description: noteDescription,
+      id: newNoteId,
+    });
+  }
+
   try {
     await batch.commit();
   } catch (error) {
@@ -51,6 +52,18 @@ export const updateNote = async (
     await noteRef.update(note);
   } catch (error) {
     console.log('Failed to update note!', error.message);
+  }
+};
+
+export const updateCategory = async (category: Category, userId: string) => {
+  const categoryRef = FirebaseFirestore().doc(
+    `users/${userId}/categories/${category?.id}`,
+  );
+
+  try {
+    await categoryRef.update(category);
+  } catch (error) {
+    console.log('Failed to update category name!', error.message);
   }
 };
 

@@ -9,6 +9,7 @@ import {
   updateNote,
   deleteNote,
   deleteCategory,
+  updateCategory,
 } from './firebase-service';
 import sharedNavigationService from './navigation-service';
 
@@ -33,10 +34,10 @@ function* takeCategoriesChannel() {
 function* takeCreateNote() {
   while (true) {
     const action = yield take('CREATE_NOTE');
-    const { categoryId, noteDescription, categoryName } = action;
+    const { categoryId, noteDescription, categoryTitle } = action;
     const userId: string = yield select((state: ReduxState) => state.userId);
     yield call(() =>
-      createNote(categoryId, categoryName, noteDescription, userId),
+      createNote(categoryId, categoryTitle, noteDescription, userId),
     );
     sharedNavigationService.goBack();
   }
@@ -49,6 +50,15 @@ function* takeUpdateNote() {
     const userId: string = yield select((state: ReduxState) => state.userId);
     yield call(() => updateNote(categoryId, note, userId));
     sharedNavigationService.goBack();
+  }
+}
+
+function* takeUpdateCategory() {
+  while (true) {
+    const action = yield take('UPDATE_CATEGORY');
+    const { category } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => updateCategory(category, userId));
   }
 }
 
@@ -115,6 +125,7 @@ export default function* rootSaga() {
     takeCreateNote(),
     takeUpdateNote(),
     takeDeleteNote(),
+    takeUpdateCategory(),
     takeDeleteCategory(),
     takeSubscribeToCategory(),
     takeCategoryChannel(),

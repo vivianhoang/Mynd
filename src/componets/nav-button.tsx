@@ -10,10 +10,11 @@ export interface NavButtonProps {
   icon?: string;
   position: 'left' | 'right';
   color?: string;
+  isDisabled?: boolean;
 }
 
 export default (props: NavButtonProps) => {
-  const { position, onPress, title, icon, color } = props;
+  const { position, onPress, title, icon, color, isDisabled } = props;
   const positionStyle =
     position === 'left' ? style.leftButton : style.rightButton;
   const content = title ? (
@@ -31,7 +32,11 @@ export default (props: NavButtonProps) => {
     <Icon name={icon} size={26} color={color || colors.offBlack} />
   ) : null;
   return (
-    <TouchableOpacity onPress={onPress} style={[style.common, positionStyle]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[style.common, positionStyle]}
+      disabled={isDisabled}
+    >
       {content}
     </TouchableOpacity>
   );

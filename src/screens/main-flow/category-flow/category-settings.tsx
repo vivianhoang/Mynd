@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { DispatchAction } from '../../../models';
@@ -6,11 +6,12 @@ import { CategorySettingsProps } from '../../../models';
 import HiveText from '../../../componets/hive-text';
 import NavButton from '../../../componets/nav-button';
 import sharedNavigationService from '../../../services/navigation-service';
-import colors from '../../../utils/colors';
+import HiveTextInput from '../../../componets/hive-text-input';
 
 export default (props: CategorySettingsProps) => {
   const category = props.route.params.category;
   const dispatch = useDispatch<DispatchAction>();
+  const [categoryTitle, setCategoryTitle] = useState(category?.title);
 
   const headerLabel = (
     <View style={styles.headerLabelContainer}>
@@ -26,6 +27,16 @@ export default (props: CategorySettingsProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => {
+          if (category?.title !== categoryTitle) {
+            dispatch({
+              type: 'UPDATE_CATEGORY',
+              category: {
+                id: category?.id,
+                title: categoryTitle,
+              },
+            });
+          }
+
           sharedNavigationService.goBack();
         }}
         icon={'arrow-left'}
@@ -36,6 +47,13 @@ export default (props: CategorySettingsProps) => {
 
   return (
     <View style={styles.container}>
+      <HiveTextInput
+        style={styles.input}
+        value={categoryTitle}
+        onChangeText={title => {
+          setCategoryTitle(title);
+        }}
+      />
       <TouchableOpacity
         style={styles.deleteButton}
         onPress={() => {
@@ -49,7 +67,9 @@ export default (props: CategorySettingsProps) => {
               {
                 text: 'Delete',
                 onPress: promptText => {
-                  if (promptText === category.title) {
+                  if (
+                    promptText.toUpperCase() === category.title.toUpperCase()
+                  ) {
                     dispatch({
                       type: 'DELETE_CATEGORY',
                       categoryId: category.id,
@@ -95,5 +115,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     textAlign: 'center',
+  },
+  input: {
+    marginBottom: 8,
   },
 });

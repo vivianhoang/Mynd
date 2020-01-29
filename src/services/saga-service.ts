@@ -34,10 +34,21 @@ function* takeCategoriesChannel() {
 function* takeCreateNote() {
   while (true) {
     const action = yield take('CREATE_NOTE');
-    const { categoryId, noteDescription, categoryTitle } = action;
+    const {
+      categoryId,
+      noteDescription,
+      noteTimestamp,
+      categoryTitle,
+    } = action;
     const userId: string = yield select((state: ReduxState) => state.userId);
     yield call(() =>
-      createNote(categoryId, categoryTitle, noteDescription, userId),
+      createNote(
+        categoryId,
+        categoryTitle,
+        noteDescription,
+        noteTimestamp,
+        userId,
+      ),
     );
     sharedNavigationService.goBack();
   }

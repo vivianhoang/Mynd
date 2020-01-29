@@ -7,6 +7,7 @@ import HiveText from '../../../componets/hive-text';
 import NavButton from '../../../componets/nav-button';
 import sharedNavigationService from '../../../services/navigation-service';
 import HiveTextInput from '../../../componets/hive-text-input';
+import colors from '../../../utils/colors';
 
 export default (props: CategorySettingsProps) => {
   const category = props.route.params.category;
@@ -47,6 +48,7 @@ export default (props: CategorySettingsProps) => {
 
   return (
     <View style={styles.container}>
+      <HiveText style={styles.categoryNameLabel}>{'Category Name'}</HiveText>
       <HiveTextInput
         style={styles.input}
         value={categoryTitle}
@@ -65,7 +67,7 @@ export default (props: CategorySettingsProps) => {
                 text: 'Cancel',
               },
               {
-                text: 'Delete',
+                text: 'Delete Forever',
                 onPress: promptText => {
                   if (
                     promptText.toUpperCase() === category.title.toUpperCase()
@@ -92,12 +94,19 @@ export default (props: CategorySettingsProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'green',
+    backgroundColor: colors.white,
+  },
+  categoryNameLabel: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+    padding: 8,
   },
   deleteButton: {
     height: 50,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    padding: 8,
   },
   deleteLabel: {
     color: 'red',
@@ -118,5 +127,9 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 8,
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.lightGray,
   },
 });

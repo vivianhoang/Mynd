@@ -8,6 +8,7 @@ export const createNote = async (
   categoryId: string,
   categoryName: string,
   noteDescription: string,
+  noteTimestamp: string,
   userId: string,
 ) => {
   const categoriesRef = FirebaseFirestore().collection(
@@ -29,6 +30,7 @@ export const createNote = async (
     batch.set(noteRef.doc(newNoteId), {
       description: noteDescription,
       id: newNoteId,
+      timestamp: noteTimestamp,
     });
   }
 

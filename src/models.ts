@@ -25,6 +25,7 @@ export interface CategoriesById {
 export interface Note {
   id: string;
   description: string;
+  timestamp: string;
 }
 
 export type Notes = Note[];
@@ -39,6 +40,7 @@ export interface CreateNote {
   type: 'CREATE_NOTE';
   categoryTitle: string;
   categoryId: string;
+  noteTimestamp: string;
   noteDescription?: string;
 }
 

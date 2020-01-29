@@ -11,7 +11,7 @@ import sharedNavigationService from '../../services/navigation-service';
 import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 
-import { CategoriesById, HomeProps, ReduxState } from '../../models';
+import { CategoriesById, HomeProps, ReduxState, Category } from '../../models';
 import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
@@ -22,6 +22,21 @@ export default (props: HomeProps) => {
   const categoriesById = useSelector<ReduxState, CategoriesById>(
     state => state.categoriesById,
   );
+  let sortedCategories: Category[] = [];
+
+  Object.keys(categoriesById).forEach(id => {
+    sortedCategories.push(categoriesById[id]);
+  });
+
+  sortedCategories.sort(function(categoryA, categoryB) {
+    const categoryAText = categoryA.title.toUpperCase();
+    const categoryBText = categoryB.title.toUpperCase();
+    return categoryAText < categoryBText
+      ? -1
+      : categoryAText > categoryBText
+      ? 1
+      : 0;
+  });
 
   props.navigation.setOptions({
     headerTitle: () => (
@@ -45,16 +60,16 @@ export default (props: HomeProps) => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={Object.keys(categoriesById)}
+        data={sortedCategories}
         ListHeaderComponent={() => (
           <HiveTextInput style={styles.searchInput} placeholder={'Search...'} />
         )}
         ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-        keyExtractor={id => id}
+        keyboardShouldPersistTaps={'always'}
         contentContainerStyle={{ padding: 16 }}
         numColumns={2}
         renderItem={({ item, index }) => {
-          const category = categoriesById[item];
+          const category = categoriesById[item.id];
           const isLeft = index % 2 == 0;
           return (
             <TouchableOpacity
@@ -69,7 +84,7 @@ export default (props: HomeProps) => {
                 sharedNavigationService.navigate({
                   page: 'CategoryFlow',
                   props: {
-                    categoryId: item,
+                    categoryId: item.id,
                   },
                 });
               }}

@@ -24,7 +24,7 @@ export default (props: CreateNoteProps) => {
   const existingNote = props.route.params?.note;
   const existingCategory = props.route.params?.category;
 
-  const [categoryName, setCategoryName] = useState(
+  const [categoryTitle, setCategoryTitle] = useState(
     existingCategory?.title || '',
   );
   const [noteDescription, setNoteDescription] = useState(
@@ -42,19 +42,30 @@ export default (props: CreateNoteProps) => {
     if (existingNote) {
       dispatch({
         type: 'UPDATE_NOTE',
-        note: { id: existingNote.id, description: noteDescription },
+        note: {
+          id: existingNote.id,
+          description: noteDescription,
+          timestamp: new Date().getTime().toString(),
+        },
         categoryId: existingCategory.id,
       });
     } else {
       const category = _.find(existingCategoriesById, category => {
-        return category.title === categoryName;
+        return category.title === categoryTitle;
       });
+
+      console.log(category, ' category info');
+
+      const newNoteDescription = noteDescription.length
+        ? noteDescription
+        : 'New Note';
 
       dispatch({
         type: 'CREATE_NOTE',
-        categoryTitle: categoryName,
+        categoryTitle: categoryTitle,
         categoryId: category?.id,
-        noteDescription: noteDescription,
+        noteTimestamp: new Date().getTime().toString(),
+        noteDescription: newNoteDescription,
       });
     }
   };
@@ -75,7 +86,7 @@ export default (props: CreateNoteProps) => {
         title={rightNavLabel}
         position={'right'}
         color={colors.white}
-        isDisabled={categoryName.length == 0}
+        isDisabled={categoryTitle.length == 0}
       />
     ),
     headerTitle: () => headerTitle,
@@ -121,8 +132,8 @@ export default (props: CreateNoteProps) => {
         <View style={styles.categoryInputContainer}>
           <HiveTextInput
             style={styles.categoryInput}
-            value={categoryName}
-            onChangeText={text => setCategoryName(text)}
+            value={categoryTitle}
+            onChangeText={text => setCategoryTitle(text)}
             placeholder={'Set category...'}
           ></HiveTextInput>
         </View>

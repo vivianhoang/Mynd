@@ -17,12 +17,22 @@ import colors from '../../../utils/colors';
 export default (props: CategoryProps) => {
   const categoryId: string = props.route.params.categoryId;
   const dispatch = useDispatch<DispatchAction>();
-  const noteList = useSelector<ReduxState, Notes>(
-    state => state.notesByCategoryId[categoryId],
-  );
   const category = useSelector<ReduxState, Category>(state => {
     return state.categoriesById[categoryId];
   });
+  const noteList = useSelector<ReduxState, Notes>(
+    state => state.notesByCategoryId[categoryId],
+  );
+  const sortedNoteList = noteList
+    ? noteList.sort(function(noteA, noteB) {
+        const timestampA = parseInt(noteA.timestamp);
+        const timestampB = parseInt(noteB.timestamp);
+
+        return timestampB - timestampA;
+      })
+    : [];
+
+  console.log(sortedNoteList);
 
   const categorySettingsButton = (
     <TouchableOpacity
@@ -79,7 +89,7 @@ export default (props: CategoryProps) => {
 
   return (
     <FlatList
-      data={noteList}
+      data={sortedNoteList}
       keyExtractor={note => note.id}
       contentContainerStyle={{ padding: 16 }}
       style={styles.container}

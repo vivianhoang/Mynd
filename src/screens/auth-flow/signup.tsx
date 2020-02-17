@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 import HiveTextInput from '../../componets/hive-text-input';
@@ -30,31 +36,39 @@ export default (props: SignupProps) => {
       <HiveText style={styles.headerLabel}>{'Signup'}</HiveText>
       <HiveTextInput
         style={styles.input}
-        placeholder="Email"
+        title="USERNAME OR EMAIL"
         value={email}
         onChangeText={text => {
           setEmail(text);
         }}
+        autoFocus={true}
       />
       <HiveTextInput
-        placeholder="Password"
+        title="PASSWORD"
         value={password}
         onChangeText={password => {
           setPassword(password);
         }}
       />
-      <BigButton
-        style={styles.button}
-        title={'Signup'}
-        onPress={async () => {
-          try {
-            await sharedAuthService.signup(email, password);
-            sharedNavigationService.navigate({ page: 'MainFlow' });
-          } catch (error) {
-            Alert.alert('Uh oh!', error.message);
-          }
-        }}
-      />
+      <View style={styles.fill} />
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: 'position', android: undefined })}
+        keyboardVerticalOffset={44 + 44 + 16}
+      >
+        <View style={styles.fill} />
+        <BigButton
+          style={styles.button}
+          title={'Signup'}
+          onPress={async () => {
+            try {
+              await sharedAuthService.signup(email, password);
+              sharedNavigationService.navigate({ page: 'MainFlow' });
+            } catch (error) {
+              Alert.alert('Uh oh!', error.message);
+            }
+          }}
+        />
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -63,15 +77,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    padding: 16,
+    padding: 32,
+  },
+  fill: {
+    flex: 1,
   },
   headerLabel: {
-    fontSize: 24,
+    color: colors.offBlack,
+    fontSize: 40,
     fontWeight: '700',
-    marginBottom: 24,
+    marginBottom: 32,
   },
   input: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   button: {
     marginTop: 24,

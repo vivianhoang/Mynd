@@ -17,6 +17,16 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* MyndTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* MyndTests.m */; };
 		9FEC191023B1AFE80068E2E3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */; };
+		9FF3EEBE23FA41C700A5E971 /* PulpDisplay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */; };
+		9FF3EEBF23FA41C700A5E971 /* PulpDisplay-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB523FA41C600A5E971 /* PulpDisplay-LightItalic.ttf */; };
+		9FF3EEC023FA41C700A5E971 /* PulpDisplay-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB623FA41C600A5E971 /* PulpDisplay-SemiBold.ttf */; };
+		9FF3EEC123FA41C700A5E971 /* PulpDisplay-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB723FA41C600A5E971 /* PulpDisplay-BoldItalic.ttf */; };
+		9FF3EEC223FA41C700A5E971 /* PulpDisplay-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB823FA41C600A5E971 /* PulpDisplay-SemiBoldItalic.ttf */; };
+		9FF3EEC323FA41C700A5E971 /* PulpDisplay-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB923FA41C600A5E971 /* PulpDisplay-Regular.ttf */; };
+		9FF3EEC423FA41C700A5E971 /* PulpDisplay-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBA23FA41C600A5E971 /* PulpDisplay-Light.ttf */; };
+		9FF3EEC523FA41C700A5E971 /* PulpDisplay-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBB23FA41C600A5E971 /* PulpDisplay-Medium.ttf */; };
+		9FF3EEC623FA41C700A5E971 /* PulpDisplay-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBC23FA41C600A5E971 /* PulpDisplay-MediumItalic.ttf */; };
+		9FF3EEC723FA41C700A5E971 /* PulpDisplay-RegularItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBD23FA41C600A5E971 /* PulpDisplay-RegularItalic.ttf */; };
 		A245A9B7848D0602546B1B4E /* libPods-Mynd-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B3090895F87D94D766F5971 /* libPods-Mynd-tvOS.a */; };
 		A4ECF7C33FD05A92619329C7 /* libPods-Mynd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2FB102EDA37D5731C698BCF /* libPods-Mynd.a */; };
 		EE9D9A6DF950CC742E75AF10 /* libPods-Mynd-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DD1078688B40BD6B099D390 /* libPods-Mynd-tvOSTests.a */; };
@@ -62,6 +72,16 @@
 		81F4175B89539899F9AD6DE5 /* Pods-MyndTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyndTests.release.xcconfig"; path = "Target Support Files/Pods-MyndTests/Pods-MyndTests.release.xcconfig"; sourceTree = "<group>"; };
 		838A796F9442A0A685180187 /* Pods-MyndTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyndTests.debug.xcconfig"; path = "Target Support Files/Pods-MyndTests/Pods-MyndTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-Bold.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-Bold.ttf"; sourceTree = "<group>"; };
+		9FF3EEB523FA41C600A5E971 /* PulpDisplay-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-LightItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-LightItalic.ttf"; sourceTree = "<group>"; };
+		9FF3EEB623FA41C600A5E971 /* PulpDisplay-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-SemiBold.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-SemiBold.ttf"; sourceTree = "<group>"; };
+		9FF3EEB723FA41C600A5E971 /* PulpDisplay-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-BoldItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-BoldItalic.ttf"; sourceTree = "<group>"; };
+		9FF3EEB823FA41C600A5E971 /* PulpDisplay-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-SemiBoldItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		9FF3EEB923FA41C600A5E971 /* PulpDisplay-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-Regular.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-Regular.ttf"; sourceTree = "<group>"; };
+		9FF3EEBA23FA41C600A5E971 /* PulpDisplay-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-Light.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-Light.ttf"; sourceTree = "<group>"; };
+		9FF3EEBB23FA41C600A5E971 /* PulpDisplay-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-Medium.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-Medium.ttf"; sourceTree = "<group>"; };
+		9FF3EEBC23FA41C600A5E971 /* PulpDisplay-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-MediumItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-MediumItalic.ttf"; sourceTree = "<group>"; };
+		9FF3EEBD23FA41C600A5E971 /* PulpDisplay-RegularItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-RegularItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-RegularItalic.ttf"; sourceTree = "<group>"; };
 		A9E1BE114A032DF4287CB8A1 /* Pods-Mynd.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd.release.xcconfig"; path = "Target Support Files/Pods-Mynd/Pods-Mynd.release.xcconfig"; sourceTree = "<group>"; };
 		B2E7F9984C04DFC118F20361 /* Pods-Mynd.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd.debug.xcconfig"; path = "Target Support Files/Pods-Mynd/Pods-Mynd.debug.xcconfig"; sourceTree = "<group>"; };
 		CBF5CC07749D8BB532A4778A /* Pods-Mynd-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Mynd-tvOSTests/Pods-Mynd-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -177,6 +197,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				9FF3EEB323FA41A100A5E971 /* Resources */,
 				13B07FAE1A68108700A75B9A /* Mynd */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* MyndTests */,
@@ -198,6 +219,23 @@
 				2D02E4901E0B4A5D006451C7 /* Mynd-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9FF3EEB323FA41A100A5E971 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */,
+				9FF3EEB723FA41C600A5E971 /* PulpDisplay-BoldItalic.ttf */,
+				9FF3EEBA23FA41C600A5E971 /* PulpDisplay-Light.ttf */,
+				9FF3EEB523FA41C600A5E971 /* PulpDisplay-LightItalic.ttf */,
+				9FF3EEBB23FA41C600A5E971 /* PulpDisplay-Medium.ttf */,
+				9FF3EEBC23FA41C600A5E971 /* PulpDisplay-MediumItalic.ttf */,
+				9FF3EEB923FA41C600A5E971 /* PulpDisplay-Regular.ttf */,
+				9FF3EEBD23FA41C600A5E971 /* PulpDisplay-RegularItalic.ttf */,
+				9FF3EEB623FA41C600A5E971 /* PulpDisplay-SemiBold.ttf */,
+				9FF3EEB823FA41C600A5E971 /* PulpDisplay-SemiBoldItalic.ttf */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -341,7 +379,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9FF3EEC323FA41C700A5E971 /* PulpDisplay-Regular.ttf in Resources */,
+				9FF3EEBF23FA41C700A5E971 /* PulpDisplay-LightItalic.ttf in Resources */,
+				9FF3EEC123FA41C700A5E971 /* PulpDisplay-BoldItalic.ttf in Resources */,
+				9FF3EEC623FA41C700A5E971 /* PulpDisplay-MediumItalic.ttf in Resources */,
+				9FF3EEC723FA41C700A5E971 /* PulpDisplay-RegularItalic.ttf in Resources */,
+				9FF3EEC423FA41C700A5E971 /* PulpDisplay-Light.ttf in Resources */,
+				9FF3EEC023FA41C700A5E971 /* PulpDisplay-SemiBold.ttf in Resources */,
+				9FF3EEC223FA41C700A5E971 /* PulpDisplay-SemiBoldItalic.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				9FF3EEC523FA41C700A5E971 /* PulpDisplay-Medium.ttf in Resources */,
+				9FF3EEBE23FA41C700A5E971 /* PulpDisplay-Bold.ttf in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				9FEC191023B1AFE80068E2E3 /* GoogleService-Info.plist in Resources */,
 			);

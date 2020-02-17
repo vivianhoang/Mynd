@@ -1,48 +1,81 @@
 import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, ImageBackground } from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
-import colors from '../../utils/colors';
 import BigButton from '../../componets/big-button';
+import HiveText from '../../componets/hive-text';
+import colors from '../../utils/colors';
 
 export default () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image
-          style={styles.logo}
-          source={require('../../assets/logo.png')}
-          resizeMode={'contain'}
-        />
-      </View>
-      <BigButton
-        title={'Login'}
-        onPress={() => sharedNavigationService.navigate({ page: 'Login' })}
-      />
-      <View style={{ height: 8 }} />
-      <BigButton
-        title={'Signup'}
-        type={'third'}
-        onPress={() => sharedNavigationService.navigate({ page: 'Signup' })}
-      />
-    </View>
+    <>
+      <ImageBackground
+        source={require('../../assets/landing_screen.png')}
+        style={styles.background}
+      >
+        <View style={styles.container}>
+          <Image
+            style={styles.logo}
+            source={require('../../assets/logo.png')}
+            resizeMode={'contain'}
+          />
+          <View style={styles.labelContainer}>
+            <HiveText style={styles.title}>{'MYND'}</HiveText>
+            <HiveText style={styles.subtitle}>
+              {'Your mind in one place'}
+            </HiveText>
+          </View>
+          <View style={styles.actionsContainer}>
+            <BigButton
+              title={'Login'}
+              type={'second'}
+              onPress={() =>
+                sharedNavigationService.navigate({ page: 'Login' })
+              }
+            />
+            <View style={{ height: 16 }} />
+            <BigButton
+              title={'Signup'}
+              type={'third'}
+              color={colors.white}
+              onPress={() =>
+                sharedNavigationService.navigate({ page: 'Signup' })
+              }
+            />
+          </View>
+        </View>
+      </ImageBackground>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
-    justifyContent: 'flex-end',
-    padding: 16,
+    padding: 32,
+    paddingVertical: 44 + 16,
   },
-  logoContainer: {
+  labelContainer: {},
+  title: {
+    fontSize: 60,
+    color: colors.white,
+    fontFamily: 'PulpDisplay-Bold',
+  },
+  subtitle: {
+    fontSize: 20,
+    fontFamily: 'PulpDisplay-Bold',
+    color: colors.offBlack,
+  },
+  actionsContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   logo: {
-    height: 100,
-    width: 100,
-    marginBottom: 200,
+    height: 75,
+    width: 75,
+    alignSelf: 'flex-end',
+    paddingBottom: 16,
+  },
+  background: {
+    flex: 1,
   },
 });

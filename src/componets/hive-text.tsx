@@ -1,15 +1,39 @@
 import React, { ReactNode } from 'react';
-import { Text, StyleSheet, TextProps } from 'react-native';
+import { Text, StyleSheet, TextProps, Alert } from 'react-native';
 import colors from '../utils/colors';
 
 interface Props extends TextProps {
   children?: string | ReactNode;
+  variant?: 'light' | 'regular' | 'medium' | 'semi-bold' | 'bold';
 }
 
 export default (props: Props) => {
-  const { children, style } = props;
+  const { children, style, variant } = props;
+  let fontFamily = 'PulpDisplay-Regular';
+
+  switch (variant) {
+    case 'light':
+      fontFamily = 'PulpDisplay-Light';
+      break;
+    case 'regular':
+      fontFamily = 'PulpDisplay-Regular';
+      break;
+    case 'medium':
+      fontFamily = 'PulpDisplay-Medium';
+      break;
+    case 'semi-bold':
+      fontFamily = 'PulpDisplay-SemiBold';
+      break;
+    case 'bold':
+      fontFamily = 'PulpDisplay-Bold';
+      break;
+  }
+
   return (
-    <Text numberOfLines={4} style={[styles.textLabel as any, style]}>
+    <Text
+      numberOfLines={4}
+      style={[styles.textLabel as any, { fontFamily }, style]}
+    >
       {children}
     </Text>
   );
@@ -17,7 +41,6 @@ export default (props: Props) => {
 
 const styles = StyleSheet.create({
   textLabel: {
-    fontFamily: 'Helvetica',
     color: colors.offBlack,
     fontSize: 16,
   },

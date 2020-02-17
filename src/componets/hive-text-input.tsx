@@ -1,34 +1,45 @@
 import React, { ReactNode } from 'react';
-import { TextInput, StyleSheet, TextInputProps } from 'react-native';
+import { View, TextInput, StyleSheet, TextInputProps } from 'react-native';
 import colors from '../utils/colors';
 import * as _ from 'lodash';
+import HiveText from './hive-text';
 
-interface Props extends TextInputProps {}
+interface Props extends TextInputProps {
+  title: string;
+}
 
 export default (props: Props) => {
-  const { style } = props;
+  const { style, title } = props;
   const finalProps = _.omit(props, 'style');
 
   return (
-    <TextInput
-      placeholderTextColor={colors.darkGray}
-      style={[styles.textInput as any, style]}
-      {...finalProps}
-    />
+    <View>
+      <HiveText style={styles.titleLabel}>{title}</HiveText>
+      <TextInput
+        placeholderTextColor={colors.darkGray}
+        selectionColor={colors.salmonRed}
+        style={[styles.textInput as any, style]}
+        {...finalProps}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  titleLabel: {
+    color: colors.lightPurple,
+    fontFamily: 'PulpDisplay-Bold',
+    fontSize: 14,
+  },
   textInput: {
-    fontFamily: 'Helvetica',
+    fontFamily: 'PulpDisplay-Regular',
     color: colors.offBlack,
     fontSize: 18,
     margin: 0,
     padding: 0,
-    backgroundColor: colors.lightGray,
     height: 50,
-    borderRadius: 8,
-    paddingLeft: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.lightGray,
     paddingRight: 8,
   },
 });

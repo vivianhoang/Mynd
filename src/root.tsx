@@ -1,25 +1,23 @@
 import React from 'react';
-import { NavigationNativeContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import home from './screens/main-flow/home';
-import createNote from './screens/main-flow/create-note';
+import templateSelection from './screens/main-flow/template-selection';
 import splash from './screens/auth-flow/splash';
 import landing from './screens/auth-flow/landing';
 import login from './screens/auth-flow/login';
-import category from './screens/main-flow/category-flow/category';
-import categorySettings from './screens/main-flow/category-flow/category-settings';
 import signup from './screens/auth-flow/signup';
 import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
-import { CategoryProps } from './models';
+import { TemplateSelectionProps } from './models';
 import colors from './utils/colors';
 
 const ModalStack = createStackNavigator();
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
-const CategoryStack = createStackNavigator();
+const TemplateSelectionStack = createStackNavigator();
 
 function MainFlow() {
   return (
@@ -28,13 +26,6 @@ function MainFlow() {
       screenOptions={{ headerStyle: { shadowColor: 'transparent' } }}
     >
       <MainStack.Screen name="Home" component={home}></MainStack.Screen>
-      <MainStack.Screen
-        name="CategoryFlow"
-        component={CategoryFlow}
-        options={{
-          headerShown: false,
-        }}
-      ></MainStack.Screen>
     </MainStack.Navigator>
   );
 }
@@ -61,22 +52,33 @@ function AuthFlow() {
   );
 }
 
-function CategoryFlow(props: CategoryProps) {
+function TemplateSelectionFlow(props: TemplateSelectionProps) {
   return (
-    <CategoryStack.Navigator
-      initialRouteName="Category"
+    <TemplateSelectionStack.Navigator
+      initialRouteName="TemplateSelection"
       screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
     >
-      <CategoryStack.Screen
-        name="Category"
-        component={category}
-        initialParams={props.route.params}
-      ></CategoryStack.Screen>
-      <CategoryStack.Screen
-        name="CategorySettings"
-        component={categorySettings}
-      ></CategoryStack.Screen>
-    </CategoryStack.Navigator>
+      <TemplateSelectionStack.Screen
+        name="TemplateSelection"
+        component={templateSelection}
+        options={{ headerShown: false }}
+      ></TemplateSelectionStack.Screen>
+      {/* <TemplateSelectionStack.Screen
+        name="IdeaTemplate"
+        component={ideaTemplate}
+        options={{ headerShown: false }}
+      ></TemplateSelectionStack.Screen>
+      <TemplateSelectionStack.Screen
+        name="TodoTemplate"
+        component={todoTemplate}
+        options={{ headerShown: false }}
+      ></TemplateSelectionStack.Screen>
+      <TemplateSelectionStack.Screen
+        name="GoalTemplate"
+        component={goalTemplate}
+        options={{ headerShown: false }}
+      ></TemplateSelectionStack.Screen> */}
+    </TemplateSelectionStack.Navigator>
   );
 }
 
@@ -95,7 +97,7 @@ function RootFlow() {
 function ModalFlow() {
   return (
     <ModalStack.Navigator
-      initialRouteName={'RootFlow'}
+      initialRouteName={'TemplateSelectionFlow'}
       mode={'modal'}
       screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
     >
@@ -104,7 +106,11 @@ function ModalFlow() {
         component={RootFlow}
         options={{ headerShown: false }}
       />
-      <ModalStack.Screen name={'CreateNote'} component={createNote} />
+      <ModalStack.Screen
+        name={'TemplateSelectionFlow'}
+        component={TemplateSelectionFlow}
+        options={{ headerShown: false }}
+      />
     </ModalStack.Navigator>
   );
 }
@@ -112,9 +118,9 @@ function ModalFlow() {
 export default () => {
   return (
     <Provider store={store}>
-      <NavigationNativeContainer ref={sharedNavigationService.navRef}>
+      <NavigationContainer ref={sharedNavigationService.navRef}>
         <ModalFlow />
-      </NavigationNativeContainer>
+      </NavigationContainer>
     </Provider>
   );
 };

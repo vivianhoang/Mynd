@@ -6,12 +6,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  ReduxState,
-  CategoriesById,
-  DispatchAction,
-  CreateNoteProps,
-} from '../../models';
+import { ReduxState, CategoriesById, DispatchAction } from '../../models';
 import * as _ from 'lodash';
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
@@ -20,115 +15,115 @@ import colors from '../../utils/colors';
 import HiveTextInput from '../../componets/hive-text-input';
 import HiveText from '../../componets/hive-text';
 
-export default (props: CreateNoteProps) => {
-  const existingNote = props.route.params?.note;
-  const existingCategory = props.route.params?.category;
+export default props => {
+  // const existingNote = props.route.params?.note;
+  // const existingCategory = props.route.params?.category;
 
-  const [categoryTitle, setCategoryTitle] = useState(
-    existingCategory?.title || '',
-  );
-  const [noteDescription, setNoteDescription] = useState(
-    existingNote?.description || '',
-  );
+  // const [categoryTitle, setCategoryTitle] = useState(
+  //   existingCategory?.title || '',
+  // );
+  // const [noteDescription, setNoteDescription] = useState(
+  //   existingNote?.description || '',
+  // );
 
-  const existingCategoriesById = useSelector<ReduxState, CategoriesById>(
-    state => state.categoriesById,
-  );
+  // const existingCategoriesById = useSelector<ReduxState, CategoriesById>(
+  //   state => state.categoriesById,
+  // );
 
-  const dispatch = useDispatch<DispatchAction>();
-  const rightNavLabel = existingNote ? 'Save' : 'Create';
+  // const dispatch = useDispatch<DispatchAction>();
+  // const rightNavLabel = existingNote ? 'Save' : 'Create';
 
-  const rightNavOnPress = () => {
-    if (existingNote) {
-      dispatch({
-        type: 'UPDATE_NOTE',
-        note: {
-          id: existingNote.id,
-          description: noteDescription,
-          timestamp: new Date().getTime().toString(),
-        },
-        categoryId: existingCategory.id,
-      });
-    } else {
-      const category = _.find(existingCategoriesById, category => {
-        return category.title === categoryTitle;
-      });
+  // const rightNavOnPress = () => {
+  //   if (existingNote) {
+  //     dispatch({
+  //       type: 'UPDATE_NOTE',
+  //       note: {
+  //         id: existingNote.id,
+  //         description: noteDescription,
+  //         timestamp: new Date().getTime().toString(),
+  //       },
+  //       categoryId: existingCategory.id,
+  //     });
+  //   } else {
+  //     const category = _.find(existingCategoriesById, category => {
+  //       return category.title === categoryTitle;
+  //     });
 
-      console.log(category, ' category info');
+  //     console.log(category, ' category info');
 
-      const newNoteDescription = noteDescription.length
-        ? noteDescription
-        : 'New Note';
+  //     const newNoteDescription = noteDescription.length
+  //       ? noteDescription
+  //       : 'New Note';
 
-      dispatch({
-        type: 'CREATE_NOTE',
-        categoryTitle: categoryTitle,
-        categoryId: category?.id,
-        noteTimestamp: new Date().getTime().toString(),
-        noteDescription: newNoteDescription,
-      });
-    }
-  };
+  //     dispatch({
+  //       type: 'CREATE_NOTE',
+  //       categoryTitle: categoryTitle,
+  //       categoryId: category?.id,
+  //       noteTimestamp: new Date().getTime().toString(),
+  //       noteDescription: newNoteDescription,
+  //     });
+  //   }
+  // };
 
-  const headerTitle = existingCategory ? (
-    <View style={{ alignItems: 'center' }}>
-      <HiveText style={{ fontSize: 12 }}>
-        {existingCategory?.title?.toUpperCase()}
-      </HiveText>
-      <HiveText style={{ fontSize: 16, fontWeight: '700' }}>{'Note'}</HiveText>
-    </View>
-  ) : null;
+  // const headerTitle = existingCategory ? (
+  //   <View style={{ alignItems: 'center' }}>
+  //     <HiveText style={{ fontSize: 12 }}>
+  //       {existingCategory?.title?.toUpperCase()}
+  //     </HiveText>
+  //     <HiveText style={{ fontSize: 16, fontWeight: '700' }}>{'Note'}</HiveText>
+  //   </View>
+  // ) : null;
 
-  props.navigation.setOptions({
-    headerRight: () => (
-      <NavButton
-        onPress={rightNavOnPress}
-        title={rightNavLabel}
-        position={'right'}
-        color={colors.white}
-        isDisabled={categoryTitle.length == 0}
-      />
-    ),
-    headerTitle: () => headerTitle,
-    headerStyle: {
-      backgroundColor: colors.honeyOrange,
-      shadowColor: 'transparent',
-    },
-    headerLeft: () => (
-      <NavButton
-        onPress={() => {
-          sharedNavigationService.goBack();
-        }}
-        icon={'arrow-left'}
-        position={'left'}
-        color={colors.white}
-      />
-    ),
-  });
+  // props.navigation.setOptions({
+  //   headerRight: () => (
+  //     <NavButton
+  //       onPress={rightNavOnPress}
+  //       title={rightNavLabel}
+  //       position={'right'}
+  //       color={colors.white}
+  //       isDisabled={categoryTitle.length == 0}
+  //     />
+  //   ),
+  //   headerTitle: () => headerTitle,
+  //   headerStyle: {
+  //     backgroundColor: colors.honeyOrange,
+  //     shadowColor: 'transparent',
+  //   },
+  //   headerLeft: () => (
+  //     <NavButton
+  //       onPress={() => {
+  //         sharedNavigationService.goBack();
+  //       }}
+  //       icon={'arrow-left'}
+  //       position={'left'}
+  //       color={colors.white}
+  //     />
+  //   ),
+  // });
 
-  const deleteButton = existingNote ? (
-    <KeyboardAvoidingView
-      keyboardVerticalOffset={50 + 16}
-      behavior={'position'}
-    >
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => {
-          dispatch({
-            type: 'DELETE_NOTE',
-            categoryId: existingCategory.id,
-            noteId: existingNote.id,
-          });
-        }}
-      >
-        <Icon name={'trash-2'} size={26} color={'red'} />
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
-  ) : null;
+  // const deleteButton = existingNote ? (
+  //   <KeyboardAvoidingView
+  //     keyboardVerticalOffset={50 + 16}
+  //     behavior={'position'}
+  //   >
+  //     <TouchableOpacity
+  //       style={styles.deleteButton}
+  //       onPress={() => {
+  //         dispatch({
+  //           type: 'DELETE_NOTE',
+  //           categoryId: existingCategory.id,
+  //           noteId: existingNote.id,
+  //         });
+  //       }}
+  //     >
+  //       <Icon name={'trash-2'} size={26} color={'red'} />
+  //     </TouchableOpacity>
+  //   </KeyboardAvoidingView>
+  // ) : null;
 
   return (
     <View style={styles.container}>
-      {!existingCategory ? (
+      {/* {!existingCategory ? (
         <View style={styles.categoryInputContainer}>
           <HiveTextInput
             style={styles.categoryInput}
@@ -147,7 +142,7 @@ export default (props: CreateNoteProps) => {
         placeholder={'Enter note...'}
         multiline={true}
       ></HiveTextInput>
-      {deleteButton}
+      {deleteButton} */}
     </View>
   );
 };

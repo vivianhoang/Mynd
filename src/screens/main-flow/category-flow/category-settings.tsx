@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { DispatchAction } from '../../../models';
-import { CategorySettingsProps } from '../../../models';
 import HiveText from '../../../componets/hive-text';
 import NavButton from '../../../componets/nav-button';
 import sharedNavigationService from '../../../services/navigation-service';
 import HiveTextInput from '../../../componets/hive-text-input';
 import colors from '../../../utils/colors';
 
-export default (props: CategorySettingsProps) => {
+export default props => {
   const category = props.route.params.category;
   const dispatch = useDispatch<DispatchAction>();
   const [categoryTitle, setCategoryTitle] = useState(category?.title);
@@ -23,32 +22,32 @@ export default (props: CategorySettingsProps) => {
     </View>
   );
 
-  props.navigation.setOptions({
-    headerTitle: () => headerLabel,
-    headerLeft: () => (
-      <NavButton
-        onPress={() => {
-          if (category?.title !== categoryTitle) {
-            dispatch({
-              type: 'UPDATE_CATEGORY',
-              category: {
-                id: category?.id,
-                title: categoryTitle,
-              },
-            });
-          }
+  // props.navigation.setOptions({
+  //   headerTitle: () => headerLabel,
+  //   headerLeft: () => (
+  //     <NavButton
+  //       onPress={() => {
+  //         if (category?.title !== categoryTitle) {
+  //           dispatch({
+  //             type: 'UPDATE_CATEGORY',
+  //             category: {
+  //               id: category?.id,
+  //               title: categoryTitle,
+  //             },
+  //           });
+  //         }
 
-          sharedNavigationService.goBack();
-        }}
-        icon={'arrow-left'}
-        position={'left'}
-      />
-    ),
-  });
+  //         sharedNavigationService.goBack();
+  //       }}
+  //       icon={'arrow-left'}
+  //       position={'left'}
+  //     />
+  //   ),
+  // });
 
   return (
     <View style={styles.container}>
-      <HiveText style={styles.categoryNameLabel}>{'Category Name'}</HiveText>
+      {/* <HiveText style={styles.categoryNameLabel}>{'Category Name'}</HiveText>
       <HiveTextInput
         style={styles.input}
         value={categoryTitle}
@@ -86,7 +85,7 @@ export default (props: CategorySettingsProps) => {
         }}
       >
         <HiveText style={styles.deleteLabel}>{'Delete'}</HiveText>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

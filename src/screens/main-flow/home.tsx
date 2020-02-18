@@ -19,50 +19,25 @@ import HiveTextInput from '../../componets/hive-text-input';
 import Icon from 'react-native-vector-icons/Feather';
 
 export default (props: HomeProps) => {
-  const categoriesById = useSelector<ReduxState, CategoriesById>(
-    state => state.categoriesById,
-  );
-  let sortedCategories: Category[] = [];
-
-  Object.keys(categoriesById).forEach(id => {
-    sortedCategories.push(categoriesById[id]);
-  });
-
-  sortedCategories.sort(function(categoryA, categoryB) {
-    const categoryAText = categoryA.title.toUpperCase();
-    const categoryBText = categoryB.title.toUpperCase();
-    return categoryAText < categoryBText
-      ? -1
-      : categoryAText > categoryBText
-      ? 1
-      : 0;
-  });
-
-  props.navigation.setOptions({
-    headerTitle: () => (
-      <Image
-        style={styles.logo}
-        source={require('../../assets/logo.png')}
-        resizeMode={'contain'}
-      />
-    ),
-    headerLeft: () => (
-      <NavButton
-        onPress={() => sharedAuthService.logout()}
-        icon={'log-out'}
-        position={'left'}
-      />
-    ),
-  });
+  // props.navigation.setOptions({
+  //   headerTitle: () => (
+  //     <Image
+  //       style={styles.logo}
+  //       source={require('../../assets/logo.png')}
+  //       resizeMode={'contain'}
+  //     />
+  //   ),
+  // });
 
   console.log('RE RENDER HOME, TODO, MEMOIZE USE SELECTOR');
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={sortedCategories}
+      <View style={{ flex: 1 }}>
+        {/* <FlatList
+        data={[]}
         ListHeaderComponent={() => (
-          <HiveTextInput style={styles.searchInput} placeholder={'Search...'} />
+          <HiveTextInput title={null} style={styles.searchInput} placeholder={'Search...'} />
         )}
         ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         keyboardShouldPersistTaps={'always'}
@@ -101,15 +76,36 @@ export default (props: HomeProps) => {
             </TouchableOpacity>
           );
         }}
-      ></FlatList>
-      <TouchableOpacity
-        onPress={() => {
-          sharedNavigationService.navigate({ page: 'CreateNote' });
-        }}
-        style={styles.addButton}
-      >
-        <Icon name={'edit-3'} color={colors.offBlack} size={26} />
-      </TouchableOpacity>
+      ></FlatList> */}
+      </View>
+      <View style={styles.tabContainer}>
+        <View style={styles.tabLabel}>
+          <TouchableOpacity onPress={() => sharedAuthService.logout()}>
+            <Icon name={'log-out'} color={colors.offBlack} size={30} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.tabLabel}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() =>
+              sharedNavigationService.navigate({
+                page: 'TemplateSelectionFlow',
+              })
+            }
+          >
+            <Image
+              style={styles.navBarButton}
+              source={require('../../assets/templates_button.png')}
+              resizeMode={'contain'}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.tabLabel}>
+          <TouchableOpacity>
+            <Icon name={'user'} color={colors.offBlack} size={30} />
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
@@ -119,9 +115,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
-  logo: {
-    height: 44,
-    width: 44,
+  navBarButton: {
+    height: 80,
+    width: 80,
+    marginBottom: 8,
+  },
+  tabContainer: {
+    height: 50 + 32,
+    borderTopWidth: 1,
+    borderColor: colors.lightGray,
+    backgroundColor: colors.white,
+    paddingBottom: 32,
+    flexDirection: 'row',
+  },
+  tabLabel: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cardBackground: {
     ...StyleSheet.absoluteFillObject,

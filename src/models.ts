@@ -4,10 +4,47 @@ import { RouteProp } from '@react-navigation/native';
 
 //---------State-related interfaces-----------//
 export interface ReduxState {
-  categoriesById: CategoriesById;
-  notesByCategoryId: NotesByCategoryId;
   userId: string;
 }
+
+// export type TemplateType = 'idea' | 'goal' | 'todo';
+
+// export interface BaseTemplate {
+//   type: TemplateType;
+// }
+
+export enum TemplateType {
+  Idea,
+  Todo,
+}
+
+export interface Idea {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  type: TemplateType.Idea;
+}
+
+export interface Todo {
+  id: string;
+  title: string;
+  checklist: string[];
+  timestamp: string;
+  type: TemplateType.Todo;
+}
+
+export type Templates = Idea | Todo;
+
+// const templates = [] as Templates[];
+
+// for (const val in templates) {
+//   const template = templates[val];
+//   switch (template.type) {
+//     case TemplateType.Goal:
+//     case TemplateType.Idea;
+//   }
+// }
 
 export interface NotesByCategoryId {
   [categoryId: string]: Note[];
@@ -56,16 +93,6 @@ export interface DeleteNote {
   categoryId: string;
 }
 
-export interface UpdateCategory {
-  type: 'UPDATE_CATEGORY';
-  category: Category;
-}
-
-export interface DeleteCategory {
-  type: 'DELETE_CATEGORY';
-  categoryId: string;
-}
-
 export interface SetUser {
   type: 'SET_USER';
   userId: string;
@@ -92,8 +119,6 @@ export type ReduxActions =
   | CreateNote
   | UpdateNote
   | DeleteNote
-  | UpdateCategory
-  | DeleteCategory
   | SetUser
   | SubscribeToCategory
   | UnsubscribeFromCategory
@@ -102,10 +127,6 @@ export type ReduxActions =
 export type DispatchAction = Dispatch<ReduxActions>;
 
 //---------------Navigation Actions-----------------//
-export interface CategoryPage {
-  page: 'CategoryFlow';
-  props: RouteParams['Category'];
-}
 
 export interface LoginPage {
   page: 'Login';
@@ -123,35 +144,26 @@ export interface LandingPage {
   page: 'Landing';
 }
 
-export interface CreateNotePage {
-  page: 'CreateNote';
-  props?: RouteParams['CreateNote'];
+export interface TemplateSelectionPage {
+  page: 'TemplateSelectionFlow';
+}
+
+export interface CreateIdeaPage {
+  page: 'CreateIdea';
 }
 
 export interface SignupPage {
   page: 'Signup';
 }
 
-export interface CategorySettingsPage {
-  page: 'CategorySettings';
-  props: RouteParams['CategorySettings'];
-}
-
 export type NavigationActions =
-  | CategoryPage
   | LoginPage
   | MainPage
   | HomePage
   | LandingPage
-  | CreateNotePage
+  | TemplateSelectionPage
   | SignupPage
-  | CategorySettingsPage;
-
-type RouteParams = {
-  Category: { categoryId: string };
-  CreateNote: { category?: Category; note?: Note };
-  CategorySettings: { category: Category };
-};
+  | CreateIdeaPage;
 
 //---------Component-based interfaces-----------//
 
@@ -159,19 +171,8 @@ export interface HomeProps {
   navigation: StackNavigationProp<any>;
 }
 
-export interface CategoryProps {
+export interface TemplateSelectionProps {
   navigation: StackNavigationProp<any>;
-  route: RouteProp<RouteParams, 'Category'>;
-}
-
-export interface CreateNoteProps {
-  navigation: StackNavigationProp<any>;
-  route: RouteProp<RouteParams, 'CreateNote'>;
-}
-
-export interface CategorySettingsProps {
-  navigation: StackNavigationProp<any>;
-  route: RouteProp<RouteParams, 'CategorySettings'>;
 }
 
 export interface LoginProps {

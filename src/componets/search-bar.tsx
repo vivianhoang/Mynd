@@ -35,7 +35,7 @@ export default (props: SearchBarProps) => {
 const styles = StyleSheet.create({
   container: {
     height: 50,
-    borderRadius: 12,
+    borderRadius: 10,
     flexDirection: 'row',
     paddingHorizontal: 16,
     backgroundColor: colors.white,
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 5,
     shadowOffset: {
-      width: 2,
-      height: 2,
+      width: 1,
+      height: 1,
     },
   },
   input: {

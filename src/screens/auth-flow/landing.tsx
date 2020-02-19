@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
     width: 75,
     alignSelf: 'flex-end',
     paddingBottom: 16,
+    opacity: 0,
   },
   background: {
     flex: 1,

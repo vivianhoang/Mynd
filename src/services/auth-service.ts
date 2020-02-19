@@ -15,7 +15,7 @@ class AuthService {
     if (user) {
       this.setUser(user.uid);
       // user is signed in
-      sharedNavigationService.navigate({ page: 'MainFlow' });
+      sharedNavigationService.navigate({ page: 'Home' });
       startSaga();
     } else {
       // user is not signed in

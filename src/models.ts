@@ -1,29 +1,37 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Dispatch } from 'redux';
 import { RouteProp } from '@react-navigation/native';
+import { ToastAndroidStatic, SectionListData } from 'react-native';
 
 //---------State-related interfaces-----------//
 export interface ReduxState {
   userId: string;
+  hiveData: HiveData;
 }
-
-// export type TemplateType = 'idea' | 'goal' | 'todo';
 
 // export interface BaseTemplate {
 //   type: TemplateType;
 // }
 
-export enum TemplateType {
-  Idea,
-  Todo,
-}
+export type TemplateData = Todo | Idea;
+
+export type JsonHiveData = {
+  [key in TemplateType]: TemplateData[];
+};
+
+export type HiveData = {
+  title: TemplateType;
+  data: TemplateData[][];
+}[];
+
+export type TemplateType = 'Idea' | 'Todo';
 
 export interface Idea {
   id: string;
   title: string;
   description: string;
   timestamp: string;
-  type: TemplateType.Idea;
+  type: 'Idea';
 }
 
 export interface Todo {
@@ -31,20 +39,10 @@ export interface Todo {
   title: string;
   checklist: string[];
   timestamp: string;
-  type: TemplateType.Todo;
+  type: 'Todo';
 }
 
 export type Templates = Idea | Todo;
-
-// const templates = [] as Templates[];
-
-// for (const val in templates) {
-//   const template = templates[val];
-//   switch (template.type) {
-//     case TemplateType.Goal:
-//     case TemplateType.Idea;
-//   }
-// }
 
 export interface NotesByCategoryId {
   [categoryId: string]: Note[];
@@ -66,11 +64,31 @@ export interface Note {
 }
 
 export type Notes = Note[];
+export type Ideas = Idea[];
+export type Todos = Todo[];
 
 //---------Actions-related interfaces-----------//
 export interface SetCategoriesById {
   type: 'SET_CATEGORIES_BY_ID';
   categoriesById: CategoriesById;
+}
+
+export interface CreateIdea {
+  type: 'CREATE_IDEA';
+  title: string;
+  description: string;
+}
+
+export interface UpdateIdea {
+  type: 'UPDATE_IDEA';
+  title: string;
+  description: string;
+  id: string;
+}
+
+export interface DeleteIdea {
+  type: 'DELETE_IDEA';
+  id: string;
 }
 
 export interface CreateNote {
@@ -98,6 +116,16 @@ export interface SetUser {
   userId: string;
 }
 
+export interface UnsubscribeFromIdea {
+  type: 'UNSUBSCRIBE_FROM_IDEA';
+  id: string;
+}
+
+export interface SetHiveData {
+  type: 'SET_HIVE_DATA';
+  hiveData: HiveData;
+}
+
 export interface SubscribeToCategory {
   type: 'SUBSCRIBE_TO_CATEGORY';
   categoryId: string;
@@ -116,10 +144,16 @@ export interface SetNotesByCategoryId {
 
 export type ReduxActions =
   | SetCategoriesById
+  | CreateIdea
+  | UpdateIdea
+  | DeleteIdea
+  | UpdateNote
   | CreateNote
   | UpdateNote
   | DeleteNote
   | SetUser
+  | SetHiveData
+  | UnsubscribeFromIdea
   | SubscribeToCategory
   | UnsubscribeFromCategory
   | SetNotesByCategoryId;
@@ -128,50 +162,74 @@ export type DispatchAction = Dispatch<ReduxActions>;
 
 //---------------Navigation Actions-----------------//
 
-export interface LoginPage {
+export type PageName =
+  | 'Home'
+  | 'Splash'
+  | 'Landing'
+  | 'Login'
+  | 'Signup'
+  | 'TemplateSelection'
+  | 'IdeaTemplate';
+
+export const Page: {
+  [key in PageName]: PageName;
+} = {
+  Home: 'Home',
+  Splash: 'Splash',
+  Landing: 'Landing',
+  Login: 'Login',
+  Signup: 'Signup',
+  TemplateSelection: 'TemplateSelection',
+  IdeaTemplate: 'IdeaTemplate',
+};
+
+export interface BasePageInterface {
+  page: PageName;
+}
+
+export interface LoginPage extends BasePageInterface {
   page: 'Login';
 }
 
-export interface MainPage {
-  page: 'MainFlow';
-}
-
-export interface HomePage {
+export interface HomePage extends BasePageInterface {
   page: 'Home';
 }
 
-export interface LandingPage {
+export interface LandingPage extends BasePageInterface {
   page: 'Landing';
 }
 
-export interface TemplateSelectionPage {
-  page: 'TemplateSelectionFlow';
+export interface TemplateSelectionPage extends BasePageInterface {
+  page: 'TemplateSelection';
 }
 
-export interface CreateIdeaPage {
-  page: 'CreateIdea';
+export interface IdeaTemplateOwnProps {
+  idea: Idea | null;
+}
+export interface IdeaTemplatePage extends BasePageInterface {
+  page: 'IdeaTemplate';
+  props: IdeaTemplateOwnProps;
 }
 
-export interface SignupPage {
+export interface SignupPage extends BasePageInterface {
   page: 'Signup';
 }
 
 export type NavigationActions =
   | LoginPage
-  | MainPage
   | HomePage
   | LandingPage
   | TemplateSelectionPage
-  | SignupPage
-  | CreateIdeaPage;
+  | IdeaTemplatePage
+  | SignupPage;
+
+export type RouteParamsList = {
+  IdeaTemplate: IdeaTemplateOwnProps;
+};
 
 //---------Component-based interfaces-----------//
 
 export interface HomeProps {
-  navigation: StackNavigationProp<any>;
-}
-
-export interface TemplateSelectionProps {
   navigation: StackNavigationProp<any>;
 }
 
@@ -181,4 +239,9 @@ export interface LoginProps {
 
 export interface SignupProps {
   navigation: StackNavigationProp<any>;
+}
+
+export interface IdeaTemplateProps {
+  navigation: StackNavigationProp<any>;
+  route: RouteProp<RouteParamsList, 'IdeaTemplate'>;
 }

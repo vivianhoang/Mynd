@@ -4,13 +4,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import home from './screens/main-flow/home';
 import templateSelection from './screens/main-flow/template-selection';
 import splash from './screens/auth-flow/splash';
-import landing from './screens/auth-flow/landing';
+import Landing from './screens/auth-flow/landing';
 import login from './screens/auth-flow/login';
 import signup from './screens/auth-flow/signup';
+import IdeaTemplate from './screens/main-flow/idea-template';
 import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
-import { TemplateSelectionProps } from './models';
+import { Page } from './models';
 import colors from './utils/colors';
 
 const ModalStack = createStackNavigator();
@@ -22,10 +23,10 @@ const TemplateSelectionStack = createStackNavigator();
 function MainFlow() {
   return (
     <MainStack.Navigator
-      initialRouteName="Home"
+      initialRouteName={'HomeNOTUSED'}
       screenOptions={{ headerStyle: { shadowColor: 'transparent' } }}
     >
-      <MainStack.Screen name="Home" component={home}></MainStack.Screen>
+      <MainStack.Screen name="HomeNOTUSED" component={home}></MainStack.Screen>
     </MainStack.Navigator>
   );
 }
@@ -33,41 +34,44 @@ function MainFlow() {
 function AuthFlow() {
   return (
     <AuthStack.Navigator
-      initialRouteName="Splash"
+      initialRouteName={Page.Splash}
       screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
     >
       <AuthStack.Screen
-        name="Splash"
+        name={Page.Splash}
         component={splash}
         options={{ headerShown: false }}
       ></AuthStack.Screen>
       <AuthStack.Screen
-        name="Landing"
-        component={landing}
+        name={Page.Landing}
+        component={Landing}
         options={{ headerShown: false }}
       ></AuthStack.Screen>
-      <AuthStack.Screen name="Login" component={login}></AuthStack.Screen>
-      <AuthStack.Screen name="Signup" component={signup}></AuthStack.Screen>
+      <AuthStack.Screen name={Page.Login} component={login}></AuthStack.Screen>
+      <AuthStack.Screen
+        name={Page.Signup}
+        component={signup}
+      ></AuthStack.Screen>
     </AuthStack.Navigator>
   );
 }
 
-function TemplateSelectionFlow(props: TemplateSelectionProps) {
+function TemplateSelectionFlow() {
   return (
     <TemplateSelectionStack.Navigator
-      initialRouteName="TemplateSelection"
+      initialRouteName="TemplateSelectionNOTUSED"
       screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
     >
       <TemplateSelectionStack.Screen
-        name="TemplateSelection"
+        name="TemplateSelectionNOTUSED"
         component={templateSelection}
         options={{ headerShown: false }}
       ></TemplateSelectionStack.Screen>
-      {/* <TemplateSelectionStack.Screen
-        name="IdeaTemplate"
-        component={ideaTemplate}
-        options={{ headerShown: false }}
+      <TemplateSelectionStack.Screen
+        name={Page.IdeaTemplate}
+        component={IdeaTemplate}
       ></TemplateSelectionStack.Screen>
+      {/*
       <TemplateSelectionStack.Screen
         name="TodoTemplate"
         component={todoTemplate}
@@ -85,11 +89,11 @@ function TemplateSelectionFlow(props: TemplateSelectionProps) {
 function RootFlow() {
   return (
     <RootStack.Navigator
-      initialRouteName="AuthFlow"
+      initialRouteName={'AuthFlowNOTUSED'}
       screenOptions={{ headerShown: false }}
     >
-      <RootStack.Screen name="AuthFlow" component={AuthFlow} />
-      <RootStack.Screen name="MainFlow" component={MainFlow} />
+      <RootStack.Screen name={'AuthFlowNOTUSED'} component={AuthFlow} />
+      <RootStack.Screen name={Page.Home} component={MainFlow} />
     </RootStack.Navigator>
   );
 }
@@ -97,7 +101,7 @@ function RootFlow() {
 function ModalFlow() {
   return (
     <ModalStack.Navigator
-      initialRouteName={'TemplateSelectionFlow'}
+      initialRouteName={'RootFlow'}
       mode={'modal'}
       screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
     >
@@ -107,7 +111,7 @@ function ModalFlow() {
         options={{ headerShown: false }}
       />
       <ModalStack.Screen
-        name={'TemplateSelectionFlow'}
+        name={Page.TemplateSelection}
         component={TemplateSelectionFlow}
         options={{ headerShown: false }}
       />

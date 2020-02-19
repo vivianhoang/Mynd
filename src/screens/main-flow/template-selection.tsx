@@ -1,5 +1,4 @@
 import React from 'react';
-import { TemplateSelectionProps } from '../../models';
 import {
   View,
   StyleSheet,
@@ -12,9 +11,8 @@ import {
 import sharedNavigationService from '../../services/navigation-service';
 import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
-import { Icon } from 'react-native-vector-icons/Icon';
 import HiveText from '../../componets/hive-text';
-import { Templates, TemplateType } from '../../models';
+import { TemplateType, PageName, NavigationActions } from '../../models';
 import SearchBar from '../../componets/search-bar';
 
 interface TemplateOption {
@@ -22,20 +20,33 @@ interface TemplateOption {
   title: string;
   description: string;
   image: ImageRequireSource;
+  pageAction: NavigationActions;
 }
 
 const templates: TemplateOption[] = [
   {
-    type: TemplateType.Idea,
+    type: 'Idea',
     title: 'Ideas',
     description: 'You have great ideas!',
     image: require('../../assets/ideas-icon.png'),
+    pageAction: {
+      page: 'IdeaTemplate',
+      props: {
+        idea: null,
+      },
+    },
   },
   {
-    type: TemplateType.Todo,
+    type: 'Todo',
     title: 'Todos',
     description: 'Create a checklist. This is a longer list of things.',
     image: require('../../assets/checklist-icon.png'),
+    pageAction: {
+      page: 'IdeaTemplate',
+      props: {
+        idea: null,
+      },
+    },
   },
 ];
 
@@ -43,11 +54,15 @@ const TemplateCard = (props: {
   title: string;
   description: string;
   image: ImageRequireSource;
+  pageAction: NavigationActions;
 }) => {
-  const { title, description, image } = props;
+  const { title, description, image, pageAction } = props;
 
   return (
-    <TouchableOpacity style={styles.templateOptionContainer} onPress={() => {}}>
+    <TouchableOpacity
+      style={styles.templateOptionContainer}
+      onPress={() => sharedNavigationService.navigate(pageAction)}
+    >
       <View style={styles.labelsContainer}>
         <View style={styles.titleContainer}>
           <Image
@@ -67,7 +82,7 @@ const TemplateCard = (props: {
   );
 };
 
-export default (props: TemplateSelectionProps) => {
+export default () => {
   return (
     <ImageBackground
       source={require('../../assets/templates_screen.png')}
@@ -92,14 +107,16 @@ export default (props: TemplateSelectionProps) => {
         <FlatList
           keyExtractor={option => option.title}
           data={templates}
+          keyboardShouldPersistTaps={'handled'}
           style={styles.contentContainer}
           renderItem={({ item }) => {
-            const { image, title, description } = item;
+            const { image, title, description, pageAction } = item;
             return (
               <TemplateCard
                 image={image as any}
                 title={title}
                 description={description}
+                pageAction={pageAction}
               />
             );
           }}
@@ -138,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F3F3',
     flexDirection: 'row',
     marginBottom: 16,
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 24,
     paddingRight: 20,
   },

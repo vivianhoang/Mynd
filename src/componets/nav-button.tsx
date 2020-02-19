@@ -1,13 +1,25 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ImageRequireSource,
+} from 'react-native';
 import HiveText from './hive-text';
-import Icon from 'react-native-vector-icons/Feather';
 import colors from '../utils/colors';
+
+interface IconOptions {
+  [key: string]: ImageRequireSource;
+}
+
+const icons: IconOptions = {
+  back: require('../assets/back-icon.png'),
+};
 
 export interface NavButtonProps {
   onPress: () => void;
   title?: string;
-  icon?: string;
+  icon?: 'back';
   position: 'left' | 'right';
   color?: string;
   isDisabled?: boolean;
@@ -16,11 +28,11 @@ export interface NavButtonProps {
 export default (props: NavButtonProps) => {
   const { position, onPress, title, icon, color, isDisabled } = props;
   const positionStyle =
-    position === 'left' ? style.leftButton : style.rightButton;
+    position === 'left' ? styles.leftButton : styles.rightButton;
   const content = title ? (
     <HiveText
       style={[
-        style.label,
+        styles.label,
         {
           color: color || colors.offBlack,
         },
@@ -29,12 +41,12 @@ export default (props: NavButtonProps) => {
       {props.title}
     </HiveText>
   ) : icon ? (
-    <Icon name={icon} size={26} color={color || colors.offBlack} />
+    <Image source={icons[icon]} style={styles.icon} />
   ) : null;
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[style.common, positionStyle]}
+      style={[styles.common, positionStyle]}
       disabled={isDisabled}
     >
       {content}
@@ -42,7 +54,7 @@ export default (props: NavButtonProps) => {
   );
 };
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   common: {
     justifyContent: 'center',
   },
@@ -55,5 +67,9 @@ const style = StyleSheet.create({
   },
   label: {
     fontSize: 18,
+  },
+  icon: {
+    height: 44,
+    width: 44,
   },
 });

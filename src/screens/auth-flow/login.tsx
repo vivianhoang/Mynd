@@ -9,7 +9,7 @@ import {
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 import HiveTextInput from '../../componets/hive-text-input';
-import { LoginProps } from '../../models';
+import { LoginProps, Page } from '../../models';
 import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
 import BigButton from '../../componets/big-button';
@@ -24,7 +24,7 @@ export default (props: LoginProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => sharedNavigationService.goBack()}
-        icon={'arrow-left'}
+        icon={'back'}
         position={'left'}
       />
     ),
@@ -60,7 +60,7 @@ export default (props: LoginProps) => {
           onPress={async () => {
             try {
               await sharedAuthService.login(email, password);
-              sharedNavigationService.navigate({ page: 'MainFlow' });
+              sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
               Alert.alert('Uh oh!', error.message);
             }
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     padding: 32,
+    paddingTop: 16,
   },
   fill: {
     flex: 1,

@@ -1,5 +1,17 @@
 import FirebaseFirestore from '@react-native-firebase/firestore';
-import { Category, CategoriesById, Notes, Note } from '../models';
+import {
+  Category,
+  CategoriesById,
+  Notes,
+  Note,
+  Idea,
+  TemplateData,
+  TemplateType,
+  Ideas,
+  Todos,
+  HiveData,
+  JsonHiveData,
+} from '../models';
 import * as _ from 'lodash';
 
 let subscriptionById = {};
@@ -97,31 +109,131 @@ export const deleteCategory = async (categoryId: string, userId: string) => {
   }
 };
 
-export const subscribeToCategories = (
-  onTrigger: (categoriesById: CategoriesById) => void,
+// export const subscribeToCategories = (
+//   onTrigger: (categoriesById: CategoriesById) => void,
+//   userId: string,
+// ) => {
+//   const path = `users/${userId}/categories`;
+//   FirebaseFirestore()
+//     .collection(path)
+//     .onSnapshot(snapshot => {
+//       if (!snapshot.empty) {
+//         // adding type to the returned snapshot
+//         const catgoriesById = _.reduce(
+//           snapshot.docs,
+//           (finalCatgoriesById, snapshot) => {
+//             const category = snapshot.data() as Category;
+//             finalCatgoriesById[category.id] = category;
+//             return finalCatgoriesById;
+//           },
+//           {} as CategoriesById,
+//         );
+//         onTrigger(catgoriesById);
+//       } else {
+//         onTrigger({});
+//         console.log('No categories!');
+//       }
+//     });
+// };
+
+export const subscribeToHive = (
+  onTrigger: (hiveData: any) => void,
   userId: string,
 ) => {
-  const path = `users/${userId}/categories`;
-  FirebaseFirestore()
+  const path = `users/${userId}/hive`;
+  const subscription = FirebaseFirestore()
     .collection(path)
     .onSnapshot(snapshot => {
       if (!snapshot.empty) {
         // adding type to the returned snapshot
-        const catgoriesById = _.reduce(
+        // const newHiveData = snapshot.docs.map(snapshot => {
+        //   const templateData = snapshot.data() as TemplateData;
+        //   return templateData;
+        // });
+        const jsonHiveData = _.reduce(
           snapshot.docs,
-          (finalCatgoriesById, snapshot) => {
-            const category = snapshot.data() as Category;
-            finalCatgoriesById[category.id] = category;
-            return finalCatgoriesById;
+          (finalHiveData, doc) => {
+            const templateData = doc.data() as TemplateData;
+            const existingData = finalHiveData[templateData.type] || [];
+            finalHiveData[templateData.type] = _.sortBy(
+              [...existingData, templateData],
+              data => data.timestamp,
+            );
+            return finalHiveData;
           },
-          {} as CategoriesById,
+          {} as JsonHiveData,
         );
-        onTrigger(catgoriesById);
+        const hiveData = _.reduce(
+          jsonHiveData,
+          (finalHiveData, data, templateType: TemplateType) => {
+            finalHiveData.push({ title: templateType, data: [data] });
+            return finalHiveData;
+          },
+          [] as HiveData,
+        );
+        console.log(hiveData);
+        onTrigger(hiveData);
       } else {
-        onTrigger({});
-        console.log('No categories!');
+        onTrigger([]);
       }
     });
+  // Store subscription for unsubscribing on logout
+  subscriptionById['hive'] = subscription;
+};
+
+export const createIdea = async (
+  ideaId: string,
+  title: string,
+  description: string,
+  userId: string,
+) => {
+  const hiveRef = FirebaseFirestore().collection(`users/${userId}`);
+  const newIdeaId = ideaId || ideasRef.doc().id;
+  const newIdea: Idea = {
+    id: newIdeaId,
+    title: title,
+    description: description,
+    timestamp: new Date().getTime().toString(),
+    type: TemplateType.Idea,
+  };
+  try {
+    ideasRef.add(newIdea);
+  } catch (error) {
+    console.log('Failed to create idea!', error.message);
+  }
+};
+
+export const updateIdea = async (
+  ideaId: string,
+  title: string,
+  description: string,
+  userId: string,
+) => {
+  const ideaRef = FirebaseFirestore().doc(`users/${userId}/ideas/${ideaId}`);
+
+  const updatedIdea: Idea = {
+    id: ideaId,
+    title: title,
+    description: description,
+    timestamp: new Date().getTime().toString(),
+    type: TemplateType.Idea,
+  };
+
+  try {
+    await ideaRef.update(updatedIdea);
+  } catch (error) {
+    console.log('Failed to update idea!', error.message);
+  }
+};
+
+export const deleteIdea = async (ideaId: string, userId: string) => {
+  const ideaRef = FirebaseFirestore().doc(`users/${userId}/ideas/${ideaId}`);
+
+  try {
+    await ideaRef.delete();
+  } catch (error) {
+    console.log('Failed to delete idea!', error.message);
+  }
 };
 
 export const subscribeToCategory = (

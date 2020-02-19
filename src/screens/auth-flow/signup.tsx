@@ -24,7 +24,7 @@ export default (props: SignupProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => sharedNavigationService.goBack()}
-        icon={'arrow-left'}
+        icon={'back'}
         position={'left'}
       />
     ),
@@ -62,7 +62,7 @@ export default (props: SignupProps) => {
           onPress={async () => {
             try {
               await sharedAuthService.signup(email, password);
-              sharedNavigationService.navigate({ page: 'MainFlow' });
+              sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
               Alert.alert('Uh oh!', error.message);
             }
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     padding: 32,
+    paddingTop: 16,
   },
   fill: {
     flex: 1,

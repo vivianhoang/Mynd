@@ -7,6 +7,7 @@ import { ReduxState, ReduxActions } from '../models';
 const sagaMiddleware = createSagaMiddleware();
 const initialState: ReduxState = {
   userId: undefined,
+  hiveData: undefined,
 };
 
 const reducer = (state: ReduxState, action: ReduxActions) => {
@@ -14,6 +15,9 @@ const reducer = (state: ReduxState, action: ReduxActions) => {
   switch (action.type) {
     case 'SET_USER':
       newState.userId = action.userId;
+      return newState;
+    case 'SET_HIVE_DATA':
+      newState.hiveData = action.hiveData;
       return newState;
     default:
       return newState;

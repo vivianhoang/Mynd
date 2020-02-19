@@ -1,35 +1,39 @@
 import { all, take, put, call, select } from 'redux-saga/effects';
-import { ReduxState, ReduxActions } from '../models';
+import { ReduxState, ReduxActions, Idea, Ideas } from '../models';
 import { channel } from 'redux-saga';
 import {
   createNote,
-  subscribeToCategories,
+  // subscribeToCategories,
   subscribeToCategory,
+  subscribeToHive,
   unsubscribeFromId,
   updateNote,
   deleteNote,
   deleteCategory,
   updateCategory,
+  updateIdea,
+  deleteIdea,
+  createIdea,
 } from './firebase-service';
 import sharedNavigationService from './navigation-service';
 
-const categoriesChannel = channel();
-function* getCategories() {
-  const userId: string = yield select((state: ReduxState) => state.userId);
-  subscribeToCategories(categoriesById => {
-    categoriesChannel.put({
-      type: 'SET_CATEGORIES_BY_ID',
-      categoriesById,
-    } as ReduxActions);
-  }, userId);
-}
+// const categoriesChannel = channel();
+// function* getCategories() {
+//   const userId: string = yield select((state: ReduxState) => state.userId);
+//   subscribeToCategories(categoriesById => {
+//     categoriesChannel.put({
+//       type: 'SET_CATEGORIES_BY_ID',
+//       categoriesById,
+//     } as ReduxActions);
+//   }, userId);
+// }
 
-function* takeCategoriesChannel() {
-  while (true) {
-    const action = yield take(categoriesChannel);
-    yield put(action);
-  }
-}
+// function* takeCategoriesChannel() {
+//   while (true) {
+//     const action = yield take(categoriesChannel);
+//     yield put(action);
+//   }
+// }
 
 function* takeCreateNote() {
   while (true) {
@@ -109,6 +113,66 @@ function* takeUnsubscribeCategory() {
   }
 }
 
+const hiveChannel = channel();
+function* getHiveInfo() {
+  const userId: string = yield select((state: ReduxState) => state.userId);
+  subscribeToHive(hiveData => {
+    hiveChannel.put({
+      type: 'SET_HIVE_DATA',
+      hiveData,
+    } as ReduxActions);
+  }, userId);
+}
+
+function* takeIdeasChannel() {
+  while (true) {
+    const action = yield take(hiveChannel);
+    yield put(action);
+  }
+}
+
+function* takeUnsubscribeIdea() {
+  while (true) {
+    const action = yield take('UNSUBSCRIBE_FROM_IDEA');
+    const { ideas } = action;
+    const typedIdeas = ideas as Ideas;
+
+    typedIdeas.forEach(idea => {
+      unsubscribeFromId(idea.id);
+    });
+  }
+}
+
+function* takeCreateIdea() {
+  while (true) {
+    const action = yield take('CREATE_IDEA');
+    const { ideaId, title, description } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => createIdea(ideaId, title, description, userId));
+    sharedNavigationService.goBack();
+  }
+}
+
+function* takeUpdateIdea() {
+  while (true) {
+    const action = yield take('UPDATE_IDEA');
+    const { ideaId, title, description } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => updateIdea(ideaId, title, description, userId));
+    sharedNavigationService.goBack();
+  }
+}
+
+function* takeDeleteIdea() {
+  while (true) {
+    const action = yield take('DELETE_IDEA');
+    const { ideaId } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => deleteIdea(ideaId, userId));
+    sharedNavigationService.goBack();
+  }
+}
+
 function* takeDeleteNote() {
   while (true) {
     const action = yield take('DELETE_NOTE');
@@ -131,8 +195,9 @@ function* takeDeleteCategory() {
 
 export default function* rootSaga() {
   yield all([
-    takeCategoriesChannel(),
-    getCategories(),
+    // takeCategoriesChannel(),
+    takeIdeasChannel(),
+    // getCategories(),
     takeCreateNote(),
     takeUpdateNote(),
     takeDeleteNote(),
@@ -141,5 +206,10 @@ export default function* rootSaga() {
     takeSubscribeToCategory(),
     takeCategoryChannel(),
     takeUnsubscribeCategory(),
+    getHiveInfo(),
+    takeUnsubscribeIdea(),
+    takeCreateIdea(),
+    takeUpdateIdea(),
+    takeDeleteIdea(),
   ]);
 }

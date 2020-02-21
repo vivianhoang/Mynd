@@ -3,37 +3,20 @@ import { ReduxState, ReduxActions, Idea, Ideas } from '../models';
 import { channel } from 'redux-saga';
 import {
   createNote,
-  // subscribeToCategories,
-  subscribeToCategory,
   subscribeToHive,
   unsubscribeFromId,
-  updateNote,
-  deleteNote,
-  deleteCategory,
-  updateCategory,
   updateIdea,
   deleteIdea,
   createIdea,
+  createChecklist,
+  updateChecklist,
+  deleteChecklist,
 } from './firebase-service';
 import sharedNavigationService from './navigation-service';
 
-// const categoriesChannel = channel();
-// function* getCategories() {
-//   const userId: string = yield select((state: ReduxState) => state.userId);
-//   subscribeToCategories(categoriesById => {
-//     categoriesChannel.put({
-//       type: 'SET_CATEGORIES_BY_ID',
-//       categoriesById,
-//     } as ReduxActions);
-//   }, userId);
-// }
-
-// function* takeCategoriesChannel() {
-//   while (true) {
-//     const action = yield take(categoriesChannel);
-//     yield put(action);
-//   }
-// }
+function* initialize() {
+  console.log('Sagas initalized...');
+}
 
 function* takeCreateNote() {
   while (true) {
@@ -58,63 +41,8 @@ function* takeCreateNote() {
   }
 }
 
-function* takeUpdateNote() {
-  while (true) {
-    const action = yield take('UPDATE_NOTE');
-    const { note, categoryId } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => updateNote(categoryId, note, userId));
-    sharedNavigationService.goBack();
-  }
-}
-
-function* takeUpdateCategory() {
-  while (true) {
-    const action = yield take('UPDATE_CATEGORY');
-    const { category } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => updateCategory(category, userId));
-  }
-}
-
-const categoryChannel = channel();
-function* takeSubscribeToCategory() {
-  while (true) {
-    const action = yield take('SUBSCRIBE_TO_CATEGORY');
-    const { categoryId } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-
-    subscribeToCategory(
-      notes => {
-        categoryChannel.put({
-          type: 'SET_NOTES_BY_CATEGORY_ID',
-          notes,
-          categoryId,
-        } as ReduxActions);
-      },
-      userId,
-      categoryId,
-    );
-  }
-}
-
-function* takeCategoryChannel() {
-  while (true) {
-    const action = yield take(categoryChannel);
-    yield put(action);
-  }
-}
-
-function* takeUnsubscribeCategory() {
-  while (true) {
-    const action = yield take('UNSUBSCRIBE_FROM_CATEGORY');
-    const { categoryId } = action;
-    unsubscribeFromId(categoryId);
-  }
-}
-
 const hiveChannel = channel();
-function* getHiveInfo() {
+function* subscribeToHiveInfo() {
   const userId: string = yield select((state: ReduxState) => state.userId);
   subscribeToHive(hiveData => {
     hiveChannel.put({
@@ -146,19 +74,20 @@ function* takeUnsubscribeIdea() {
 function* takeCreateIdea() {
   while (true) {
     const action = yield take('CREATE_IDEA');
-    const { ideaId, title, description } = action;
+    const { title, description } = action;
     const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => createIdea(ideaId, title, description, userId));
-    sharedNavigationService.goBack();
+    yield call(() => createIdea(title, description, userId));
+    // Go back twice to dismiss modal
+    sharedNavigationService.navigate({ page: 'HomeReset' });
   }
 }
 
 function* takeUpdateIdea() {
   while (true) {
     const action = yield take('UPDATE_IDEA');
-    const { ideaId, title, description } = action;
+    const { ideaId, title, description, timestamp } = action;
     const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => updateIdea(ideaId, title, description, userId));
+    yield call(() => updateIdea(title, description, userId, ideaId, timestamp));
     sharedNavigationService.goBack();
   }
 }
@@ -173,43 +102,49 @@ function* takeDeleteIdea() {
   }
 }
 
-function* takeDeleteNote() {
+function* takeCreateChecklist() {
   while (true) {
-    const action = yield take('DELETE_NOTE');
-    const { noteId, categoryId } = action;
+    const action = yield take('CREATE_CHECKLIST');
+    const { title, items } = action;
     const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => deleteNote(noteId, categoryId, userId));
+    yield call(() => createChecklist(title, items, userId));
+    // Go back twice to dismiss modal
+    sharedNavigationService.navigate({ page: 'HomeReset' });
+  }
+}
+
+function* takeUpdateChecklist() {
+  while (true) {
+    const action = yield take('UPDATE_CHECKLIST');
+    const { id, title, items, timestamp } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => updateChecklist(title, items, userId, id, timestamp));
+    sharedNavigationService.navigate({ page: 'HomeReset' });
+  }
+}
+
+function* takeDeleteChecklist() {
+  while (true) {
+    const action = yield take('DELETE_CHECKLIST');
+    const { id } = action;
+    const userId: string = yield select((state: ReduxState) => state.userId);
+    yield call(() => deleteChecklist(id, userId));
     sharedNavigationService.goBack();
   }
 }
 
-function* takeDeleteCategory() {
-  while (true) {
-    const action = yield take('DELETE_CATEGORY');
-    const { categoryId } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => deleteCategory(categoryId, userId));
-    sharedNavigationService.navigate({ page: 'Home' });
-  }
-}
-
-export default function* rootSaga() {
+export const rootSaga = function*() {
   yield all([
-    // takeCategoriesChannel(),
-    takeIdeasChannel(),
-    // getCategories(),
-    takeCreateNote(),
-    takeUpdateNote(),
-    takeDeleteNote(),
-    takeUpdateCategory(),
-    takeDeleteCategory(),
-    takeSubscribeToCategory(),
-    takeCategoryChannel(),
-    takeUnsubscribeCategory(),
-    getHiveInfo(),
-    takeUnsubscribeIdea(),
     takeCreateIdea(),
     takeUpdateIdea(),
     takeDeleteIdea(),
+    takeCreateChecklist(),
+    takeUpdateChecklist(),
+    takeDeleteChecklist(),
+    takeIdeasChannel(),
   ]);
-}
+};
+
+export const sagaAfterLogin = function*() {
+  yield all([initialize(), subscribeToHiveInfo()]);
+};

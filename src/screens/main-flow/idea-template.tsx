@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Image,
   TextInput,
+  ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
 import { IdeaTemplateProps, DispatchAction } from '../../models';
@@ -26,13 +27,13 @@ export default (props: IdeaTemplateProps) => {
     if (existingIdea) {
       dispatch({
         type: 'UPDATE_IDEA',
-        id: existingIdea.id,
+        ideaId: existingIdea.id,
         title: ideaTitle,
         description: ideaDescription,
+        timestamp: existingIdea.timestamp,
       });
     } else {
       const newIdeaDescription = _.trim(ideaDescription) || `What's your idea?`;
-
       const newIdeaTitle = _.trim(ideaTitle) || `What's your idea?`;
 
       dispatch({
@@ -52,7 +53,7 @@ export default (props: IdeaTemplateProps) => {
     ),
     headerLeft: () => (
       <NavButton
-        onPress={() => sharedNavigationService.goBack()}
+        onPress={() => sharedNavigationService.navigate({ page: 'HomeReset' })}
         title={'Cancel'}
         position={'left'}
       />
@@ -69,7 +70,10 @@ export default (props: IdeaTemplateProps) => {
   });
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 400 }}
+    >
       <TextInput
         selectionColor={colors.salmonRed}
         placeholderTextColor={colors.lightPurple}
@@ -82,12 +86,13 @@ export default (props: IdeaTemplateProps) => {
         selectionColor={colors.salmonRed}
         placeholderTextColor={colors.lightPurple}
         style={styles.ideaInput}
+        scrollEnabled={false}
         multiline={true}
         placeholder={'Start writing something here...'}
         value={ideaDescription}
         onChangeText={text => setIdeaDescription(text)}
       />
-    </View>
+    </ScrollView>
   );
 };
 

@@ -37,14 +37,14 @@ const templates: TemplateOption[] = [
     },
   },
   {
-    type: 'Todo',
-    title: 'Todos',
+    type: 'Checklist',
+    title: 'Checklists',
     description: 'Create a checklist. This is a longer list of things.',
     image: require('../../assets/checklist-icon.png'),
     pageAction: {
-      page: 'IdeaTemplate',
+      page: 'ChecklistTemplate',
       props: {
-        idea: null,
+        checklist: null,
       },
     },
   },

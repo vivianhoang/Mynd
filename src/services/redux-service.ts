@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import * as _ from 'lodash';
-import saga from './saga-service';
+import { rootSaga, sagaAfterLogin } from './saga-service';
 import { ReduxState, ReduxActions } from '../models';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -31,7 +31,11 @@ const store = createStore(
 );
 
 export const startSaga = () => {
-  sagaMiddleware.run(saga);
+  sagaMiddleware.run(rootSaga);
+};
+
+export const startSagaAfterLogin = () => {
+  sagaMiddleware.run(sagaAfterLogin);
 };
 
 export default store;

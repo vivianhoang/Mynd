@@ -1,16 +1,12 @@
 import FirebaseFirestore from '@react-native-firebase/firestore';
 import {
-  Category,
-  CategoriesById,
-  Notes,
-  Note,
   Idea,
   TemplateData,
   TemplateType,
-  Ideas,
-  Todos,
   HiveData,
   JsonHiveData,
+  Checklist,
+  ChecklistItem,
 } from '../models';
 import * as _ from 'lodash';
 
@@ -53,89 +49,6 @@ export const createNote = async (
   }
 };
 
-export const updateNote = async (
-  categoryId: string,
-  note: Note,
-  userId: string,
-) => {
-  const noteRef = FirebaseFirestore().doc(
-    `users/${userId}/categories/${categoryId}/notes/${note.id}`,
-  );
-
-  try {
-    await noteRef.update(note);
-  } catch (error) {
-    console.log('Failed to update note!', error.message);
-  }
-};
-
-export const updateCategory = async (category: Category, userId: string) => {
-  const categoryRef = FirebaseFirestore().doc(
-    `users/${userId}/categories/${category?.id}`,
-  );
-
-  try {
-    await categoryRef.update(category);
-  } catch (error) {
-    console.log('Failed to update category name!', error.message);
-  }
-};
-
-export const deleteNote = async (
-  noteId: string,
-  categoryId: string,
-  userId: string,
-) => {
-  const noteRef = FirebaseFirestore().doc(
-    `users/${userId}/categories/${categoryId}/notes/${noteId}`,
-  );
-
-  try {
-    await noteRef.delete();
-  } catch (error) {
-    console.log('Failed to update note!', error.message);
-  }
-};
-
-export const deleteCategory = async (categoryId: string, userId: string) => {
-  const categoryRef = FirebaseFirestore().doc(
-    `users/${userId}/categories/${categoryId}`,
-  );
-
-  try {
-    await categoryRef.delete();
-  } catch (error) {
-    console.log('Failed to delete category!', error.message);
-  }
-};
-
-// export const subscribeToCategories = (
-//   onTrigger: (categoriesById: CategoriesById) => void,
-//   userId: string,
-// ) => {
-//   const path = `users/${userId}/categories`;
-//   FirebaseFirestore()
-//     .collection(path)
-//     .onSnapshot(snapshot => {
-//       if (!snapshot.empty) {
-//         // adding type to the returned snapshot
-//         const catgoriesById = _.reduce(
-//           snapshot.docs,
-//           (finalCatgoriesById, snapshot) => {
-//             const category = snapshot.data() as Category;
-//             finalCatgoriesById[category.id] = category;
-//             return finalCatgoriesById;
-//           },
-//           {} as CategoriesById,
-//         );
-//         onTrigger(catgoriesById);
-//       } else {
-//         onTrigger({});
-//         console.log('No categories!');
-//       }
-//     });
-// };
-
 export const subscribeToHive = (
   onTrigger: (hiveData: any) => void,
   userId: string,
@@ -143,80 +56,85 @@ export const subscribeToHive = (
   const path = `users/${userId}/hive`;
   const subscription = FirebaseFirestore()
     .collection(path)
-    .onSnapshot(snapshot => {
-      if (!snapshot.empty) {
-        // adding type to the returned snapshot
-        // const newHiveData = snapshot.docs.map(snapshot => {
-        //   const templateData = snapshot.data() as TemplateData;
-        //   return templateData;
-        // });
-        const jsonHiveData = _.reduce(
-          snapshot.docs,
-          (finalHiveData, doc) => {
-            const templateData = doc.data() as TemplateData;
-            const existingData = finalHiveData[templateData.type] || [];
-            finalHiveData[templateData.type] = _.sortBy(
-              [...existingData, templateData],
-              data => data.timestamp,
-            );
-            return finalHiveData;
-          },
-          {} as JsonHiveData,
-        );
-        const hiveData = _.reduce(
-          jsonHiveData,
-          (finalHiveData, data, templateType: TemplateType) => {
-            finalHiveData.push({ title: templateType, data: [data] });
-            return finalHiveData;
-          },
-          [] as HiveData,
-        );
-        console.log(hiveData);
-        onTrigger(hiveData);
-      } else {
-        onTrigger([]);
-      }
-    });
+    .onSnapshot(
+      snapshot => {
+        console.log(snapshot);
+        if (!snapshot.empty) {
+          const jsonHiveData = _.reduce(
+            snapshot.docs,
+            (finalHiveData, doc) => {
+              const templateData = doc.data() as TemplateData;
+              const existingData = finalHiveData[templateData.type] || [];
+              finalHiveData[templateData.type] = _.orderBy(
+                [...existingData, templateData],
+                data => {
+                  return data.timestamp;
+                },
+                ['asc'],
+              );
+              return finalHiveData;
+            },
+            {} as JsonHiveData,
+          );
+          const hiveData = _.reduce(
+            jsonHiveData,
+            (finalHiveData, data, templateType: TemplateType) => {
+              finalHiveData.push({ title: templateType, data: [data] });
+              return finalHiveData;
+            },
+            [] as HiveData,
+          );
+          console.log(hiveData);
+          onTrigger(hiveData);
+        } else {
+          console.log('EMPTY');
+          onTrigger([]);
+        }
+      },
+      error => {
+        console.log('ERROR!', error);
+      },
+    );
   // Store subscription for unsubscribing on logout
   subscriptionById['hive'] = subscription;
 };
 
 export const createIdea = async (
-  ideaId: string,
   title: string,
   description: string,
   userId: string,
 ) => {
-  const hiveRef = FirebaseFirestore().collection(`users/${userId}`);
-  const newIdeaId = ideaId || ideasRef.doc().id;
+  const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
+  const ideaId = hiveRef.doc().id;
   const newIdea: Idea = {
-    id: newIdeaId,
+    id: ideaId,
     title: title,
     description: description,
     timestamp: new Date().getTime().toString(),
-    type: TemplateType.Idea,
+    type: 'Idea',
   };
   try {
-    ideasRef.add(newIdea);
+    await hiveRef.doc(ideaId).set(newIdea);
   } catch (error) {
     console.log('Failed to create idea!', error.message);
   }
 };
 
 export const updateIdea = async (
-  ideaId: string,
   title: string,
   description: string,
   userId: string,
+  ideaId: string,
+  timestamp: string,
 ) => {
-  const ideaRef = FirebaseFirestore().doc(`users/${userId}/ideas/${ideaId}`);
+  const ideaRef = FirebaseFirestore().doc(`users/${userId}/hive/${ideaId}`);
 
   const updatedIdea: Idea = {
     id: ideaId,
     title: title,
     description: description,
-    timestamp: new Date().getTime().toString(),
-    type: TemplateType.Idea,
+    timestamp,
+    type: 'Idea',
   };
 
   try {
@@ -236,29 +154,63 @@ export const deleteIdea = async (ideaId: string, userId: string) => {
   }
 };
 
-export const subscribeToCategory = (
-  onTrigger: (notes: Notes) => void,
+export const createChecklist = async (
+  title: string,
+  items: ChecklistItem[],
   userId: string,
-  categoryId: string,
 ) => {
-  const path = `users/${userId}/categories/${categoryId}/notes`;
-  const subscription = FirebaseFirestore()
-    .collection(path)
-    .onSnapshot(snapshot => {
-      if (!snapshot.empty) {
-        // adding type to the returned snapshot
-        const newNotesList = snapshot.docs.map(snapshot => {
-          const note = snapshot.data() as Note;
-          return note;
-        });
-        onTrigger(newNotesList);
-        console.log('ANTHING');
-      } else {
-        onTrigger([]);
-        console.log('No notes!');
-      }
-    });
-  subscriptionById[categoryId] = subscription;
+  const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
+  const checklistId = hiveRef.doc().id;
+  const newChecklist: Checklist = {
+    id: checklistId,
+    title: title,
+    items,
+    timestamp: new Date().getTime().toString(),
+    type: 'Checklist',
+  };
+  try {
+    await hiveRef.doc(checklistId).set(newChecklist);
+  } catch (error) {
+    console.log('Failed to create checklist!', error.message);
+  }
+};
+
+export const updateChecklist = async (
+  title: string,
+  items: ChecklistItem[],
+  userId: string,
+  checklistId: string,
+  timestamp: string,
+) => {
+  const checklistRef = FirebaseFirestore().doc(
+    `users/${userId}/hive/${checklistId}`,
+  );
+
+  const updatedChecklist: Checklist = {
+    id: checklistId,
+    title: title,
+    items,
+    timestamp,
+    type: 'Checklist',
+  };
+
+  try {
+    await checklistRef.update(updatedChecklist);
+  } catch (error) {
+    console.log('Failed to update checklist!', error.message);
+  }
+};
+
+export const deleteChecklist = async (checklistId: string, userId: string) => {
+  const checklistRef = FirebaseFirestore().doc(
+    `users/${userId}/checklists/${checklistId}`,
+  );
+
+  try {
+    await checklistRef.delete();
+  } catch (error) {
+    console.log('Failed to delete checklist!', error.message);
+  }
 };
 
 export const unsubscribeFromId = (id: string) => {
@@ -266,5 +218,11 @@ export const unsubscribeFromId = (id: string) => {
   if (unsubscribe) {
     unsubscribe();
     delete subscriptionById[id];
+  }
+};
+
+export const unsubscribeFromAll = () => {
+  for (const id in subscriptionById) {
+    unsubscribeFromId(id);
   }
 };

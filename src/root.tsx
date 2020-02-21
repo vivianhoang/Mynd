@@ -3,11 +3,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import home from './screens/main-flow/home';
 import templateSelection from './screens/main-flow/template-selection';
-import splash from './screens/auth-flow/splash';
+import Splash from './screens/auth-flow/splash';
 import Landing from './screens/auth-flow/landing';
 import login from './screens/auth-flow/login';
 import signup from './screens/auth-flow/signup';
 import IdeaTemplate from './screens/main-flow/idea-template';
+import ChecklistTemplate from './screens/main-flow/checklist-template';
 import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
@@ -23,10 +24,22 @@ const TemplateSelectionStack = createStackNavigator();
 function MainFlow() {
   return (
     <MainStack.Navigator
-      initialRouteName={'HomeNOTUSED'}
-      screenOptions={{ headerStyle: { shadowColor: 'transparent' } }}
+      initialRouteName={'HomeReset'}
+      screenOptions={{ gestureEnabled: false }}
     >
-      <MainStack.Screen name="HomeNOTUSED" component={home}></MainStack.Screen>
+      <MainStack.Screen
+        options={{ headerShown: false }}
+        name="HomeReset"
+        component={home}
+      ></MainStack.Screen>
+      <MainStack.Screen
+        name={Page.IdeaTemplate}
+        component={IdeaTemplate}
+      ></MainStack.Screen>
+      <MainStack.Screen
+        name={Page.ChecklistTemplate}
+        component={ChecklistTemplate}
+      ></MainStack.Screen>
     </MainStack.Navigator>
   );
 }
@@ -35,11 +48,14 @@ function AuthFlow() {
   return (
     <AuthStack.Navigator
       initialRouteName={Page.Splash}
-      screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
+      screenOptions={{
+        headerStyle: { shadowColor: colors.lightGray },
+        gestureEnabled: false,
+      }}
     >
       <AuthStack.Screen
         name={Page.Splash}
-        component={splash}
+        component={Splash}
         options={{ headerShown: false }}
       ></AuthStack.Screen>
       <AuthStack.Screen
@@ -60,7 +76,10 @@ function TemplateSelectionFlow() {
   return (
     <TemplateSelectionStack.Navigator
       initialRouteName="TemplateSelectionNOTUSED"
-      screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
+      screenOptions={{
+        headerStyle: { shadowColor: colors.lightGray },
+        gestureEnabled: false,
+      }}
     >
       <TemplateSelectionStack.Screen
         name="TemplateSelectionNOTUSED"
@@ -71,12 +90,11 @@ function TemplateSelectionFlow() {
         name={Page.IdeaTemplate}
         component={IdeaTemplate}
       ></TemplateSelectionStack.Screen>
-      {/*
       <TemplateSelectionStack.Screen
-        name="TodoTemplate"
-        component={todoTemplate}
-        options={{ headerShown: false }}
+        name={Page.ChecklistTemplate}
+        component={ChecklistTemplate}
       ></TemplateSelectionStack.Screen>
+      {/*
       <TemplateSelectionStack.Screen
         name="GoalTemplate"
         component={goalTemplate}
@@ -90,7 +108,7 @@ function RootFlow() {
   return (
     <RootStack.Navigator
       initialRouteName={'AuthFlowNOTUSED'}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, gestureEnabled: false }}
     >
       <RootStack.Screen name={'AuthFlowNOTUSED'} component={AuthFlow} />
       <RootStack.Screen name={Page.Home} component={MainFlow} />
@@ -103,7 +121,10 @@ function ModalFlow() {
     <ModalStack.Navigator
       initialRouteName={'RootFlow'}
       mode={'modal'}
-      screenOptions={{ headerStyle: { shadowColor: colors.lightGray } }}
+      screenOptions={{
+        headerStyle: { shadowColor: colors.lightGray },
+        gestureEnabled: false,
+      }}
     >
       <ModalStack.Screen
         name={'RootFlow'}

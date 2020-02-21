@@ -1,8 +1,9 @@
 import FirebaseAuth from '@react-native-firebase/auth';
 import sharedNavigationService from './navigation-service';
 import FirebaseFirestore from '@react-native-firebase/firestore';
-import { startSaga } from './redux-service';
+import { startSaga, startSagaAfterLogin } from './redux-service';
 import store from './redux-service';
+import { unsubscribeFromAll } from './firebase-service';
 
 class AuthService {
   setUser(userId: string) {
@@ -10,13 +11,14 @@ class AuthService {
   }
 
   async initialize() {
+    startSaga();
     const user = FirebaseAuth().currentUser;
 
     if (user) {
       this.setUser(user.uid);
       // user is signed in
       sharedNavigationService.navigate({ page: 'Home' });
-      startSaga();
+      startSagaAfterLogin();
     } else {
       // user is not signed in
       sharedNavigationService.navigate({ page: 'Landing' });
@@ -29,6 +31,7 @@ class AuthService {
       password,
     );
     await this.createNewUser(userCredential.user.uid);
+    startSagaAfterLogin();
   }
 
   async login(email: string, password: string) {
@@ -37,11 +40,12 @@ class AuthService {
       password,
     );
     this.setUser(userCredential.user.uid);
-    startSaga();
+    startSagaAfterLogin();
   }
 
   logout() {
     FirebaseAuth().signOut();
+    unsubscribeFromAll();
     this.setUser(undefined);
     sharedNavigationService.navigate({ page: 'Landing' });
   }
@@ -52,7 +56,6 @@ class AuthService {
       .doc(userId)
       .set({});
     this.setUser(userId);
-    startSaga();
   }
 }
 

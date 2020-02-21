@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  Text,
   SectionList,
+  SafeAreaView,
   ImageRequireSource,
 } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
@@ -16,181 +16,187 @@ import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 
 import {
-  CategoriesById,
   HomeProps,
   ReduxState,
-  Category,
-  Ideas,
   HiveData,
   TemplateType,
+  TemplateData,
 } from '../../models';
-import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
-import HiveTextInput from '../../componets/hive-text-input';
-import Icon from 'react-native-vector-icons/Feather';
-import { TextInput } from 'react-native-gesture-handler';
 import SearchBar from '../../componets/search-bar';
 
 const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
-  Todo: require('../../assets/checklist-icon.png'),
+  Checklist: require('../../assets/checklist-icon.png'),
 };
 
 export default (props: HomeProps) => {
   const hiveData = useSelector<ReduxState, HiveData>(state => state.hiveData);
-  // props.navigation.setOptions({
-  //   headerTitle: () => (
-  //     <Image
-  //       style={styles.logo}
-  //       source={require('../../assets/logo.png')}
-  //       resizeMode={'contain'}
-  //     />
-  //   ),
-  // });
 
   console.log('RE RENDER HOME, TODO, MEMOIZE USE SELECTOR');
 
   return (
-    <View style={styles.container}>
-      <View style={{ flex: 1 }}>
-        <View style={{ paddingVertical: 16 }}>
-          <SearchBar placeholder={'Search for something...'} />
-        </View>
-        <SectionList
-          sections={hiveData}
-          renderSectionHeader={({ section: { title } }) => {
-            const sectionTitle = `${title}s`;
-            const icon = iconMap[title as TemplateType];
-            return (
-              <View
-                style={{
-                  paddingBottom: 16,
-                  paddingTop: 8,
-                  backgroundColor: colors.white,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-              >
-                <Image
-                  source={icon}
-                  style={{ height: 34, width: 34, marginRight: 12 }}
-                  resizeMode={'contain'}
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
+      <View style={styles.container}>
+        <View style={{ flex: 1, paddingHorizontal: 16 }}>
+          <View
+            style={{
+              // paddingTop: 16,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <HiveText variant={'medium'} style={{ fontSize: 20 }}>
+              {`What's on your mind?`}
+            </HiveText>
+            <Image
+              source={require('../../assets/home-bee.png')}
+              style={{ height: 187 * 0.3, width: 276 * 0.3, marginRight: 16 }}
+              resizeMode={'contain'}
+            />
+          </View>
+          <View style={{ paddingVertical: 16 }}>
+            <SearchBar placeholder={'Search for something...'} />
+          </View>
+          <SectionList
+            sections={hiveData}
+            keyExtractor={(item, index) => {
+              return `section-${item[0].id}`;
+            }}
+            renderSectionHeader={({ section: { title } }) => {
+              const sectionTitle = `${title}s`;
+              const icon = iconMap[title as TemplateType];
+              return (
+                <View
+                  style={{
+                    paddingBottom: 16,
+                    paddingTop: 8,
+                    backgroundColor: colors.white,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Image
+                    source={icon}
+                    style={{ height: 34, width: 34, marginRight: 12 }}
+                    resizeMode={'contain'}
+                  />
+                  <HiveText variant={'bold'} style={{ fontSize: 30 }}>
+                    {sectionTitle}
+                  </HiveText>
+                </View>
+              );
+            }}
+            renderItem={({ item }) => {
+              return (
+                <FlatList
+                  numColumns={3}
+                  data={[...item]}
+                  keyExtractor={item => {
+                    return item.id;
+                  }}
+                  renderItem={({
+                    item,
+                    index,
+                  }: {
+                    item: TemplateData;
+                    index: number;
+                  }) => {
+                    let marginHorizontal = index % 3 == 1 ? 16 : 0;
+                    return (
+                      <TouchableOpacity
+                        style={{
+                          height: (375 - 32) / 3,
+                          width: (Dimensions.get('window').width - 64) / 3,
+                          backgroundColor: colors.placeholderGray,
+                          marginHorizontal,
+                          marginBottom: 12,
+                          borderRadius: 10,
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          padding: 12,
+                        }}
+                        onPress={() => {
+                          switch (item.type) {
+                            case 'Idea':
+                              {
+                                sharedNavigationService.navigate({
+                                  page: 'IdeaTemplate',
+                                  props: { idea: item },
+                                });
+                              }
+                              break;
+                            case 'Checklist':
+                              {
+                                sharedNavigationService.navigate({
+                                  page: 'ChecklistTemplate',
+                                  props: { checklist: item },
+                                });
+                              }
+                              break;
+                          }
+                        }}
+                      >
+                        <HiveText
+                          style={{ textAlign: 'center' }}
+                          variant={'medium'}
+                        >
+                          {item.title}
+                        </HiveText>
+                      </TouchableOpacity>
+                    );
+                  }}
                 />
-                <HiveText variant={'bold'} style={{ fontSize: 30 }}>
-                  {sectionTitle}
-                </HiveText>
-              </View>
-            );
-          }}
-          renderItem={({ item }) => {
-            console.log(item);
-            return (
-              <FlatList
-                numColumns={3}
-                data={[...item, ...item]}
-                renderItem={({ item, index }) => {
-                  let marginHorizontal = index % 3 == 1 ? 16 : 0;
-                  return (
-                    <View
-                      style={{
-                        height: (375 - 32) / 3,
-                        width: (Dimensions.get('window').width - 64) / 3,
-                        backgroundColor: colors.placeholderGray,
-                        marginHorizontal,
-                        marginBottom: 16,
-                        borderRadius: 10,
-                      }}
-                    />
-                  );
-                }}
+              );
+            }}
+          ></SectionList>
+        </View>
+        <View style={styles.tabContainer}>
+          <View style={styles.tabLabel}>
+            <TouchableOpacity onPress={() => sharedAuthService.logout()}>
+              <Image
+                style={styles.tabIcon}
+                source={require('../../assets/ellipsis-icon.png')}
+                resizeMode={'contain'}
               />
-            );
-          }}
-        ></SectionList>
-        {/* <FlatList
-          data={ideas}
-          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-          keyboardShouldPersistTaps={'always'}
-          contentContainerStyle={{ padding: 16 }}
-          renderItem={({ item, index }) => {
-            const isLeft = index % 2 == 0;
-            return (
-              <TouchableOpacity
+            </TouchableOpacity>
+          </View>
+          <View style={styles.tabLabel}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() =>
+                sharedNavigationService.navigate({
+                  page: 'TemplateSelection',
+                })
+              }
+            >
+              <Image
                 style={[
-                  styles.categoryCard,
+                  styles.tabIcon,
                   {
-                    marginLeft: isLeft ? 0 : 4,
-                    marginRight: isLeft ? 8 : 4,
+                    height: 70,
+                    width: 70,
                   },
                 ]}
-                onPress={() => {
-                  sharedNavigationService.navigate({
-                    page: 'IdeaTemplate',
-                    props: {
-                      idea: item,
-                    },
-                  });
-                }}
-              >
-                <View style={styles.cardBackground} />
-                <Image
-                  source={require('../../assets/honey-comb.png')}
-                  style={styles.cardBackgroundImage}
-                  resizeMode={'cover'}
-                />
-                <HiveText numberOfLines={1} style={styles.cardLabel}>
-                  {item.title.toUpperCase()}
-                </HiveText>
-              </TouchableOpacity>
-            );
-          }}
-        ></FlatList> */}
-      </View>
-      <View style={styles.tabContainer}>
-        <View style={styles.tabLabel}>
-          <TouchableOpacity onPress={() => sharedAuthService.logout()}>
-            <Image
-              style={styles.tabIcon}
-              source={require('../../assets/ellipsis-icon.png')}
-              resizeMode={'contain'}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.tabLabel}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() =>
-              sharedNavigationService.navigate({
-                page: 'TemplateSelection',
-              })
-            }
-          >
-            <Image
-              style={[
-                styles.tabIcon,
-                {
-                  height: 80,
-                  width: 80,
-                  marginBottom: 8,
-                },
-              ]}
-              source={require('../../assets/templates_button.png')}
-              resizeMode={'contain'}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.tabLabel}>
-          <TouchableOpacity>
-            <Image
-              style={styles.tabIcon}
-              source={require('../../assets/user-icon.png')}
-              resizeMode={'contain'}
-            />
-          </TouchableOpacity>
+                source={require('../../assets/templates_button.png')}
+                resizeMode={'contain'}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.tabLabel}>
+            <TouchableOpacity>
+              <Image
+                style={styles.tabIcon}
+                source={require('../../assets/user-icon.png')}
+                resizeMode={'contain'}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -198,18 +204,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   tabIcon: {
-    height: 50,
-    width: 50,
+    height: 44,
+    width: 44,
   },
   tabContainer: {
-    height: 50 + 32,
+    height: 44,
     borderTopWidth: 1,
     borderColor: colors.lightGray,
     backgroundColor: colors.white,
-    paddingBottom: 32,
+    alignItems: 'center',
     flexDirection: 'row',
   },
   tabLabel: {

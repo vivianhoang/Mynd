@@ -13,7 +13,7 @@ export interface ReduxState {
 //   type: TemplateType;
 // }
 
-export type TemplateData = Todo | Idea;
+export type TemplateData = Checklist | Idea;
 
 export type JsonHiveData = {
   [key in TemplateType]: TemplateData[];
@@ -24,7 +24,7 @@ export type HiveData = {
   data: TemplateData[][];
 }[];
 
-export type TemplateType = 'Idea' | 'Todo';
+export type TemplateType = 'Idea' | 'Checklist';
 
 export interface Idea {
   id: string;
@@ -34,44 +34,25 @@ export interface Idea {
   type: 'Idea';
 }
 
-export interface Todo {
-  id: string;
+export interface ChecklistItem {
   title: string;
-  checklist: string[];
-  timestamp: string;
-  type: 'Todo';
-}
-
-export type Templates = Idea | Todo;
-
-export interface NotesByCategoryId {
-  [categoryId: string]: Note[];
-}
-
-export interface Category {
-  id: string;
-  title: string;
-}
-
-export interface CategoriesById {
-  [id: string]: Category;
-}
-
-export interface Note {
-  id: string;
-  description: string;
+  checked: boolean;
   timestamp: string;
 }
+export interface Checklist {
+  id: string;
+  title: string;
+  items: ChecklistItem[];
+  timestamp: string;
+  type: 'Checklist';
+}
 
-export type Notes = Note[];
+export type Templates = Idea | Checklist;
+
 export type Ideas = Idea[];
-export type Todos = Todo[];
+export type Checklists = Checklist[];
 
 //---------Actions-related interfaces-----------//
-export interface SetCategoriesById {
-  type: 'SET_CATEGORIES_BY_ID';
-  categoriesById: CategoriesById;
-}
 
 export interface CreateIdea {
   type: 'CREATE_IDEA';
@@ -83,7 +64,8 @@ export interface UpdateIdea {
   type: 'UPDATE_IDEA';
   title: string;
   description: string;
-  id: string;
+  ideaId: string;
+  timestamp: string;
 }
 
 export interface DeleteIdea {
@@ -91,24 +73,23 @@ export interface DeleteIdea {
   id: string;
 }
 
-export interface CreateNote {
-  type: 'CREATE_NOTE';
-  categoryTitle: string;
-  categoryId: string;
-  noteTimestamp: string;
-  noteDescription?: string;
+export interface CreateChecklist {
+  type: 'CREATE_CHECKLIST';
+  title: string;
+  items: ChecklistItem[];
 }
 
-export interface UpdateNote {
-  type: 'UPDATE_NOTE';
-  note: Note;
-  categoryId: string;
+export interface UpdateChecklist {
+  type: 'UPDATE_CHECKLIST';
+  title: string;
+  items: ChecklistItem[];
+  id: string;
+  timestamp: string;
 }
 
-export interface DeleteNote {
-  type: 'DELETE_NOTE';
-  noteId: string;
-  categoryId: string;
+export interface DeleteChecklist {
+  type: 'DELETE_CHECKLIST';
+  id: string;
 }
 
 export interface SetUser {
@@ -126,37 +107,16 @@ export interface SetHiveData {
   hiveData: HiveData;
 }
 
-export interface SubscribeToCategory {
-  type: 'SUBSCRIBE_TO_CATEGORY';
-  categoryId: string;
-}
-
-export interface UnsubscribeFromCategory {
-  type: 'UNSUBSCRIBE_FROM_CATEGORY';
-  categoryId: string;
-}
-
-export interface SetNotesByCategoryId {
-  type: 'SET_NOTES_BY_CATEGORY_ID';
-  notes: Notes;
-  categoryId: string;
-}
-
 export type ReduxActions =
-  | SetCategoriesById
   | CreateIdea
   | UpdateIdea
   | DeleteIdea
-  | UpdateNote
-  | CreateNote
-  | UpdateNote
-  | DeleteNote
+  | CreateChecklist
+  | UpdateChecklist
+  | DeleteChecklist
   | SetUser
   | SetHiveData
-  | UnsubscribeFromIdea
-  | SubscribeToCategory
-  | UnsubscribeFromCategory
-  | SetNotesByCategoryId;
+  | UnsubscribeFromIdea;
 
 export type DispatchAction = Dispatch<ReduxActions>;
 
@@ -164,23 +124,27 @@ export type DispatchAction = Dispatch<ReduxActions>;
 
 export type PageName =
   | 'Home'
+  | 'HomeReset'
   | 'Splash'
   | 'Landing'
   | 'Login'
   | 'Signup'
   | 'TemplateSelection'
-  | 'IdeaTemplate';
+  | 'IdeaTemplate'
+  | 'ChecklistTemplate';
 
 export const Page: {
   [key in PageName]: PageName;
 } = {
   Home: 'Home',
+  HomeReset: 'HomeReset',
   Splash: 'Splash',
   Landing: 'Landing',
   Login: 'Login',
   Signup: 'Signup',
   TemplateSelection: 'TemplateSelection',
   IdeaTemplate: 'IdeaTemplate',
+  ChecklistTemplate: 'ChecklistTemplate',
 };
 
 export interface BasePageInterface {
@@ -193,6 +157,10 @@ export interface LoginPage extends BasePageInterface {
 
 export interface HomePage extends BasePageInterface {
   page: 'Home';
+}
+
+export interface HomeReset extends BasePageInterface {
+  page: 'HomeReset';
 }
 
 export interface LandingPage extends BasePageInterface {
@@ -211,6 +179,14 @@ export interface IdeaTemplatePage extends BasePageInterface {
   props: IdeaTemplateOwnProps;
 }
 
+export interface ChecklistTemplateOwnProps {
+  checklist: Checklist | null;
+}
+export interface ChecklistTemplatePage extends BasePageInterface {
+  page: 'ChecklistTemplate';
+  props: ChecklistTemplateOwnProps;
+}
+
 export interface SignupPage extends BasePageInterface {
   page: 'Signup';
 }
@@ -218,13 +194,16 @@ export interface SignupPage extends BasePageInterface {
 export type NavigationActions =
   | LoginPage
   | HomePage
+  | HomeReset
   | LandingPage
   | TemplateSelectionPage
   | IdeaTemplatePage
+  | ChecklistTemplatePage
   | SignupPage;
 
 export type RouteParamsList = {
   IdeaTemplate: IdeaTemplateOwnProps;
+  ChecklistTemplate: ChecklistTemplateOwnProps;
 };
 
 //---------Component-based interfaces-----------//
@@ -244,4 +223,9 @@ export interface SignupProps {
 export interface IdeaTemplateProps {
   navigation: StackNavigationProp<any>;
   route: RouteProp<RouteParamsList, 'IdeaTemplate'>;
+}
+
+export interface ChecklistTemplateProps {
+  navigation: StackNavigationProp<any>;
+  route: RouteProp<RouteParamsList, 'ChecklistTemplate'>;
 }

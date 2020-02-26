@@ -12,43 +12,6 @@ import * as _ from 'lodash';
 
 let subscriptionById = {};
 
-export const createNote = async (
-  categoryId: string,
-  categoryName: string,
-  noteDescription: string,
-  noteTimestamp: string,
-  userId: string,
-) => {
-  const categoriesRef = FirebaseFirestore().collection(
-    `users/${userId}/categories`,
-  );
-  const newCategoryId = categoryId || categoriesRef.doc().id;
-
-  const batch = FirebaseFirestore().batch();
-  batch.set(categoriesRef.doc(newCategoryId), {
-    id: newCategoryId,
-    title: categoryName,
-  });
-
-  if (noteDescription.length) {
-    const noteRef = FirebaseFirestore().collection(
-      `users/${userId}/categories/${newCategoryId}/notes`,
-    );
-    const newNoteId = noteRef.doc().id;
-    batch.set(noteRef.doc(newNoteId), {
-      description: noteDescription,
-      id: newNoteId,
-      timestamp: noteTimestamp,
-    });
-  }
-
-  try {
-    await batch.commit();
-  } catch (error) {
-    console.log('Failed to create note!', error.message);
-  }
-};
-
 export const subscribeToHive = (
   onTrigger: (hiveData: any) => void,
   userId: string,

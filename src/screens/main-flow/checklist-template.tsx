@@ -18,7 +18,6 @@ import {
   Alert,
 } from 'react-native';
 import {
-  DispatchAction,
   ChecklistTemplateProps,
   ChecklistItem,
   ReduxState,
@@ -26,7 +25,7 @@ import {
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 import {
   deleteChecklist,
@@ -82,7 +81,6 @@ export default (props: ChecklistTemplateProps) => {
   );
   const [newItemTitle, setNewItemTitle] = useState('');
   const [newItemChecked, setNewItemChecked] = useState(false);
-  // const [newItemFocused, setNewItemFocused] = useState(false);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   let inputRefList = useRef(checklistItems.map(() => createRef<TextInput>()));
@@ -323,19 +321,9 @@ export default (props: ChecklistTemplateProps) => {
           );
         })}
         {/* New input */}
-        <View
-          style={[
-            styles.rowContainer,
-            {
-              // opacity: newItemFocused ? 1 : 0,
-            },
-          ]}
-        >
+        <View style={[styles.rowContainer]}>
           <TextInput
             ref={newInputRef}
-            // onFocus={() => {
-            //   setNewItemFocused(true);
-            // }}
             onBlur={() => {
               if (_.trim(newItemTitle)) {
                 const newItem: ChecklistItem = {
@@ -348,7 +336,6 @@ export default (props: ChecklistTemplateProps) => {
               }
               setNewItemTitle('');
               setNewItemChecked(false);
-              // setNewItemFocused(false);
             }}
             onSubmitEditing={() => {
               if (_.trim(newItemTitle)) {
@@ -364,7 +351,6 @@ export default (props: ChecklistTemplateProps) => {
               }
               setNewItemTitle('');
               setNewItemChecked(false);
-              // setNewItemFocused(false);
             }}
             blurOnSubmit={false}
             placeholderTextColor={colors.lightPurple}
@@ -374,13 +360,10 @@ export default (props: ChecklistTemplateProps) => {
             selectionColor={colors.salmonRed}
             style={styles.rowInput}
             multiline={true}
-            // onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
           />
           <TouchableOpacity
             style={styles.checkBox}
-            // disabled={!newItemFocused}
             onPress={() => setNewItemChecked(!newItemChecked)}
-            // onFocus={() => setNewItemFocused(true)}
             onBlur={() => {
               if (_.trim(newItemTitle)) {
                 const newItem: ChecklistItem = {
@@ -393,7 +376,6 @@ export default (props: ChecklistTemplateProps) => {
               }
               setNewItemTitle('');
               setNewItemChecked(false);
-              // setNewItemFocused(false);
             }}
           >
             <View
@@ -461,7 +443,6 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: 'row',
-    // alignItems: 'center',
     borderBottomWidth: 1,
     borderColor: colors.placeholderGray,
   },
@@ -475,7 +456,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 14,
     marginRight: 16,
-    // minHeight: 50,
   },
   checkBox: {
     height: 30,

@@ -10,10 +10,9 @@ import {
   SafeAreaView,
 } from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
-import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
-import { TemplateType, PageName, NavigationActions } from '../../models';
+import { TemplateType, NavigationActions } from '../../models';
 import SearchBar from '../../componets/search-bar';
 import _ from 'lodash';
 

@@ -9,11 +9,11 @@ import {
   KeyboardAvoidingView,
   Alert,
 } from 'react-native';
-import { IdeaTemplateProps, DispatchAction, ReduxState } from '../../models';
+import { IdeaTemplateProps, ReduxState } from '../../models';
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 import { TouchableOpacity } from 'react-native';
 import {

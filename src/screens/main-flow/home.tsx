@@ -303,12 +303,6 @@ const styles = StyleSheet.create({
     height: null,
     width: null,
   },
-  categoryCard: {
-    height: 100,
-    justifyContent: 'flex-end',
-    padding: 16,
-    flex: 1,
-  },
   cardLabel: {
     fontSize: 18,
     fontWeight: '700',

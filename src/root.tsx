@@ -6,7 +6,9 @@ import templateSelection from './screens/main-flow/template-selection';
 import Splash from './screens/auth-flow/splash';
 import Landing from './screens/auth-flow/landing';
 import login from './screens/auth-flow/login';
+import ForgotPassword from './screens/auth-flow/forgot-pasword';
 import signup from './screens/auth-flow/signup';
+import Loader from './screens/main-flow/loader';
 import IdeaTemplate from './screens/main-flow/idea-template';
 import ChecklistTemplate from './screens/main-flow/checklist-template';
 import sharedNavigationService from './services/navigation-service';
@@ -15,7 +17,8 @@ import store from './services/redux-service';
 import { Page } from './models';
 import colors from './utils/colors';
 
-const ModalStack = createStackNavigator();
+const ModalStack0 = createStackNavigator();
+const ModalStack1 = createStackNavigator();
 const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
@@ -64,6 +67,10 @@ function AuthFlow() {
         options={{ headerShown: false }}
       ></AuthStack.Screen>
       <AuthStack.Screen name={Page.Login} component={login}></AuthStack.Screen>
+      <AuthStack.Screen
+        name={Page.ForgotPassword}
+        component={ForgotPassword}
+      ></AuthStack.Screen>
       <AuthStack.Screen
         name={Page.Signup}
         component={signup}
@@ -116,9 +123,9 @@ function RootFlow() {
   );
 }
 
-function ModalFlow() {
+function ModalStack1Flow() {
   return (
-    <ModalStack.Navigator
+    <ModalStack1.Navigator
       initialRouteName={'RootFlow'}
       mode={'modal'}
       screenOptions={{
@@ -126,17 +133,59 @@ function ModalFlow() {
         gestureEnabled: false,
       }}
     >
-      <ModalStack.Screen
+      <ModalStack1.Screen
         name={'RootFlow'}
         component={RootFlow}
         options={{ headerShown: false }}
       />
-      <ModalStack.Screen
+      <ModalStack1.Screen
         name={Page.TemplateSelection}
         component={TemplateSelectionFlow}
         options={{ headerShown: false }}
       />
-    </ModalStack.Navigator>
+    </ModalStack1.Navigator>
+  );
+}
+
+function ModalStack0Flow() {
+  return (
+    <ModalStack0.Navigator
+      initialRouteName={'ModalStack1Flow'}
+      mode={'modal'}
+      screenOptions={{
+        headerStyle: { shadowColor: colors.lightGray },
+        gestureEnabled: false,
+        headerShown: false,
+      }}
+    >
+      <ModalStack0.Screen
+        name={'ModalStack1Flow'}
+        component={ModalStack1Flow}
+      />
+      <ModalStack0.Screen
+        name={Page.Loader}
+        component={Loader}
+        options={{
+          cardStyle: {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          },
+          transitionSpec: {
+            open: {
+              animation: 'timing',
+              config: {
+                duration: 0,
+              },
+            },
+            close: {
+              animation: 'timing',
+              config: {
+                duration: 0,
+              },
+            },
+          },
+        }}
+      />
+    </ModalStack0.Navigator>
   );
 }
 
@@ -144,7 +193,7 @@ export default () => {
   return (
     <Provider store={store}>
       <NavigationContainer ref={sharedNavigationService.navRef}>
-        <ModalFlow />
+        <ModalStack0Flow />
       </NavigationContainer>
     </Provider>
   );

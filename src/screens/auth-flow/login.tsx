@@ -5,6 +5,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
@@ -36,7 +37,7 @@ export default (props: LoginProps) => {
       <HiveText style={styles.headerLabel}>{'Login'}</HiveText>
       <HiveTextInput
         style={styles.input}
-        title="USERNAME OR EMAIL"
+        title="EMAIL"
         value={email}
         onChangeText={text => {
           setEmail(text);
@@ -50,6 +51,22 @@ export default (props: LoginProps) => {
           setPassword(password);
         }}
       />
+      <TouchableOpacity
+        hitSlop={{ left: 12, top: 12, right: 12, bottom: 12 }}
+        onPress={() =>
+          sharedNavigationService.navigate({ page: 'ForgotPassword' })
+        }
+      >
+        <HiveText
+          style={{
+            color: colors.lightPurple,
+            textAlign: 'right',
+            marginTop: 16,
+          }}
+        >
+          {'Forgot Password'}
+        </HiveText>
+      </TouchableOpacity>
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
@@ -58,10 +75,12 @@ export default (props: LoginProps) => {
         <BigButton
           style={styles.button}
           onPress={async () => {
+            sharedNavigationService.navigate({ page: 'Loader' });
             try {
               await sharedAuthService.login(email, password);
               sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
+              sharedNavigationService.navigate({ page: 'Login' });
               Alert.alert('Uh oh!', error.message);
             }
           }}

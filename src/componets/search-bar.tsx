@@ -5,24 +5,25 @@ import {
   View,
   Image,
   TouchableOpacity,
+  TextInputProps,
 } from 'react-native';
 import colors from '../utils/colors';
+import * as _ from 'lodash';
 
-interface SearchBarProps {
-  placeholder: string;
+interface SearchBarProps extends TextInputProps {
+  onDismiss: () => void;
 }
 
 export default (props: SearchBarProps) => {
-  const { placeholder } = props;
   return (
     <View style={styles.container}>
       <TextInput
         selectionColor={colors.salmonRed}
-        placeholder={placeholder}
         placeholderTextColor={colors.lightPurple}
         style={styles.input}
+        {...props}
       />
-      <TouchableOpacity style={styles.iconContainer}>
+      <TouchableOpacity style={styles.iconContainer} onPress={props.onDismiss}>
         <Image
           style={styles.clearIcon}
           source={require('../assets/clear-icon.png')}

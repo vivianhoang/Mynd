@@ -3,29 +3,37 @@ import React, {
   useRef,
   createRef,
   RefObject,
-  memo,
   useEffect,
   useReducer,
 } from 'react';
 import {
   View,
+  Platform,
   StyleSheet,
   Image,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   DispatchAction,
   ChecklistTemplateProps,
   ChecklistItem,
+  ReduxState,
 } from '../../models';
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as _ from 'lodash';
+import {
+  deleteChecklist,
+  createChecklist,
+  updateChecklist,
+} from '../../services/firebase-service';
+import { topSpace } from '../../utils/layout';
 
 const CheckListRow = (props: {
   item: ChecklistItem;
@@ -45,6 +53,7 @@ const CheckListRow = (props: {
         onSubmitEditing={props.onSubmitEditing}
         selectionColor={colors.salmonRed}
         style={styles.rowInput}
+        multiline={true}
         onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
       />
       <TouchableOpacity style={styles.checkBox} onPress={props.onToggle}>
@@ -63,7 +72,7 @@ const CheckListRow = (props: {
 
 export default (props: ChecklistTemplateProps) => {
   const existingChecklist = props.route.params?.checklist;
-  const dispatch = useDispatch<DispatchAction>();
+  // const dispatch = useDispatch<DispatchAction>();
 
   const [checklistTitle, setChecklistTitle] = useState(
     existingChecklist?.title || '',
@@ -73,25 +82,40 @@ export default (props: ChecklistTemplateProps) => {
   );
   const [newItemTitle, setNewItemTitle] = useState('');
   const [newItemChecked, setNewItemChecked] = useState(false);
-  const [newItemFocused, setNewItemFocused] = useState(false);
+  // const [newItemFocused, setNewItemFocused] = useState(false);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   let inputRefList = useRef(checklistItems.map(() => createRef<TextInput>()));
   const newInputRef = useRef<TextInput>(null);
+  const newTitleInputRef = useRef<TextInput>(null);
+
+  const userId = useSelector<ReduxState, string>(state => state.userId);
 
   useEffect(() => {
     inputRefList.current = checklistItems.map(() => createRef<TextInput>());
     forceUpdate();
   }, [checklistItems.length]);
 
-  const rightNavOnPress = () => {
+  const getFinalChecklist = () => {
+    let newTitle = checklistTitle;
     let newItems = [...checklistItems];
+
+    if (newTitleInputRef.current) {
+      newTitle =
+        _.trim((newTitleInputRef.current as any)._lastNativeText) || 'Untitled';
+    }
+
     for (const index in inputRefList.current) {
       const inputRef = inputRefList.current[index];
       const input = inputRef.current;
       if (input && input.isFocused()) {
         input.blur();
         const lastText = (input as any)._lastNativeText;
+
+        if (lastText == undefined) {
+          continue;
+        }
+
         if (!_.trim(lastText)) {
           // Remove
           newItems.splice(parseInt(index), 1);
@@ -111,22 +135,48 @@ export default (props: ChecklistTemplateProps) => {
       newItems.push(newItem);
     }
 
-    if (existingChecklist) {
-      dispatch({
-        type: 'UPDATE_CHECKLIST',
-        id: existingChecklist.id,
-        title: checklistTitle,
-        items: newItems,
-        timestamp: existingChecklist.timestamp,
-      });
-    } else {
-      const newChecklistTitle = _.trim(checklistTitle) || `List`;
+    return { newTitle, newItems };
+  };
 
-      dispatch({
-        type: 'CREATE_CHECKLIST',
-        title: newChecklistTitle,
-        items: newItems,
+  const updateOrCreateList = async () => {
+    const { newTitle, newItems } = getFinalChecklist();
+
+    sharedNavigationService.navigate({ page: 'Loader' });
+
+    try {
+      if (existingChecklist) {
+        await updateChecklist({
+          id: existingChecklist.id,
+          title: newTitle,
+          items: newItems,
+          timestamp: existingChecklist.timestamp,
+          userId,
+        });
+      } else {
+        await createChecklist({
+          title: newTitle,
+          items: newItems,
+          userId,
+        });
+      }
+      sharedNavigationService.navigate({ page: 'HomeReset' });
+    } catch (error) {
+      // Same as dismissing loader
+      sharedNavigationService.navigate({
+        page: 'ChecklistTemplate',
+        props: {
+          checklist: existingChecklist
+            ? {
+                type: 'Checklist',
+                id: existingChecklist.id,
+                title: newTitle,
+                items: newItems,
+                timestamp: existingChecklist.timestamp,
+              }
+            : null,
+        },
       });
+      Alert.alert('Uh oh!', `Couldn't save list. ${error.message}`);
     }
   };
 
@@ -140,161 +190,256 @@ export default (props: ChecklistTemplateProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => {
-          sharedNavigationService.navigate({ page: 'HomeReset' });
+          const finalTitleAndItems = getFinalChecklist();
+          const initialTitleAndItems = {
+            newTitle: existingChecklist ? existingChecklist.title : 'Untitled',
+            newItems: existingChecklist ? existingChecklist.items : [],
+          };
+
+          if (_.isEqual(initialTitleAndItems, finalTitleAndItems)) {
+            sharedNavigationService.navigate({ page: 'HomeReset' });
+          } else
+            Alert.alert(
+              'It looks like you have some unsaved changes',
+              'Do you wish to continue?',
+              [
+                {
+                  text: 'No',
+                },
+                {
+                  text: 'Yes',
+                  onPress: () =>
+                    sharedNavigationService.navigate({ page: 'HomeReset' }),
+                },
+              ],
+            );
         }}
         title={'Cancel'}
         position={'left'}
       />
     ),
-    headerRight: () => (
-      <NavButton
-        onPress={rightNavOnPress}
-        title={'Done'}
-        position={'right'}
-        color={colors.honeyOrange}
-      />
-    ),
+    headerRight: existingChecklist
+      ? () => (
+          <NavButton
+            onPress={() => {
+              Alert.alert(
+                'Are you sure you want to delete this checklist?',
+                'This action cannot be undone.',
+                [
+                  { text: 'Cancel' },
+                  {
+                    text: 'Delete',
+                    onPress: async () => {
+                      sharedNavigationService.navigate({ page: 'Loader' });
+                      try {
+                        await deleteChecklist({
+                          id: existingChecklist.id,
+                          userId,
+                        });
+                        sharedNavigationService.navigate({
+                          page: 'HomeReset',
+                        });
+                      } catch (error) {
+                        // Same as dismissing loader
+                        sharedNavigationService.navigate({
+                          page: 'ChecklistTemplate',
+                          props: {
+                            checklist: existingChecklist || null,
+                          },
+                        });
+                        Alert.alert(
+                          'Uh oh!',
+                          `Couldn't delete list. ${error.message}`,
+                        );
+                      }
+                    },
+                  },
+                ],
+              );
+            }}
+            title={'Delete'}
+            position={'right'}
+            color={'red'}
+          />
+        )
+      : null,
     headerStyle: { shadowColor: colors.lightGray },
   });
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 400 }}
-      keyboardShouldPersistTaps={'handled'}
-    >
-      <TextInput
-        selectionColor={colors.salmonRed}
-        placeholderTextColor={colors.lightPurple}
-        style={styles.titleInput}
-        placeholder={'Untitled'}
-        value={checklistTitle}
-        onChangeText={text => setChecklistTitle(text)}
-      />
-      {checklistItems.map((item, index) => {
-        // Adding timestamp fixed issue of focusing on later items after previous has been removed
-        const key = `${item.title}-${item.timestamp}`;
-        const ref = inputRefList.current[index];
-
-        return (
-          <CheckListRow
-            key={key}
-            inputRef={ref}
-            item={item}
-            onSubmitEditing={() => {
-              const nextInputRef = inputRefList?.current[index + 1];
-              if (nextInputRef && nextInputRef.current) {
-                console.log('focusing next...');
-                nextInputRef.current && nextInputRef.current.focus();
-              } else {
-                console.log('focusing new', newInputRef);
-                newInputRef.current && newInputRef.current.focus();
-              }
-            }}
-            onToggle={() => {
-              let newItems = [...checklistItems];
-              newItems[index] = { ...item, checked: !item.checked };
-
-              setChecklistItems(newItems);
-            }}
-            onEndEditing={text => {
-              let newItems = [...checklistItems];
-              if (!_.trim(text)) {
-                // Remove
-                newItems.splice(index, 1);
-              } else {
-                newItems[index] = { ...item, title: text };
-              }
-
-              setChecklistItems(newItems);
-            }}
-          />
-        );
-      })}
-      {/* New input */}
-      <View
-        style={[
-          styles.rowContainer,
-          {
-            opacity: newItemFocused ? 1 : 0,
-          },
-        ]}
+    <View style={{ flex: 1 }}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={{ paddingBottom: 400 }}
+        keyboardShouldPersistTaps={'handled'}
       >
         <TextInput
-          ref={newInputRef}
-          onFocus={() => {
-            setNewItemFocused(true);
-          }}
-          onBlur={() => {
-            if (_.trim(newItemTitle)) {
-              const newItem: ChecklistItem = {
-                title: _.trim(newItemTitle),
-                checked: newItemChecked,
-                timestamp: new Date().getTime().toString(),
-              };
-              const newItems = [...checklistItems, newItem];
-              setChecklistItems(newItems);
-            }
-            setNewItemTitle('');
-            setNewItemChecked(false);
-            setNewItemFocused(false);
-          }}
-          onSubmitEditing={() => {
-            if (_.trim(newItemTitle)) {
-              const newItem: ChecklistItem = {
-                title: _.trim(newItemTitle),
-                checked: newItemChecked,
-                timestamp: new Date().getTime().toString(),
-              };
-              const newItems = [...checklistItems, newItem];
-              setChecklistItems(newItems);
-            } else {
-              newInputRef.current && newInputRef.current.blur();
-            }
-            setNewItemTitle('');
-            setNewItemChecked(false);
-            // setNewItemFocused(false);
-          }}
-          blurOnSubmit={false}
-          placeholderTextColor={colors.lightPurple}
-          placeholder={'Item'}
-          value={newItemTitle}
-          onChangeText={text => setNewItemTitle(text)}
           selectionColor={colors.salmonRed}
-          style={styles.rowInput}
-          // onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
+          placeholderTextColor={colors.lightPurple}
+          style={styles.titleInput}
+          placeholder={'Untitled'}
+          value={checklistTitle}
+          onChangeText={text => setChecklistTitle(text)}
+          ref={newTitleInputRef}
         />
+        {checklistItems.map((item, index) => {
+          // Adding timestamp fixed issue of focusing on later items after previous has been removed
+          const key = `${item.title}-${item.timestamp}`;
+          const ref = inputRefList.current[index];
+
+          return (
+            <CheckListRow
+              key={key}
+              inputRef={ref}
+              item={item}
+              onSubmitEditing={() => {
+                const nextInputRef = inputRefList?.current[index + 1];
+                if (nextInputRef && nextInputRef.current) {
+                  console.log('focusing next...');
+                  nextInputRef.current && nextInputRef.current.focus();
+                } else {
+                  console.log('focusing new', newInputRef);
+                  newInputRef.current && newInputRef.current.focus();
+                }
+              }}
+              onToggle={() => {
+                let newItems = [...checklistItems];
+                newItems[index] = { ...item, checked: !item.checked };
+
+                setChecklistItems(newItems);
+              }}
+              onEndEditing={text => {
+                let newItems = [...checklistItems];
+                if (!_.trim(text)) {
+                  // Remove
+                  newItems.splice(index, 1);
+                } else {
+                  newItems[index] = { ...item, title: text };
+                }
+
+                setChecklistItems(newItems);
+              }}
+            />
+          );
+        })}
+        {/* New input */}
+        <View
+          style={[
+            styles.rowContainer,
+            {
+              // opacity: newItemFocused ? 1 : 0,
+            },
+          ]}
+        >
+          <TextInput
+            ref={newInputRef}
+            // onFocus={() => {
+            //   setNewItemFocused(true);
+            // }}
+            onBlur={() => {
+              if (_.trim(newItemTitle)) {
+                const newItem: ChecklistItem = {
+                  title: _.trim(newItemTitle),
+                  checked: newItemChecked,
+                  timestamp: new Date().getTime().toString(),
+                };
+                const newItems = [...checklistItems, newItem];
+                setChecklistItems(newItems);
+              }
+              setNewItemTitle('');
+              setNewItemChecked(false);
+              // setNewItemFocused(false);
+            }}
+            onSubmitEditing={() => {
+              if (_.trim(newItemTitle)) {
+                const newItem: ChecklistItem = {
+                  title: _.trim(newItemTitle),
+                  checked: newItemChecked,
+                  timestamp: new Date().getTime().toString(),
+                };
+                const newItems = [...checklistItems, newItem];
+                setChecklistItems(newItems);
+              } else {
+                newInputRef.current && newInputRef.current.blur();
+              }
+              setNewItemTitle('');
+              setNewItemChecked(false);
+              // setNewItemFocused(false);
+            }}
+            blurOnSubmit={false}
+            placeholderTextColor={colors.lightPurple}
+            placeholder={'New item'}
+            value={newItemTitle}
+            onChangeText={text => setNewItemTitle(text)}
+            selectionColor={colors.salmonRed}
+            style={styles.rowInput}
+            multiline={true}
+            // onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
+          />
+          <TouchableOpacity
+            style={styles.checkBox}
+            // disabled={!newItemFocused}
+            onPress={() => setNewItemChecked(!newItemChecked)}
+            // onFocus={() => setNewItemFocused(true)}
+            onBlur={() => {
+              if (_.trim(newItemTitle)) {
+                const newItem: ChecklistItem = {
+                  title: _.trim(newItemTitle),
+                  checked: newItemChecked,
+                  timestamp: new Date().getTime().toString(),
+                };
+                const newItems = [...checklistItems, newItem];
+                setChecklistItems(newItems);
+              }
+              setNewItemTitle('');
+              setNewItemChecked(false);
+              // setNewItemFocused(false);
+            }}
+          >
+            <View
+              style={[
+                styles.activeCheckBox,
+                {
+                  opacity: newItemChecked ? 1 : 0,
+                },
+              ]}
+            />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: 'position', android: undefined })}
+        keyboardVerticalOffset={44 + 16 + topSpace()}
+      >
         <TouchableOpacity
-          style={styles.checkBox}
-          disabled={!newItemFocused}
-          onPress={() => setNewItemChecked(!newItemChecked)}
-          onFocus={() => setNewItemFocused(true)}
-          onBlur={() => {
-            if (_.trim(newItemTitle)) {
-              const newItem: ChecklistItem = {
-                title: _.trim(newItemTitle),
-                checked: newItemChecked,
-                timestamp: new Date().getTime().toString(),
-              };
-              const newItems = [...checklistItems, newItem];
-              setChecklistItems(newItems);
-            }
-            setNewItemTitle('');
-            setNewItemChecked(false);
-            setNewItemFocused(false);
+          onPress={updateOrCreateList}
+          style={{
+            position: 'absolute',
+            right: 16,
+            bottom: 16,
+            backgroundColor: colors.honeyOrange,
+            height: 60,
+            width: 60,
+            borderRadius: 30,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: colors.darkGray,
+            shadowRadius: 4,
+            shadowOpacity: 0.2,
+            shadowOffset: {
+              width: 2,
+              height: 2,
+            },
           }}
         >
-          <View
-            style={[
-              styles.activeCheckBox,
-              {
-                opacity: newItemChecked ? 1 : 0,
-              },
-            ]}
+          <Image
+            style={styles.icon}
+            source={require('../../assets/check-icon.png')}
+            resizeMode={'contain'}
           />
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -316,7 +461,7 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // alignItems: 'center',
     borderBottomWidth: 1,
     borderColor: colors.placeholderGray,
   },
@@ -327,7 +472,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'PulpDisplay-Regular',
     color: colors.offBlack,
-    height: 50,
+    marginTop: 8,
+    marginBottom: 14,
+    marginRight: 16,
+    // minHeight: 50,
   },
   checkBox: {
     height: 30,
@@ -337,11 +485,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 11,
   },
   activeCheckBox: {
     height: 22,
     width: 22,
     borderRadius: 12,
     backgroundColor: colors.salmonRed,
+  },
+  icon: {
+    height: 44,
+    width: 44,
+    tintColor: colors.white,
   },
 });

@@ -1,16 +1,21 @@
 import { all, take, put, call, select } from 'redux-saga/effects';
-import { ReduxState, ReduxActions, Idea, Ideas } from '../models';
+import {
+  ReduxState,
+  ReduxActions,
+  // Idea,
+  // Ideas
+} from '../models';
 import { channel } from 'redux-saga';
 import {
   createNote,
   subscribeToHive,
-  unsubscribeFromId,
+  // unsubscribeFromId,
   updateIdea,
-  deleteIdea,
-  createIdea,
-  createChecklist,
-  updateChecklist,
-  deleteChecklist,
+  // deleteIdea,
+  // createIdea,
+  // createChecklist,
+  // updateChecklist,
+  // deleteChecklist,
 } from './firebase-service';
 import sharedNavigationService from './navigation-service';
 
@@ -59,88 +64,88 @@ function* takeIdeasChannel() {
   }
 }
 
-function* takeUnsubscribeIdea() {
-  while (true) {
-    const action = yield take('UNSUBSCRIBE_FROM_IDEA');
-    const { ideas } = action;
-    const typedIdeas = ideas as Ideas;
+// function* takeUnsubscribeIdea() {
+//   while (true) {
+//     const action = yield take('UNSUBSCRIBE_FROM_IDEA');
+//     const { ideas } = action;
+//     const typedIdeas = ideas as Ideas;
 
-    typedIdeas.forEach(idea => {
-      unsubscribeFromId(idea.id);
-    });
-  }
-}
+//     typedIdeas.forEach(idea => {
+//       unsubscribeFromId(idea.id);
+//     });
+//   }
+// }
 
-function* takeCreateIdea() {
-  while (true) {
-    const action = yield take('CREATE_IDEA');
-    const { title, description } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => createIdea(title, description, userId));
-    // Go back twice to dismiss modal
-    sharedNavigationService.navigate({ page: 'HomeReset' });
-  }
-}
+// function* takeCreateIdea() {
+//   while (true) {
+//     const action = yield take('CREATE_IDEA');
+//     const { title, description } = action;
+//     const userId: string = yield select((state: ReduxState) => state.userId);
+//     yield call(() => createIdea(title, description, userId));
+//     // Go back twice to dismiss modal
+//     sharedNavigationService.navigate({ page: 'HomeReset' });
+//   }
+// }
 
 function* takeUpdateIdea() {
   while (true) {
     const action = yield take('UPDATE_IDEA');
-    const { ideaId, title, description, timestamp } = action;
+    const { id, title, description, timestamp } = action;
     const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => updateIdea(title, description, userId, ideaId, timestamp));
+    yield call(() => updateIdea({ title, description, userId, id, timestamp }));
     sharedNavigationService.goBack();
   }
 }
 
-function* takeDeleteIdea() {
-  while (true) {
-    const action = yield take('DELETE_IDEA');
-    const { ideaId } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => deleteIdea(ideaId, userId));
-    sharedNavigationService.goBack();
-  }
-}
+// function* takeDeleteIdea() {
+//   while (true) {
+//     const action = yield take('DELETE_IDEA');
+//     const { ideaId } = action;
+//     const userId: string = yield select((state: ReduxState) => state.userId);
+//     yield call(() => deleteIdea(ideaId, userId));
+//     sharedNavigationService.goBack();
+//   }
+// }
 
-function* takeCreateChecklist() {
-  while (true) {
-    const action = yield take('CREATE_CHECKLIST');
-    const { title, items } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => createChecklist(title, items, userId));
-    // Go back twice to dismiss modal
-    sharedNavigationService.navigate({ page: 'HomeReset' });
-  }
-}
+// function* takeCreateChecklist() {
+//   while (true) {
+//     const action = yield take('CREATE_CHECKLIST');
+//     const { title, items } = action;
+//     const userId: string = yield select((state: ReduxState) => state.userId);
+//     yield call(() => createChecklist(title, items, userId));
+//     // Go back twice to dismiss modal
+//     sharedNavigationService.navigate({ page: 'HomeReset' });
+//   }
+// }
 
-function* takeUpdateChecklist() {
-  while (true) {
-    const action = yield take('UPDATE_CHECKLIST');
-    const { id, title, items, timestamp } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => updateChecklist(title, items, userId, id, timestamp));
-    sharedNavigationService.navigate({ page: 'HomeReset' });
-  }
-}
+// function* takeUpdateChecklist() {
+//   while (true) {
+//     const action = yield take('UPDATE_CHECKLIST');
+//     const { id, title, items, timestamp } = action;
+//     const userId: string = yield select((state: ReduxState) => state.userId);
+//     yield call(() => updateChecklist(title, items, userId, id, timestamp));
+//     sharedNavigationService.navigate({ page: 'HomeReset' });
+//   }
+// }
 
-function* takeDeleteChecklist() {
-  while (true) {
-    const action = yield take('DELETE_CHECKLIST');
-    const { id } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => deleteChecklist(id, userId));
-    sharedNavigationService.goBack();
-  }
-}
+// function* takeDeleteChecklist() {
+//   while (true) {
+//     const action = yield take('DELETE_CHECKLIST');
+//     const { id } = action;
+//     const userId: string = yield select((state: ReduxState) => state.userId);
+//     yield call(() => deleteChecklist(id, userId));
+//     sharedNavigationService.goBack();
+//   }
+// }
 
 export const rootSaga = function*() {
   yield all([
-    takeCreateIdea(),
+    // takeCreateIdea(),
     takeUpdateIdea(),
-    takeDeleteIdea(),
-    takeCreateChecklist(),
-    takeUpdateChecklist(),
-    takeDeleteChecklist(),
+    // takeDeleteIdea(),
+    // takeCreateChecklist(),
+    // takeUpdateChecklist(),
+    // takeDeleteChecklist(),
     takeIdeasChannel(),
   ]);
 };

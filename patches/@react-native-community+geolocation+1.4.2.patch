@@ -1,0 +1,16 @@
+diff --git a/node_modules/@react-native-community/geolocation/ios/RNCGeolocation.m b/node_modules/@react-native-community/geolocation/ios/RNCGeolocation.m
+index 838d64a..a5455e5 100644
+--- a/node_modules/@react-native-community/geolocation/ios/RNCGeolocation.m
++++ b/node_modules/@react-native-community/geolocation/ios/RNCGeolocation.m
+@@ -179,6 +179,11 @@ - (void)beginLocationUpdatesWithDesiredAccuracy:(CLLocationAccuracy)desiredAccur
+ 
+   _locationManager.distanceFilter  = distanceFilter;
+   _locationManager.desiredAccuracy = desiredAccuracy;
++    if (@available(iOS 11.0, *)) {
++        _locationManager.showsBackgroundLocationIndicator = false;
++    } else {
++        // Fallback on earlier versions
++    }
+   _usingSignificantChanges = useSignificantChanges;
+ 
+   // Start observing location

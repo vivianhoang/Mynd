@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   Image,
   ImageRequireSource,
   FlatList,
+  SafeAreaView,
 } from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
 import NavButton from '../../componets/nav-button';
@@ -14,6 +15,7 @@ import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
 import { TemplateType, PageName, NavigationActions } from '../../models';
 import SearchBar from '../../componets/search-bar';
+import _ from 'lodash';
 
 interface TemplateOption {
   type: TemplateType;
@@ -83,45 +85,75 @@ const TemplateCard = (props: {
 };
 
 export default () => {
+  const [searchText, setSearchText] = useState('');
+
+  const filterTemplates = () => {
+    let data: TemplateOption[] = [];
+    templates.filter(templateData => {
+      if (
+        _.includes(templateData.title.toLowerCase(), searchText.toLowerCase())
+      ) {
+        data.push(templateData);
+      }
+    });
+    return data;
+  };
+
+  const resultsView =
+    templates.length && !filterTemplates().length ? (
+      <HiveText style={styles.noResultsLabel}>{'No results.'}</HiveText>
+    ) : (
+      <FlatList
+        keyExtractor={option => option.title}
+        keyboardDismissMode={'on-drag'}
+        showsVerticalScrollIndicator={false}
+        data={filterTemplates()}
+        keyboardShouldPersistTaps={'handled'}
+        style={styles.contentContainer}
+        renderItem={({ item }) => {
+          const { image, title, description, pageAction } = item;
+          return (
+            <TemplateCard
+              image={image as any}
+              title={title}
+              description={description}
+              pageAction={pageAction}
+            />
+          );
+        }}
+      />
+    );
+
   return (
     <ImageBackground
       source={require('../../assets/templates_screen.png')}
       style={styles.background}
     >
-      <View style={styles.container}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => sharedNavigationService.goBack()}
-          >
-            <Image
-              source={require('../../assets/close-icon.png')}
-              style={styles.closeIcon}
-              resizeMode={'contain'}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={{ marginVertical: 16 }}>
-          <SearchBar placeholder={'Find a template'} />
-        </View>
-        <FlatList
-          keyExtractor={option => option.title}
-          data={templates}
-          keyboardShouldPersistTaps={'handled'}
-          style={styles.contentContainer}
-          renderItem={({ item }) => {
-            const { image, title, description, pageAction } = item;
-            return (
-              <TemplateCard
-                image={image as any}
-                title={title}
-                description={description}
-                pageAction={pageAction}
+      <SafeAreaView style={styles.safeAreaView}>
+        <View style={styles.container}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => sharedNavigationService.goBack()}
+            >
+              <Image
+                source={require('../../assets/close-icon.png')}
+                style={styles.closeIcon}
+                resizeMode={'contain'}
               />
-            );
-          }}
-        />
-      </View>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginVertical: 16 }}>
+            <SearchBar
+              placeholder={'Find a template'}
+              value={searchText}
+              onChangeText={(text: string) => setSearchText(text)}
+              onDismiss={() => setSearchText('')}
+            />
+          </View>
+          {resultsView}
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 };
@@ -129,12 +161,10 @@ export default () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 44,
     paddingHorizontal: 16,
   },
   topBar: {
     height: 44,
-    // backgroundColor: colors.white,
     alignItems: 'flex-end',
   },
   background: {
@@ -186,5 +216,12 @@ const styles = StyleSheet.create({
   },
   descriptionLabel: {
     fontSize: 18,
+  },
+  noResultsLabel: {
+    marginLeft: 8,
+    fontSize: 18,
+  },
+  safeAreaView: {
+    flex: 1,
   },
 });

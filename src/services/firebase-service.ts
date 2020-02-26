@@ -99,11 +99,12 @@ export const subscribeToHive = (
   subscriptionById['hive'] = subscription;
 };
 
-export const createIdea = async (
-  title: string,
-  description: string,
-  userId: string,
-) => {
+export const createIdea = async (params: {
+  title: string;
+  description: string;
+  userId: string;
+}) => {
+  const { title, description, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const ideaId = hiveRef.doc().id;
   const newIdea: Idea = {
@@ -120,17 +121,18 @@ export const createIdea = async (
   }
 };
 
-export const updateIdea = async (
-  title: string,
-  description: string,
-  userId: string,
-  ideaId: string,
-  timestamp: string,
-) => {
-  const ideaRef = FirebaseFirestore().doc(`users/${userId}/hive/${ideaId}`);
+export const updateIdea = async (params: {
+  title: string;
+  description: string;
+  userId: string;
+  id: string;
+  timestamp: string;
+}) => {
+  const { title, description, userId, id, timestamp } = params;
+  const ideaRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
 
   const updatedIdea: Idea = {
-    id: ideaId,
+    id,
     title: title,
     description: description,
     timestamp,
@@ -144,8 +146,9 @@ export const updateIdea = async (
   }
 };
 
-export const deleteIdea = async (ideaId: string, userId: string) => {
-  const ideaRef = FirebaseFirestore().doc(`users/${userId}/ideas/${ideaId}`);
+export const deleteIdea = async (params: { id: string; userId: string }) => {
+  const { id, userId } = params;
+  const ideaRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
 
   try {
     await ideaRef.delete();
@@ -154,11 +157,12 @@ export const deleteIdea = async (ideaId: string, userId: string) => {
   }
 };
 
-export const createChecklist = async (
-  title: string,
-  items: ChecklistItem[],
-  userId: string,
-) => {
+export const createChecklist = async (params: {
+  title: string;
+  items: ChecklistItem[];
+  userId: string;
+}) => {
+  const { title, items, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const checklistId = hiveRef.doc().id;
   const newChecklist: Checklist = {
@@ -175,19 +179,18 @@ export const createChecklist = async (
   }
 };
 
-export const updateChecklist = async (
-  title: string,
-  items: ChecklistItem[],
-  userId: string,
-  checklistId: string,
-  timestamp: string,
-) => {
-  const checklistRef = FirebaseFirestore().doc(
-    `users/${userId}/hive/${checklistId}`,
-  );
+export const updateChecklist = async (params: {
+  title: string;
+  items: ChecklistItem[];
+  userId: string;
+  id: string;
+  timestamp: string;
+}) => {
+  const { title, items, userId, id, timestamp } = params;
+  const checklistRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
 
   const updatedChecklist: Checklist = {
-    id: checklistId,
+    id,
     title: title,
     items,
     timestamp,
@@ -201,10 +204,12 @@ export const updateChecklist = async (
   }
 };
 
-export const deleteChecklist = async (checklistId: string, userId: string) => {
-  const checklistRef = FirebaseFirestore().doc(
-    `users/${userId}/checklists/${checklistId}`,
-  );
+export const deleteChecklist = async (params: {
+  id: string;
+  userId: string;
+}) => {
+  const { id, userId } = params;
+  const checklistRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
 
   try {
     await checklistRef.delete();

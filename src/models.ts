@@ -1,7 +1,6 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Dispatch } from 'redux';
 import { RouteProp } from '@react-navigation/native';
-import { ToastAndroidStatic, SectionListData } from 'react-native';
 
 //---------State-related interfaces-----------//
 export interface ReduxState {
@@ -128,7 +127,9 @@ export type PageName =
   | 'Splash'
   | 'Landing'
   | 'Login'
+  | 'ForgotPassword'
   | 'Signup'
+  | 'Loader'
   | 'TemplateSelection'
   | 'IdeaTemplate'
   | 'ChecklistTemplate';
@@ -141,6 +142,8 @@ export const Page: {
   Splash: 'Splash',
   Landing: 'Landing',
   Login: 'Login',
+  ForgotPassword: 'ForgotPassword',
+  Loader: 'Loader',
   Signup: 'Signup',
   TemplateSelection: 'TemplateSelection',
   IdeaTemplate: 'IdeaTemplate',
@@ -151,8 +154,16 @@ export interface BasePageInterface {
   page: PageName;
 }
 
+export interface LoaderPage extends BasePageInterface {
+  page: 'Loader';
+}
+
 export interface LoginPage extends BasePageInterface {
   page: 'Login';
+}
+
+export interface ForgotPasswordPage extends BasePageInterface {
+  page: 'ForgotPassword';
 }
 
 export interface HomePage extends BasePageInterface {
@@ -192,7 +203,9 @@ export interface SignupPage extends BasePageInterface {
 }
 
 export type NavigationActions =
+  | LoaderPage
   | LoginPage
+  | ForgotPasswordPage
   | HomePage
   | HomeReset
   | LandingPage
@@ -213,6 +226,10 @@ export interface HomeProps {
 }
 
 export interface LoginProps {
+  navigation: StackNavigationProp<any>;
+}
+
+export interface ForgotPasswordProps {
   navigation: StackNavigationProp<any>;
 }
 

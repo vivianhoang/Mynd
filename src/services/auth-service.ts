@@ -43,6 +43,10 @@ class AuthService {
     startSagaAfterLogin();
   }
 
+  async forgotPassword(email: string) {
+    await FirebaseAuth().sendPasswordResetEmail(email);
+  }
+
   logout() {
     FirebaseAuth().signOut();
     unsubscribeFromAll();

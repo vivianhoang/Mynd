@@ -9,15 +9,14 @@ import {
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 import HiveTextInput from '../../componets/hive-text-input';
+import { ForgotPasswordProps } from '../../models';
+import NavButton from '../../componets/nav-button';
+import colors from '../../utils/colors';
 import BigButton from '../../componets/big-button';
 import HiveText from '../../componets/hive-text';
-import { SignupProps } from '../../models';
-import colors from '../../utils/colors';
-import NavButton from '../../componets/nav-button';
 
-export default (props: SignupProps) => {
+export default (props: ForgotPasswordProps) => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   props.navigation.setOptions({
     headerTitle: null,
@@ -33,7 +32,7 @@ export default (props: SignupProps) => {
 
   return (
     <View style={styles.container}>
-      <HiveText style={styles.headerLabel}>{'Signup'}</HiveText>
+      <HiveText style={styles.headerLabel}>{'Forgot Password'}</HiveText>
       <HiveTextInput
         style={styles.input}
         title="EMAIL"
@@ -43,32 +42,27 @@ export default (props: SignupProps) => {
         }}
         autoFocus={true}
       />
-      <HiveTextInput
-        title="PASSWORD"
-        value={password}
-        onChangeText={password => {
-          setPassword(password);
-        }}
-      />
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
         keyboardVerticalOffset={44 + 44 + 16}
       >
-        <View style={styles.fill} />
         <BigButton
           style={styles.button}
-          title={'Signup'}
           onPress={async () => {
             sharedNavigationService.navigate({ page: 'Loader' });
             try {
-              await sharedAuthService.signup(email, password);
-              sharedNavigationService.navigate({ page: 'Home' });
+              await sharedAuthService.forgotPassword(email);
+              sharedNavigationService.navigate({
+                page: 'Login',
+              });
+              Alert.alert(`A reset email has been sent to ${email}.`);
             } catch (error) {
-              sharedNavigationService.navigate({ page: 'Signup' });
+              sharedNavigationService.navigate({ page: 'ForgotPassword' });
               Alert.alert('Uh oh!', error.message);
             }
           }}
+          title={'Submit'}
         />
       </KeyboardAvoidingView>
     </View>

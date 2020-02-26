@@ -46,7 +46,9 @@ export const subscribeToHive = (
               return finalHiveData;
             },
             [] as HiveData,
-          );
+          ).sort((a, b) => {
+            return a.title > b.title ? 1 : -1;
+          });
           console.log(hiveData);
           onTrigger(hiveData);
         } else {

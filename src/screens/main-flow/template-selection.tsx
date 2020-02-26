@@ -26,18 +26,6 @@ interface TemplateOption {
 
 const templates: TemplateOption[] = [
   {
-    type: 'Idea',
-    title: 'Ideas',
-    description: 'You have great ideas!',
-    image: require('../../assets/ideas-icon.png'),
-    pageAction: {
-      page: 'IdeaTemplate',
-      props: {
-        idea: null,
-      },
-    },
-  },
-  {
     type: 'Checklist',
     title: 'Checklists',
     description: 'Create a checklist. This is a longer list of things.',
@@ -46,6 +34,18 @@ const templates: TemplateOption[] = [
       page: 'ChecklistTemplate',
       props: {
         checklist: null,
+      },
+    },
+  },
+  {
+    type: 'Idea',
+    title: 'Ideas',
+    description: 'You have great ideas!',
+    image: require('../../assets/ideas-icon.png'),
+    pageAction: {
+      page: 'IdeaTemplate',
+      props: {
+        idea: null,
       },
     },
   },

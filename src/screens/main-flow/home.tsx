@@ -291,23 +291,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cardBackground: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.honeyOrange,
-    borderRadius: 8,
-    opacity: 0.75,
-  },
-  cardBackgroundImage: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.25,
-    height: null,
-    width: null,
-  },
-  cardLabel: {
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
   searchInput: {
     marginBottom: 16,
   },

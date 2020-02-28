@@ -52,7 +52,7 @@ const CheckListRow = (props: {
         onSubmitEditing={props.onSubmitEditing}
         selectionColor={colors.salmonRed}
         style={styles.rowInput}
-        multiline={true}
+        // multiline={true}
         onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
       />
       <TouchableOpacity style={styles.checkBox} onPress={props.onToggle}>
@@ -359,7 +359,7 @@ export default (props: ChecklistTemplateProps) => {
             onChangeText={text => setNewItemTitle(text)}
             selectionColor={colors.salmonRed}
             style={styles.rowInput}
-            multiline={true}
+            // multiline={true}
           />
           <TouchableOpacity
             style={styles.checkBox}

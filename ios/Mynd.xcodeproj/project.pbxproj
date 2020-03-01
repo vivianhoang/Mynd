@@ -26,8 +26,8 @@
 		9490D812240B9B490094D722 /* PulpDisplay-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBB23FA41C600A5E971 /* PulpDisplay-Medium.ttf */; };
 		9490D813240B9B490094D722 /* PulpDisplay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */; };
 		9490D814240B9B490094D722 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
-		9490D815240B9B490094D722 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */; };
-		9FEC191023B1AFE80068E2E3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */; };
+		9490D833240BB7FE0094D722 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9490D831240BB7F40094D722 /* GoogleService-Info.plist */; };
+		9490D835240BB8040094D722 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9490D82E240BB7F30094D722 /* GoogleService-Info.plist */; };
 		9FF3EEBE23FA41C700A5E971 /* PulpDisplay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */; };
 		9FF3EEBF23FA41C700A5E971 /* PulpDisplay-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB523FA41C600A5E971 /* PulpDisplay-LightItalic.ttf */; };
 		9FF3EEC023FA41C700A5E971 /* PulpDisplay-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB623FA41C600A5E971 /* PulpDisplay-SemiBold.ttf */; };
@@ -50,7 +50,6 @@
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Mynd/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Mynd/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Mynd/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Mynd/main.m; sourceTree = "<group>"; };
 		1CD3F36F89CC41F6DA833D0F /* Pods-Mynd-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Mynd-tvOSTests/Pods-Mynd-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		2DD1078688B40BD6B099D390 /* libPods-Mynd-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mynd-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,8 +61,10 @@
 		838A796F9442A0A685180187 /* Pods-MyndTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyndTests.debug.xcconfig"; path = "Target Support Files/Pods-MyndTests/Pods-MyndTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9490D7FF240B998E0094D722 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		9490D81C240B9B490094D722 /* Mynd Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mynd Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9490D81E240B9DA10094D722 /* InfoDev.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = InfoDev.plist; path = Mynd/InfoDev.plist; sourceTree = "<group>"; };
-		9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9490D82E240BB7F30094D722 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9490D82F240BB7F30094D722 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9490D831240BB7F40094D722 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9490D832240BB7F40094D722 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-Bold.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-Bold.ttf"; sourceTree = "<group>"; };
 		9FF3EEB523FA41C600A5E971 /* PulpDisplay-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-LightItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-LightItalic.ttf"; sourceTree = "<group>"; };
 		9FF3EEB623FA41C600A5E971 /* PulpDisplay-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-SemiBold.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -124,13 +125,12 @@
 		13B07FAE1A68108700A75B9A /* Mynd */ = {
 			isa = PBXGroup;
 			children = (
+				9490D82D240BB7F30094D722 /* Dev */,
+				9490D830240BB7F40094D722 /* Prod */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
-				9490D81E240B9DA10094D722 /* InfoDev.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
-				13B07FB61A68108700A75B9A /* Info.plist */,
-				9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
@@ -198,6 +198,24 @@
 				9490D81C240B9B490094D722 /* Mynd Dev.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9490D82D240BB7F30094D722 /* Dev */ = {
+			isa = PBXGroup;
+			children = (
+				9490D82E240BB7F30094D722 /* GoogleService-Info.plist */,
+				9490D82F240BB7F30094D722 /* Info.plist */,
+			);
+			path = Dev;
+			sourceTree = "<group>";
+		};
+		9490D830240BB7F40094D722 /* Prod */ = {
+			isa = PBXGroup;
+			children = (
+				9490D831240BB7F40094D722 /* GoogleService-Info.plist */,
+				9490D832240BB7F40094D722 /* Info.plist */,
+			);
+			path = Prod;
 			sourceTree = "<group>";
 		};
 		9FF3EEB323FA41A100A5E971 /* Resources */ = {
@@ -308,6 +326,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9490D833240BB7FE0094D722 /* GoogleService-Info.plist in Resources */,
 				9FF3EEC323FA41C700A5E971 /* PulpDisplay-Regular.ttf in Resources */,
 				9FF3EEBF23FA41C700A5E971 /* PulpDisplay-LightItalic.ttf in Resources */,
 				9FF3EEC123FA41C700A5E971 /* PulpDisplay-BoldItalic.ttf in Resources */,
@@ -320,7 +339,6 @@
 				9FF3EEC523FA41C700A5E971 /* PulpDisplay-Medium.ttf in Resources */,
 				9FF3EEBE23FA41C700A5E971 /* PulpDisplay-Bold.ttf in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				9FEC191023B1AFE80068E2E3 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +346,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9490D835240BB8040094D722 /* GoogleService-Info.plist in Resources */,
 				9490D809240B9B490094D722 /* PulpDisplay-Regular.ttf in Resources */,
 				9490D80A240B9B490094D722 /* PulpDisplay-LightItalic.ttf in Resources */,
 				9490D80B240B9B490094D722 /* PulpDisplay-BoldItalic.ttf in Resources */,
@@ -340,7 +359,6 @@
 				9490D812240B9B490094D722 /* PulpDisplay-Medium.ttf in Resources */,
 				9490D813240B9B490094D722 /* PulpDisplay-Bold.ttf in Resources */,
 				9490D814240B9B490094D722 /* LaunchScreen.xib in Resources */,
-				9490D815240B9B490094D722 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,7 +641,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = UDEEHCEKCM;
-				INFOPLIST_FILE = Mynd/Info.plist;
+				INFOPLIST_FILE = Prod/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -632,7 +650,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kudasai.mynd;
 				PRODUCT_NAME = Mynd;
-				PROVISIONING_PROFILE_SPECIFIER = "Mynd Prod";
+				PROVISIONING_PROFILE_SPECIFIER = "Mynd Adhoc";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -646,7 +664,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UDEEHCEKCM;
-				INFOPLIST_FILE = Mynd/Info.plist;
+				INFOPLIST_FILE = Prod/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -655,7 +673,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kudasai.mynd;
 				PRODUCT_NAME = Mynd;
-				PROVISIONING_PROFILE_SPECIFIER = "Mynd Prod";
+				PROVISIONING_PROFILE_SPECIFIER = "Mynd Adhoc";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -771,7 +789,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = UDEEHCEKCM;
-				INFOPLIST_FILE = Mynd/InfoDev.plist;
+				INFOPLIST_FILE = Dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -794,7 +812,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UDEEHCEKCM;
-				INFOPLIST_FILE = Mynd/InfoDev.plist;
+				INFOPLIST_FILE = Dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",

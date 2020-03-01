@@ -1,14 +1,14 @@
 export default {
-  offBlack: '#383838',
-  honeyOrange: '#FFB802',
-  honeyYellow: '#FFE456',
-  white: '#ffffff',
-  lightPurple: '#CBC0D3',
+  inactiveGray: '#C4C4C4',
   lightGray: '#E5E5E5',
   placeholderGray: '#F3f3f3',
-  salmonRed: '#FF6969',
 
-  darkGray: '#75726d',
-  teal: '#5ce6ba',
+  honeyOrange: '#FFB802',
+  honeyYellow: '#FFE456',
+  lightPurple: '#CBC0D3',
   lightRed: '#CBC0D3',
+  offBlack: '#383838',
+  salmonRed: '#FF6969',
+  teal: '#5ce6ba',
+  white: '#ffffff',
 };

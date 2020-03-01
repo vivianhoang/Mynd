@@ -5,37 +5,37 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  Dimensions,
   SectionList,
   SafeAreaView,
   ImageRequireSource,
+  ActivityIndicator,
 } from 'react-native';
-import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
-import {
-  HomeProps,
-  ReduxState,
-  HiveData,
-  TemplateType,
-  TemplateData,
-} from '../../models';
+import { ReduxState, HiveData, TemplateType, TemplateData } from '../../models';
 import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
 import SearchBar from '../../componets/search-bar';
-import sharedGeoNotificationService from '../../services/geo-notification';
-import { screenSize } from '../../utils/layout';
+// import sharedGeoNotificationService from '../../services/geo-notification';
+import { screenSize, topSpace } from '../../utils/layout';
 
 const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
   Checklist: require('../../assets/checklist-icon.png'),
 };
 
-export default (props: HomeProps) => {
-  const hiveData =
-    useSelector<ReduxState, HiveData>(state => state.hiveData) || [];
+export default () => {
+  const hiveData = useSelector<ReduxState, HiveData>(state => state.hiveData);
   const [searchText, setSearchText] = useState('');
+
+  if (hiveData == undefined) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size={'large'} color={colors.offBlack} />
+      </View>
+    );
+  }
 
   const filterHiveData = () => {
     const finalHiveData = hiveData.reduce((data, value) => {
@@ -101,15 +101,7 @@ export default (props: HomeProps) => {
           const sectionTitle = `${title}s`;
           const icon = iconMap[title as TemplateType];
           return (
-            <View
-              style={{
-                paddingBottom: 16,
-                paddingTop: 8,
-                backgroundColor: colors.white,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
+            <View style={styles.headerContainer}>
               <Image
                 source={icon}
                 style={{ height: 34, width: 34, marginRight: 12 }}
@@ -141,7 +133,7 @@ export default (props: HomeProps) => {
                   <TouchableOpacity
                     style={{
                       height: (375 - 32) / 3,
-                      width: (Dimensions.get('window').width - 64) / 3,
+                      width: (screenSize.width - 64) / 3,
                       backgroundColor: colors.placeholderGray,
                       marginHorizontal,
                       marginBottom: 12,
@@ -187,84 +179,40 @@ export default (props: HomeProps) => {
     );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <View style={styles.container}>
-        {hiveData.length ? (
-          <View style={{ flex: 1, paddingHorizontal: 16 }}>
-            <View
-              style={{
-                // paddingTop: 16,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <HiveText variant={'medium'} style={{ fontSize: 20 }}>
-                {`What's on your mind?`}
-              </HiveText>
-              <Image
-                source={require('../../assets/home-bee.png')}
-                style={{ height: 187 * 0.3, width: 276 * 0.3, marginRight: 16 }}
-                resizeMode={'contain'}
-              />
-            </View>
-            <View style={{ paddingVertical: 16 }}>
-              <SearchBar
-                placeholder={'Search for something...'}
-                value={searchText}
-                onChangeText={(text: string) => setSearchText(text)}
-                onDismiss={() => setSearchText('')}
-              />
-            </View>
-            {resultsView}
+    <View style={styles.container}>
+      {hiveData.length ? (
+        <View style={{ flex: 1, paddingHorizontal: 16 }}>
+          <View
+            style={{
+              // paddingTop: 16,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <HiveText variant={'medium'} style={{ fontSize: 20 }}>
+              {`What's on your mind?`}
+            </HiveText>
+            <Image
+              source={require('../../assets/home-bee.png')}
+              style={{ height: 187 * 0.3, width: 276 * 0.3, marginRight: 16 }}
+              resizeMode={'contain'}
+            />
           </View>
-        ) : (
-          zeroDataView()
-        )}
-        <View style={styles.tabContainer}>
-          <View style={styles.tabLabel}>
-            <TouchableOpacity onPress={() => sharedAuthService.logout()}>
-              <Image
-                style={styles.tabIcon}
-                source={require('../../assets/ellipsis-icon.png')}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
+          <View style={{ paddingVertical: 16 }}>
+            <SearchBar
+              placeholder={'Search for something...'}
+              value={searchText}
+              onChangeText={(text: string) => setSearchText(text)}
+              onDismiss={() => setSearchText('')}
+            />
           </View>
-          <View style={styles.tabLabel}>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() =>
-                sharedNavigationService.navigate({
-                  page: 'TemplateSelection',
-                })
-              }
-            >
-              <Image
-                style={[
-                  styles.tabIcon,
-                  {
-                    height: 70,
-                    width: 70,
-                  },
-                ]}
-                source={require('../../assets/templates_button.png')}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.tabLabel}>
-            <TouchableOpacity>
-              <Image
-                style={styles.tabIcon}
-                source={require('../../assets/user-icon.png')}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
+          {resultsView}
         </View>
-      </View>
-    </SafeAreaView>
+      ) : (
+        zeroDataView()
+      )}
+    </View>
   );
 };
 
@@ -272,7 +220,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    paddingTop: 16,
+    paddingTop: 16 + topSpace(),
   },
   tabIcon: {
     height: 44,
@@ -308,5 +256,12 @@ const styles = StyleSheet.create({
   noResultsLabel: {
     marginLeft: 8,
     fontSize: 18,
+  },
+  headerContainer: {
+    paddingBottom: 16,
+    paddingTop: 8,
+    backgroundColor: colors.white,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

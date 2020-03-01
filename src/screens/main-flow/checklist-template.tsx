@@ -268,7 +268,7 @@ export default (props: ChecklistTemplateProps) => {
     <View style={{ flex: 1 }}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 400 }}
+        contentContainerStyle={{ paddingBottom: 450 }}
         keyboardShouldPersistTaps={'handled'}
       >
         <TextInput
@@ -391,28 +391,11 @@ export default (props: ChecklistTemplateProps) => {
       </ScrollView>
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 16 + topSpace()}
+        keyboardVerticalOffset={44 + topSpace()}
       >
         <TouchableOpacity
           onPress={updateOrCreateList}
-          style={{
-            position: 'absolute',
-            right: 16,
-            bottom: 16,
-            backgroundColor: colors.honeyOrange,
-            height: 60,
-            width: 60,
-            borderRadius: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowColor: colors.darkGray,
-            shadowRadius: 4,
-            shadowOpacity: 0.2,
-            shadowOffset: {
-              width: 2,
-              height: 2,
-            },
-          }}
+          style={styles.saveButton}
         >
           <Image
             style={styles.icon}
@@ -477,5 +460,23 @@ const styles = StyleSheet.create({
     height: 44,
     width: 44,
     tintColor: colors.white,
+  },
+  saveButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: colors.honeyOrange,
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
   },
 });

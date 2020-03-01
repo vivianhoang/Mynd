@@ -10,7 +10,7 @@ const initialState: ReduxState = {
   hiveData: undefined,
 };
 
-const reducer = (state: ReduxState, action: ReduxActions) => {
+const reducer = (state: ReduxState = initialState, action: ReduxActions) => {
   let newState = _.cloneDeep(state);
   switch (action.type) {
     case 'SET_USER':
@@ -18,6 +18,9 @@ const reducer = (state: ReduxState, action: ReduxActions) => {
       return newState;
     case 'SET_HIVE_DATA':
       newState.hiveData = action.hiveData;
+      return newState;
+    case 'RESET_REDUX':
+      newState = initialState;
       return newState;
     default:
       return newState;

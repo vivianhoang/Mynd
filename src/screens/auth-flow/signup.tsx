@@ -14,6 +14,7 @@ import HiveText from '../../componets/hive-text';
 import { SignupProps } from '../../models';
 import colors from '../../utils/colors';
 import NavButton from '../../componets/nav-button';
+import { topSpace } from '../../utils/layout';
 
 export default (props: SignupProps) => {
   const [email, setEmail] = useState('');
@@ -53,7 +54,7 @@ export default (props: SignupProps) => {
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 44 + 16}
+        keyboardVerticalOffset={44 + topSpace() + 16}
       >
         <View style={styles.fill} />
         <BigButton

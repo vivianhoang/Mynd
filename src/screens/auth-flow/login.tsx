@@ -15,6 +15,7 @@ import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
 import BigButton from '../../componets/big-button';
 import HiveText from '../../componets/hive-text';
+import { topSpace } from '../../utils/layout';
 
 export default (props: LoginProps) => {
   const [email, setEmail] = useState('');
@@ -50,17 +51,18 @@ export default (props: LoginProps) => {
         onChangeText={password => {
           setPassword(password);
         }}
+        secureTextEntry={true}
       />
       <TouchableOpacity
         hitSlop={{ left: 12, top: 12, right: 12, bottom: 12 }}
         onPress={() =>
           sharedNavigationService.navigate({ page: 'ForgotPassword' })
         }
+        style={{ alignSelf: 'flex-end' }}
       >
         <HiveText
           style={{
             color: colors.lightPurple,
-            textAlign: 'right',
             marginTop: 16,
           }}
         >
@@ -70,7 +72,7 @@ export default (props: LoginProps) => {
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 44 + 16}
+        keyboardVerticalOffset={44 + topSpace() + 16}
       >
         <BigButton
           style={styles.button}

@@ -16,7 +16,7 @@ export default (props: Props) => {
     <View>
       <HiveText style={styles.titleLabel}>{title}</HiveText>
       <TextInput
-        placeholderTextColor={colors.darkGray}
+        // placeholderTextColor={colors.darkGray}
         selectionColor={colors.salmonRed}
         style={[styles.textInput as any, style]}
         {...finalProps}

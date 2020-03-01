@@ -15,6 +15,7 @@ import HiveText from '../../componets/hive-text';
 import { TemplateType, NavigationActions } from '../../models';
 import SearchBar from '../../componets/search-bar';
 import _ from 'lodash';
+import { topSpace } from '../../utils/layout';
 
 interface TemplateOption {
   type: TemplateType;
@@ -128,31 +129,29 @@ export default () => {
       source={require('../../assets/templates_screen.png')}
       style={styles.background}
     >
-      <SafeAreaView style={styles.safeAreaView}>
-        <View style={styles.container}>
-          <View style={styles.topBar}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => sharedNavigationService.goBack()}
-            >
-              <Image
-                source={require('../../assets/close-icon.png')}
-                style={styles.closeIcon}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginVertical: 16 }}>
-            <SearchBar
-              placeholder={'Find a template'}
-              value={searchText}
-              onChangeText={(text: string) => setSearchText(text)}
-              onDismiss={() => setSearchText('')}
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => sharedNavigationService.goBack()}
+          >
+            <Image
+              source={require('../../assets/close-icon.png')}
+              style={styles.closeIcon}
+              resizeMode={'contain'}
             />
-          </View>
-          {resultsView}
+          </TouchableOpacity>
         </View>
-      </SafeAreaView>
+        <View style={{ marginVertical: 16 }}>
+          <SearchBar
+            placeholder={'Find a template'}
+            value={searchText}
+            onChangeText={(text: string) => setSearchText(text)}
+            onDismiss={() => setSearchText('')}
+          />
+        </View>
+        {resultsView}
+      </View>
     </ImageBackground>
   );
 };
@@ -163,7 +162,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   topBar: {
-    height: 44,
+    height: 44 + topSpace(),
+    paddingTop: topSpace(),
     alignItems: 'flex-end',
   },
   background: {
@@ -219,8 +219,5 @@ const styles = StyleSheet.create({
   noResultsLabel: {
     marginLeft: 8,
     fontSize: 18,
-  },
-  safeAreaView: {
-    flex: 1,
   },
 });

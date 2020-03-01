@@ -64,8 +64,8 @@ export default (props: Props) => {
 
 const styles = StyleSheet.create({
   button: {
-    height: 60,
-    borderRadius: 30,
+    height: 50,
+    borderRadius: 999,
     backgroundColor: defaultButtonColor,
     borderColor: defaultButtonColor,
     justifyContent: 'center',

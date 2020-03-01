@@ -1,7 +1,19 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  ImageRequireSource,
+} from 'react-native';
+import {
+  NavigationContainer,
+  TabNavigationState,
+  NavigationHelpers,
+  ParamListBase,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import home from './screens/main-flow/home';
+import Home from './screens/main-flow/home';
+import Settings from './screens/main-flow/settings';
 import templateSelection from './screens/main-flow/template-selection';
 import Splash from './screens/auth-flow/splash';
 import Landing from './screens/auth-flow/landing';
@@ -16,6 +28,12 @@ import { Provider } from 'react-redux';
 import store from './services/redux-service';
 import { Page } from './models';
 import colors from './utils/colors';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+// import HiveText from './componets/hive-text';
+import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
+import { bottomSpace } from './utils/layout';
+const hiveIcon = require('./assets/hive-icon.png');
+const settingsIcon = require('./assets/settings-icon.png');
 
 const ModalStack0 = createStackNavigator();
 const ModalStack1 = createStackNavigator();
@@ -24,16 +42,126 @@ const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
 const TemplateSelectionStack = createStackNavigator();
 
+const Tabs = createBottomTabNavigator();
+
+function TabFlow() {
+  const renderTabButton = (params: {
+    navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
+    index: number;
+    state: TabNavigationState;
+    imageSource: ImageRequireSource;
+  }) => {
+    const { navigation, index, state, imageSource } = params;
+    const route = state.routes[index];
+    const isFocused = state.index === index;
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+      canPreventDefault: true,
+    });
+
+    return (
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        activeOpacity={1}
+        key={`${route.key}-${route.name}`}
+        onPress={() => {
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        }}
+      >
+        <Image
+          style={{
+            height: 40,
+            width: 40,
+            tintColor: isFocused ? colors.offBlack : colors.inactiveGray,
+          }}
+          source={imageSource}
+          resizeMode={'contain'}
+        />
+        {/* <HiveText
+          style={{
+            fontSize: 14,
+            color: isFocused ? colors.offBlack : colors.inactiveGray,
+          }}
+        >
+          {route.name}
+        </HiveText> */}
+      </TouchableOpacity>
+    );
+  };
+  return (
+    <Tabs.Navigator
+      tabBar={({ state, descriptors, navigation }) => {
+        const bottomSpacing = bottomSpace();
+        return (
+          <View
+            style={{
+              flexDirection: 'row',
+              height: 50 + bottomSpacing,
+              paddingBottom: bottomSpacing,
+              borderTopWidth: 1,
+              borderColor: colors.lightGray,
+              backgroundColor: colors.white,
+              alignItems: 'center',
+            }}
+          >
+            {renderTabButton({
+              navigation,
+              state,
+              index: 0,
+              imageSource: hiveIcon,
+            })}
+            <TouchableOpacity
+              onPress={() => navigation.navigate('TemplateSelection')}
+            >
+              <Image
+                style={{
+                  height: 50,
+                  width: 50,
+                }}
+                source={require('./assets/templates_button.png')}
+                resizeMode={'contain'}
+              />
+            </TouchableOpacity>
+            {renderTabButton({
+              navigation,
+              state,
+              index: 1,
+              imageSource: settingsIcon,
+            })}
+          </View>
+        );
+      }}
+    >
+      <Tabs.Screen name={'Hive'} component={Home} />
+      <Tabs.Screen name={'Settings'} component={Settings} />
+    </Tabs.Navigator>
+  );
+}
+
 function MainFlow() {
   return (
     <MainStack.Navigator
       initialRouteName={'HomeReset'}
       screenOptions={{ gestureEnabled: false }}
     >
-      <MainStack.Screen
+      {/* <MainStack.Screen
         options={{ headerShown: false }}
         name="HomeReset"
         component={home}
+      ></MainStack.Screen> */}
+      <MainStack.Screen
+        name={'HomeReset'} //Add into models
+        component={TabFlow}
+        options={{
+          headerShown: false,
+        }}
       ></MainStack.Screen>
       <MainStack.Screen
         name={Page.IdeaTemplate}

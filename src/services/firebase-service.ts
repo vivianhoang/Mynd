@@ -49,7 +49,7 @@ export const subscribeToHive = (
           ).sort((a, b) => {
             return a.title > b.title ? 1 : -1;
           });
-          console.log(hiveData);
+          // console.log(hiveData);
           onTrigger(hiveData);
         } else {
           console.log('EMPTY');

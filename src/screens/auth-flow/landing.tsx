@@ -75,7 +75,9 @@ export default () => {
               onMomentumScrollEnd={onScrollEnd}
             >
               <View style={styles.labelContainer}>
-                <HiveText style={styles.title}>{'MYND'}</HiveText>
+                <HiveText style={styles.title} variant={'bold'}>
+                  {'MYND'}
+                </HiveText>
                 <HiveText style={styles.subtitle}>
                   {'Your mind in one place'}
                 </HiveText>
@@ -149,12 +151,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 60,
     color: colors.white,
-    fontFamily: 'PulpDisplay-Bold',
     alignSelf: 'center',
   },
   subtitle: {
     fontSize: 20,
-    fontFamily: 'PulpDisplay-Bold',
     color: colors.offBlack,
     alignSelf: 'center',
   },
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     paddingHorizontal: 32,
-    paddingBottom: 16,
+    paddingBottom: 32,
   },
   background: {
     flex: 1,

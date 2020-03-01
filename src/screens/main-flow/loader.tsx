@@ -5,7 +5,7 @@ import colors from '../../utils/colors';
 export default () => {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size={'large'} color={colors.darkGray} />
+      <ActivityIndicator size={'large'} color={colors.offBlack} />
     </View>
   );
 };

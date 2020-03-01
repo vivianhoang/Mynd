@@ -51,6 +51,7 @@ class AuthService {
     FirebaseAuth().signOut();
     unsubscribeFromAll();
     this.setUser(undefined);
+    store.dispatch({ type: 'RESET_REDUX' });
     sharedNavigationService.navigate({ page: 'Landing' });
   }
 

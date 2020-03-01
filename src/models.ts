@@ -106,6 +106,10 @@ export interface SetHiveData {
   hiveData: HiveData;
 }
 
+export interface ResetRedux {
+  type: 'RESET_REDUX';
+}
+
 export type ReduxActions =
   | CreateIdea
   | UpdateIdea
@@ -115,7 +119,8 @@ export type ReduxActions =
   | DeleteChecklist
   | SetUser
   | SetHiveData
-  | UnsubscribeFromIdea;
+  | UnsubscribeFromIdea
+  | ResetRedux;
 
 export type DispatchAction = Dispatch<ReduxActions>;
 
@@ -220,10 +225,6 @@ export type RouteParamsList = {
 };
 
 //---------Component-based interfaces-----------//
-
-export interface HomeProps {
-  navigation: StackNavigationProp<any>;
-}
 
 export interface LoginProps {
   navigation: StackNavigationProp<any>;

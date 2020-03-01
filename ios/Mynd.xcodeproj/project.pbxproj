@@ -38,7 +38,7 @@
 		9FF3EEC523FA41C700A5E971 /* PulpDisplay-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBB23FA41C600A5E971 /* PulpDisplay-Medium.ttf */; };
 		9FF3EEC623FA41C700A5E971 /* PulpDisplay-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBC23FA41C600A5E971 /* PulpDisplay-MediumItalic.ttf */; };
 		9FF3EEC723FA41C700A5E971 /* PulpDisplay-RegularItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBD23FA41C600A5E971 /* PulpDisplay-RegularItalic.ttf */; };
-		A4ECF7C33FD05A92619329C7 /* libPods-Mynd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2FB102EDA37D5731C698BCF /* libPods-Mynd.a */; };
+		A4ECF7C33FD05A92619329C7 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,7 +62,7 @@
 		838A796F9442A0A685180187 /* Pods-MyndTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyndTests.debug.xcconfig"; path = "Target Support Files/Pods-MyndTests/Pods-MyndTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9490D7FF240B998E0094D722 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		9490D81C240B9B490094D722 /* Mynd Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mynd Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9490D81D240B9B490094D722 /* Mynd copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Mynd copy-Info.plist"; path = "/Users/kalel/Desktop/Mynd/ios/Mynd copy-Info.plist"; sourceTree = "<absolute>"; };
+		9490D81E240B9DA10094D722 /* InfoDev.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = InfoDev.plist; path = Mynd/InfoDev.plist; sourceTree = "<group>"; };
 		9FEC190F23B1AFE80068E2E3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9FF3EEB423FA41C600A5E971 /* PulpDisplay-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-Bold.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-Bold.ttf"; sourceTree = "<group>"; };
 		9FF3EEB523FA41C600A5E971 /* PulpDisplay-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PulpDisplay-LightItalic.ttf"; path = "../../android/app/src/main/assets/fonts/PulpDisplay-LightItalic.ttf"; sourceTree = "<group>"; };
@@ -89,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A4ECF7C33FD05A92619329C7 /* libPods-Mynd.a in Frameworks */,
+				A4ECF7C33FD05A92619329C7 /* (null) in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
+				9490D81E240B9DA10094D722 /* InfoDev.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -184,7 +185,6 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				251CBC66C311B2E4153277EA /* Pods */,
-				9490D81D240B9B490094D722 /* Mynd copy-Info.plist */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -771,7 +771,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = UDEEHCEKCM;
-				INFOPLIST_FILE = "Mynd copy-Info.plist";
+				INFOPLIST_FILE = Mynd/InfoDev.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -794,7 +794,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UDEEHCEKCM;
-				INFOPLIST_FILE = "Mynd copy-Info.plist";
+				INFOPLIST_FILE = Mynd/InfoDev.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",

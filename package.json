@@ -25,6 +25,7 @@
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-background-timer": "^2.1.1",
+    "react-native-config": "^0.12.0",
     "react-native-geolocation-service": "^4.0.0",
     "react-native-gesture-handler": "^1.6.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",

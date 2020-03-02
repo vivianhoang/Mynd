@@ -201,7 +201,7 @@ export default () => {
           </View>
           <View style={{ paddingVertical: 16 }}>
             <SearchBar
-              placeholder={'Search for something...'}
+              placeholder={'Search the Hive...'}
               value={searchText}
               onChangeText={(text: string) => setSearchText(text)}
               onDismiss={() => setSearchText('')}

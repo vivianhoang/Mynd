@@ -144,7 +144,7 @@ export default () => {
         </View>
         <View style={{ marginVertical: 16 }}>
           <SearchBar
-            placeholder={'Find a template'}
+            placeholder={'Find a template...'}
             value={searchText}
             onChangeText={(text: string) => setSearchText(text)}
             onDismiss={() => setSearchText('')}

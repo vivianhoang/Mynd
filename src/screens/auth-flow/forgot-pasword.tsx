@@ -33,7 +33,7 @@ export default (props: ForgotPasswordProps) => {
 
   return (
     <View style={styles.container}>
-      <HiveText style={styles.headerLabel}>{'Forgot Password'}</HiveText>
+      <HiveText style={styles.headerLabel}>{'Forgot Password?'}</HiveText>
       <HiveTextInput
         style={styles.input}
         title="EMAIL"

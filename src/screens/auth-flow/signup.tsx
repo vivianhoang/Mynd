@@ -5,6 +5,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
@@ -50,7 +52,18 @@ export default (props: SignupProps) => {
         onChangeText={password => {
           setPassword(password);
         }}
+        secureText={true}
+        showIcon={true}
+        style={{ flexDirection: 'row' }}
       />
+      <HiveText
+        variant={'light'}
+        style={{
+          color: colors.lightPurple,
+        }}
+      >
+        {'At least 6 characters'}
+      </HiveText>
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
@@ -67,7 +80,10 @@ export default (props: SignupProps) => {
               sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
               sharedNavigationService.navigate({ page: 'Signup' });
-              Alert.alert('Uh oh!', error.message);
+              Alert.alert(
+                'Something went wrong!',
+                'Please make sure your password has six characters.',
+              );
             }
           }}
         />
@@ -97,5 +113,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
+  },
+  titleIcon: {
+    height: 44,
+    width: 44,
+  },
+  eyeIconContainer: {
+    marginLeft: 8,
   },
 });

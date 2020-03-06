@@ -51,7 +51,7 @@ export default (props: LoginProps) => {
         onChangeText={password => {
           setPassword(password);
         }}
-        secureTextEntry={true}
+        secureText={true}
       />
       <TouchableOpacity
         hitSlop={{ left: 12, top: 12, right: 12, bottom: 12 }}
@@ -60,14 +60,7 @@ export default (props: LoginProps) => {
         }
         style={{ alignSelf: 'flex-end' }}
       >
-        <HiveText
-          style={{
-            color: colors.lightPurple,
-            marginTop: 16,
-          }}
-        >
-          {'Forgot Password'}
-        </HiveText>
+        <HiveText style={styles.forgotPassword}>{'Forgot Password?'}</HiveText>
       </TouchableOpacity>
       <View style={styles.fill} />
       <KeyboardAvoidingView
@@ -114,5 +107,9 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
+  },
+  forgotPassword: {
+    color: colors.lightPurple,
+    marginTop: 16,
   },
 });

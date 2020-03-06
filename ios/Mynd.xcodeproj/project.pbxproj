@@ -12,6 +12,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		6A3E64EA8CC9E757141797BA /* libPods-Mynd Dev.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C0E2950CC13C9E3DB6470D7C /* libPods-Mynd Dev.a */; };
+		90033D62424884DA7F38D8FB /* libPods-Mynd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B4E06EECD7316A936D21B80 /* libPods-Mynd.a */; };
 		9490D804240B9B490094D722 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		9490D805240B9B490094D722 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		9490D809240B9B490094D722 /* PulpDisplay-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEB923FA41C600A5E971 /* PulpDisplay-Regular.ttf */; };
@@ -38,7 +39,7 @@
 		9FF3EEC523FA41C700A5E971 /* PulpDisplay-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBB23FA41C600A5E971 /* PulpDisplay-Medium.ttf */; };
 		9FF3EEC623FA41C700A5E971 /* PulpDisplay-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBC23FA41C600A5E971 /* PulpDisplay-MediumItalic.ttf */; };
 		9FF3EEC723FA41C700A5E971 /* PulpDisplay-RegularItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FF3EEBD23FA41C600A5E971 /* PulpDisplay-RegularItalic.ttf */; };
-		A4ECF7C33FD05A92619329C7 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		A4ECF7C33FD05A92619329C7 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +55,7 @@
 		1CD3F36F89CC41F6DA833D0F /* Pods-Mynd-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Mynd-tvOSTests/Pods-Mynd-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		2DD1078688B40BD6B099D390 /* libPods-Mynd-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mynd-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5045152F40C697E287CBE952 /* Pods-Mynd Dev.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd Dev.debug.xcconfig"; path = "Target Support Files/Pods-Mynd Dev/Pods-Mynd Dev.debug.xcconfig"; sourceTree = "<group>"; };
+		5B4E06EECD7316A936D21B80 /* libPods-Mynd.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mynd.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6916B944243BC52AC0D97AEE /* Pods-Mynd-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mynd-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Mynd-tvOS/Pods-Mynd-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		7B3090895F87D94D766F5971 /* libPods-Mynd-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Mynd-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E65D47134114EC0E8EE1746 /* libPods-MyndTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MyndTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,7 +92,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A4ECF7C33FD05A92619329C7 /* (null) in Frameworks */,
+				A4ECF7C33FD05A92619329C7 /* BuildFile in Frameworks */,
+				90033D62424884DA7F38D8FB /* libPods-Mynd.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,6 +166,7 @@
 				2DD1078688B40BD6B099D390 /* libPods-Mynd-tvOSTests.a */,
 				7E65D47134114EC0E8EE1746 /* libPods-MyndTests.a */,
 				C0E2950CC13C9E3DB6470D7C /* libPods-Mynd Dev.a */,
+				5B4E06EECD7316A936D21B80 /* libPods-Mynd.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

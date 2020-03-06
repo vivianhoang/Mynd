@@ -29,7 +29,7 @@ const templates: TemplateOption[] = [
   {
     type: 'Checklist',
     title: 'Checklists',
-    description: 'Create a checklist. This is a longer list of things.',
+    description: 'A list for your daily needs.',
     image: require('../../assets/checklist-icon.png'),
     pageAction: {
       page: 'ChecklistTemplate',
@@ -41,7 +41,7 @@ const templates: TemplateOption[] = [
   {
     type: 'Idea',
     title: 'Ideas',
-    description: 'You have great ideas!',
+    description: 'Quickly write down your thoughts.',
     image: require('../../assets/ideas-icon.png'),
     pageAction: {
       page: 'IdeaTemplate',

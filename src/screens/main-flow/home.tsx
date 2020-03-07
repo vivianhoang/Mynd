@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -37,14 +37,47 @@ export default () => {
     );
   }
 
+  // const isNetworkConnectedQuery = undefined;
+  // const networkConnectedRef = useRef(isNetworkConnectedQuery);
+
+  // useEffect(() => {
+  //   if (isNetworkConnectedQuery === networkConnectedRef.current) {
+  //     return;
+  //   }
+  //   networkConnectedRef.current = isNetworkConnectedQuery;
+  //   console.log('Do something');
+  // }, [isNetworkConnectedQuery]);
+
   const filterHiveData = () => {
     const finalHiveData = hiveData.reduce((data, value) => {
       const clonedValue = _.cloneDeep(value);
+
       clonedValue.data[0] = clonedValue.data[0].filter(templateData => {
-        return _.includes(
-          templateData.title.toLowerCase(),
-          searchText.toLowerCase(),
-        );
+        if (templateData.type == 'Checklist') {
+          return (
+            _.includes(
+              templateData.title.toLowerCase(),
+              searchText.toLowerCase(),
+            ) ||
+            !!templateData.items.filter(item => {
+              return _.includes(
+                item.title.toLowerCase(),
+                searchText.toLowerCase(),
+              );
+            }).length
+          );
+        } else if (templateData.type == 'Idea') {
+          return (
+            _.includes(
+              templateData.title.toLowerCase(),
+              searchText.toLowerCase(),
+            ) ||
+            _.includes(
+              templateData.description.toLowerCase(),
+              searchText.toLowerCase(),
+            )
+          );
+        }
       });
       if (clonedValue.data[0].length) {
         data.push(clonedValue);

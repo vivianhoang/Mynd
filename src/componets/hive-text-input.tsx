@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     color: colors.lightPurple,
     fontFamily: 'PulpDisplay-Bold',
     fontSize: 14,
+    marginTop: 8,
   },
   textInput: {
     fontFamily: 'PulpDisplay-Regular',
@@ -72,6 +73,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.lightGray,
     flexDirection: 'row',
+    margin: 0,
+    padding: 0,
   },
   titleIcon: {
     height: 44,

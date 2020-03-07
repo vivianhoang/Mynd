@@ -36,17 +36,7 @@ export default () => {
       </View>
     );
   }
-
-  // const isNetworkConnectedQuery = undefined;
-  // const networkConnectedRef = useRef(isNetworkConnectedQuery);
-
-  // useEffect(() => {
-  //   if (isNetworkConnectedQuery === networkConnectedRef.current) {
-  //     return;
-  //   }
-  //   networkConnectedRef.current = isNetworkConnectedQuery;
-  //   console.log('Do something');
-  // }, [isNetworkConnectedQuery]);
+  a;
 
   const filterHiveData = () => {
     const finalHiveData = hiveData.reduce((data, value) => {

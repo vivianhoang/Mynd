@@ -6,6 +6,7 @@ import {
   TextInputProps,
   TouchableOpacity,
   Image,
+  ImageSourcePropType,
 } from 'react-native';
 import colors from '../utils/colors';
 import * as _ from 'lodash';
@@ -21,16 +22,16 @@ export default (props: Props) => {
   const [viewPassword, setViewPassword] = useState(true);
   const { style, title, showIcon, secureText } = props;
   const finalProps = _.omit(props, 'style');
+  const viewPasswordIcon = viewPassword
+    ? require('../assets/hide-icon.png')
+    : require('../assets/show-icon.png');
 
   const iconView = showIcon ? (
     <TouchableOpacity
       style={styles.eyeIconContainer}
       onPress={() => setViewPassword(!viewPassword)}
     >
-      <Image
-        style={styles.titleIcon}
-        source={require('../assets/checklist-icon.png')}
-      />
+      <Image style={styles.titleIcon} source={viewPasswordIcon} />
     </TouchableOpacity>
   ) : null;
 

@@ -1,0 +1,22 @@
+diff --git a/node_modules/@types/react-native/index.d.ts b/node_modules/@types/react-native/index.d.ts
+index 2101879..47da4f0 100644
+--- a/node_modules/@types/react-native/index.d.ts
++++ b/node_modules/@types/react-native/index.d.ts
+@@ -1285,10 +1285,16 @@ export interface TextInputProps extends ViewProps, TextInputIOSProps, TextInputA
+ 
+     /**
+      * If true, the text field will blur when submitted.
+-     * The default value is true.
++     * The default value is true for single line and false for multiline.
+      */
+     blurOnSubmit?: boolean;
+ 
++    /**
++     * If true, the text field can create a new line.
++     * The default value is true for multiline and false for single line.
++     */
++    enableNewLine?: boolean;
++
+     /**
+      * If true, caret is hidden. The default value is false.
+      */

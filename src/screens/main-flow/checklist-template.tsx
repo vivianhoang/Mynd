@@ -14,7 +14,6 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-  ScrollView,
   Alert,
 } from 'react-native';
 import {
@@ -33,6 +32,7 @@ import {
   updateChecklist,
 } from '../../services/firebase-service';
 import { topSpace } from '../../utils/layout';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 
 const CheckListRow = (props: {
   item: ChecklistItem;
@@ -40,6 +40,7 @@ const CheckListRow = (props: {
   inputRef: RefObject<TextInput>;
   onEndEditing: (text: string) => void;
   onSubmitEditing: () => void;
+  onChangeText?: (text: string) => void;
 }) => {
   const { title, checked } = props.item;
   return (
@@ -49,10 +50,14 @@ const CheckListRow = (props: {
         placeholderTextColor={colors.lightPurple}
         placeholder={'Item'}
         defaultValue={title}
+        onChangeText={props.onChangeText}
+        enableNewLine={false}
         onSubmitEditing={props.onSubmitEditing}
         selectionColor={colors.salmonRed}
         style={styles.rowInput}
-        // multiline={true}
+        multiline={true}
+        scrollEnabled={false}
+        blurOnSubmit={false}
         onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
       />
       <TouchableOpacity style={styles.checkBox} onPress={props.onToggle}>
@@ -79,12 +84,16 @@ export default (props: ChecklistTemplateProps) => {
   const [checklistItems, setChecklistItems] = useState(
     existingChecklist?.items || [],
   );
+  const [newInputToggle, setNewInputToggle] = useState(false);
   const [newItemTitle, setNewItemTitle] = useState('');
   const [newItemChecked, setNewItemChecked] = useState(false);
+  const [newItemTitle2, setNewItemTitle2] = useState('');
+  const [newItemChecked2, setNewItemChecked2] = useState(false);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   let inputRefList = useRef(checklistItems.map(() => createRef<TextInput>()));
   const newInputRef = useRef<TextInput>(null);
+  const newInputRef2 = useRef<TextInput>(null);
   const newTitleInputRef = useRef<TextInput>(null);
 
   const userId = useSelector<ReduxState, string>(state => state.userId);
@@ -266,9 +275,9 @@ export default (props: ChecklistTemplateProps) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 450 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         keyboardShouldPersistTaps={'handled'}
       >
         <TextInput
@@ -279,6 +288,7 @@ export default (props: ChecklistTemplateProps) => {
           value={checklistTitle}
           onChangeText={text => setChecklistTitle(text)}
           ref={newTitleInputRef}
+          blurOnSubmit={true}
         />
         {checklistItems.map((item, index) => {
           // Adding timestamp fixed issue of focusing on later items after previous has been removed
@@ -297,7 +307,7 @@ export default (props: ChecklistTemplateProps) => {
                   nextInputRef.current && nextInputRef.current.focus();
                 } else {
                   console.log('focusing new', newInputRef);
-                  newInputRef.current && newInputRef.current.focus();
+                  newInputRef2.current && newInputRef2.current.focus();
                 }
               }}
               onToggle={() => {
@@ -307,6 +317,7 @@ export default (props: ChecklistTemplateProps) => {
                 setChecklistItems(newItems);
               }}
               onEndEditing={text => {
+                // When clicking out
                 let newItems = [...checklistItems];
                 if (!_.trim(text)) {
                   // Remove
@@ -314,81 +325,88 @@ export default (props: ChecklistTemplateProps) => {
                 } else {
                   newItems[index] = { ...item, title: text };
                 }
-
                 setChecklistItems(newItems);
               }}
             />
           );
         })}
         {/* New input */}
-        <View style={[styles.rowContainer]}>
-          <TextInput
-            ref={newInputRef}
-            onBlur={() => {
-              if (_.trim(newItemTitle)) {
-                const newItem: ChecklistItem = {
-                  title: _.trim(newItemTitle),
-                  checked: newItemChecked,
-                  timestamp: new Date().getTime().toString(),
-                };
-                const newItems = [...checklistItems, newItem];
-                setChecklistItems(newItems);
-              }
-              setNewItemTitle('');
-              setNewItemChecked(false);
-            }}
-            onSubmitEditing={() => {
-              if (_.trim(newItemTitle)) {
-                const newItem: ChecklistItem = {
-                  title: _.trim(newItemTitle),
-                  checked: newItemChecked,
-                  timestamp: new Date().getTime().toString(),
-                };
-                const newItems = [...checklistItems, newItem];
-                setChecklistItems(newItems);
-              } else {
-                newInputRef.current && newInputRef.current.blur();
-              }
-              setNewItemTitle('');
-              setNewItemChecked(false);
-            }}
-            blurOnSubmit={false}
-            placeholderTextColor={colors.lightPurple}
-            placeholder={'New item'}
-            value={newItemTitle}
-            onChangeText={text => setNewItemTitle(text)}
-            selectionColor={colors.salmonRed}
-            style={styles.rowInput}
-            // multiline={true}
-          />
-          <TouchableOpacity
-            style={styles.checkBox}
-            onPress={() => setNewItemChecked(!newItemChecked)}
-            onBlur={() => {
-              if (_.trim(newItemTitle)) {
-                const newItem: ChecklistItem = {
-                  title: _.trim(newItemTitle),
-                  checked: newItemChecked,
-                  timestamp: new Date().getTime().toString(),
-                };
-                const newItems = [...checklistItems, newItem];
-                setChecklistItems(newItems);
-              }
-              setNewItemTitle('');
-              setNewItemChecked(false);
-            }}
+        <View>
+          <View
+            style={[
+              !newInputToggle ? StyleSheet.absoluteFillObject : null,
+              {
+                opacity: newInputToggle ? 1 : 0,
+              },
+            ]}
           >
-            <View
-              style={[
-                styles.activeCheckBox,
-                {
-                  opacity: newItemChecked ? 1 : 0,
-                },
-              ]}
+            <CheckListRow
+              inputRef={newInputRef}
+              item={{
+                title: newItemTitle,
+                timestamp: new Date().getTime().toString(),
+                checked: newItemChecked,
+              }}
+              onChangeText={text => setNewItemTitle(text)}
+              onSubmitEditing={() => {
+                setNewInputToggle(false);
+                newInputRef2.current && newInputRef2.current.focus();
+              }}
+              onToggle={() => setNewItemChecked(!newItemChecked)}
+              onEndEditing={() => {
+                if (_.trim(newItemTitle)) {
+                  const newItem: ChecklistItem = {
+                    title: _.trim(newItemTitle),
+                    checked: newItemChecked,
+                    timestamp: new Date().getTime().toString(),
+                  };
+                  const newItems = [...checklistItems, newItem];
+                  setChecklistItems(newItems);
+                }
+                setNewItemTitle('');
+                setNewItemChecked(false);
+              }}
             />
-          </TouchableOpacity>
+          </View>
+          <View
+            pointerEvents={newInputToggle ? 'none' : 'auto'}
+            style={[
+              newInputToggle ? StyleSheet.absoluteFillObject : null,
+              {
+                opacity: newInputToggle ? 0 : 1,
+              },
+            ]}
+          >
+            <CheckListRow
+              inputRef={newInputRef2}
+              item={{
+                title: newItemTitle2,
+                timestamp: new Date().getTime().toString(),
+                checked: newItemChecked2,
+              }}
+              onChangeText={text => setNewItemTitle2(text)}
+              onSubmitEditing={() => {
+                setNewInputToggle(true);
+                newInputRef.current && newInputRef.current.focus();
+              }}
+              onToggle={() => setNewItemChecked2(!newItemChecked2)}
+              onEndEditing={() => {
+                if (_.trim(newItemTitle2)) {
+                  const newItem: ChecklistItem = {
+                    title: _.trim(newItemTitle2),
+                    checked: newItemChecked2,
+                    timestamp: new Date().getTime().toString(),
+                  };
+                  const newItems = [...checklistItems, newItem];
+                  setChecklistItems(newItems);
+                }
+                setNewItemTitle2('');
+                setNewItemChecked2(false);
+              }}
+            />
+          </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
         keyboardVerticalOffset={44 + topSpace()}

@@ -36,7 +36,6 @@ export default () => {
       </View>
     );
   }
-  a;
 
   const filterHiveData = () => {
     const finalHiveData = hiveData.reduce((data, value) => {

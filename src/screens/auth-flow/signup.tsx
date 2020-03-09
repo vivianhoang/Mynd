@@ -82,7 +82,7 @@ export default (props: SignupProps) => {
               sharedNavigationService.navigate({ page: 'Signup' });
               Alert.alert(
                 'Something went wrong!',
-                'Please make sure your password has six characters.',
+                error.message.replace(/ *\[[^)]*\] */g, ''), // Removes Firebase error code, and only displays the Firebase error messsage
               );
             }
           }}

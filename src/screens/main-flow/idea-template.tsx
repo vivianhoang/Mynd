@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Image,
   TextInput,
-  ScrollView,
   KeyboardAvoidingView,
   Alert,
 } from 'react-native';
@@ -22,6 +21,7 @@ import {
   createIdea,
 } from '../../services/firebase-service';
 import { topSpace } from '../../utils/layout';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 
 export default (props: IdeaTemplateProps) => {
   const existingIdea = props.route.params?.idea;
@@ -164,9 +164,10 @@ export default (props: IdeaTemplateProps) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 450 }}
+        contentContainerStyle={{ paddingBottom: 130 }}
+        keyboardShouldPersistTaps={'handled'}
       >
         <TextInput
           selectionColor={colors.salmonRed}
@@ -186,7 +187,7 @@ export default (props: IdeaTemplateProps) => {
           value={ideaDescription}
           onChangeText={text => setIdeaDescription(text)}
         />
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
         keyboardVerticalOffset={44 + topSpace()}

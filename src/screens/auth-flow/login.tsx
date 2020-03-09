@@ -76,7 +76,10 @@ export default (props: LoginProps) => {
               sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
               sharedNavigationService.navigate({ page: 'Login' });
-              Alert.alert('Uh oh!', error.message);
+              Alert.alert(
+                'Uh oh!',
+                error.message.replace(/ *\[[^)]*\] */g, ''), // Removes Firebase error code, and only displays the Firebase error messsage);
+              );
             }
           }}
           title={'Login'}

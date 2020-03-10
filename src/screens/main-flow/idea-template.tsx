@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Platform,
@@ -32,6 +32,7 @@ export default (props: IdeaTemplateProps) => {
   );
 
   const userId = useSelector<ReduxState, string>(state => state.userId);
+  const descriptionInputRef = useRef<TextInput>(null);
 
   const updateOrCreateIdea = async () => {
     sharedNavigationService.navigate({ page: 'Loader' });
@@ -168,6 +169,7 @@ export default (props: IdeaTemplateProps) => {
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 130 }}
         keyboardShouldPersistTaps={'handled'}
+        automaticallyAdjustContentInsets={false}
       >
         <TextInput
           selectionColor={colors.salmonRed}
@@ -176,8 +178,12 @@ export default (props: IdeaTemplateProps) => {
           placeholder={'Untitled'}
           value={ideaTitle}
           onChangeText={text => setIdeaTitle(text)}
+          onSubmitEditing={() => {
+            descriptionInputRef.current.focus();
+          }}
         />
         <TextInput
+          ref={descriptionInputRef}
           selectionColor={colors.salmonRed}
           placeholderTextColor={colors.lightPurple}
           style={styles.ideaInput}

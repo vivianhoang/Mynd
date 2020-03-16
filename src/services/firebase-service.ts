@@ -7,6 +7,8 @@ import {
   JsonHiveData,
   Checklist,
   ChecklistItem,
+  Goal,
+  Goals,
 } from '../models';
 import * as _ from 'lodash';
 
@@ -180,6 +182,80 @@ export const deleteChecklist = async (params: {
     await checklistRef.delete();
   } catch (error) {
     console.log('Failed to delete checklist!', error.message);
+  }
+};
+
+export const createGoal = async (params: {
+  title: string;
+  description: string;
+  tasks: Goal[];
+  completed: boolean;
+  userId: string;
+}) => {
+  const { title, description, tasks, completed, userId } = params;
+  const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
+  const goalId = hiveRef.doc().id;
+  const newGoal: Goal = {
+    id: goalId,
+    title: title,
+    description,
+    tasks,
+    completed,
+    timestamp: new Date().getTime().toString(),
+    type: 'Goal',
+  };
+  try {
+    await hiveRef.doc(goalId).set(newGoal);
+  } catch (error) {
+    console.log('Failed to create goal!', error.message);
+  }
+};
+
+export const updateGoal = async (params: {
+  title: string;
+  tasks: Goal[];
+  userId: string;
+  id: string;
+  description: string;
+  timestamp: string;
+  completed: boolean;
+}) => {
+  const {
+    title,
+    tasks,
+    description,
+    userId,
+    id,
+    timestamp,
+    completed,
+  } = params;
+  const goalRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
+
+  const updatedGoal: Goal = {
+    id,
+    title,
+    tasks,
+    timestamp,
+    completed,
+    description,
+    type: 'Goal',
+  };
+
+  try {
+    await goalRef.update(updatedGoal);
+  } catch (error) {
+    console.log('Failed to update goal!', error.message);
+  }
+};
+
+export const deleteGoal = async (params: { id: string; userId: string }) => {
+  const { id, userId } = params;
+  const goalRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
+
+  try {
+    await goalRef.delete();
+  } catch (error) {
+    console.log('Failed to delete goal!', error.message);
   }
 };
 

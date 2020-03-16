@@ -23,7 +23,7 @@ export type HiveData = {
   data: TemplateData[][];
 }[];
 
-export type TemplateType = 'Idea' | 'Checklist';
+export type TemplateType = 'Idea' | 'Checklist' | 'Goal';
 
 export interface Idea {
   id: string;
@@ -46,10 +46,21 @@ export interface Checklist {
   type: 'Checklist';
 }
 
-export type Templates = Idea | Checklist;
+export interface Goal {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  tasks?: Goal[];
+  completed: boolean;
+  type: 'Goal';
+}
+
+export type Templates = Idea | Checklist | Goal;
 
 export type Ideas = Idea[];
 export type Checklists = Checklist[];
+export type Goals = Goal[];
 
 //---------Actions-related interfaces-----------//
 
@@ -91,6 +102,26 @@ export interface DeleteChecklist {
   id: string;
 }
 
+export interface CreateGoal {
+  type: 'CREATE_GOAL';
+  title: string;
+  description: string;
+  tasks?: Goal[];
+}
+
+export interface UpdateGoal {
+  type: 'UPDATE_GOAL';
+  title: string;
+  description: string;
+  tasks?: Goal[];
+  completed: boolean;
+}
+
+export interface DeleteGoal {
+  type: 'DELETE_GOAL';
+  id: string;
+}
+
 export interface SetUser {
   type: 'SET_USER';
   userId: string;
@@ -117,6 +148,9 @@ export type ReduxActions =
   | CreateChecklist
   | UpdateChecklist
   | DeleteChecklist
+  | CreateGoal
+  | UpdateGoal
+  | DeleteGoal
   | SetUser
   | SetHiveData
   | UnsubscribeFromIdea
@@ -137,7 +171,8 @@ export type PageName =
   | 'Loader'
   | 'TemplateSelection'
   | 'IdeaTemplate'
-  | 'ChecklistTemplate';
+  | 'ChecklistTemplate'
+  | 'GoalTemplate';
 
 export const Page: {
   [key in PageName]: PageName;
@@ -153,6 +188,7 @@ export const Page: {
   TemplateSelection: 'TemplateSelection',
   IdeaTemplate: 'IdeaTemplate',
   ChecklistTemplate: 'ChecklistTemplate',
+  GoalTemplate: 'GoalTemplate',
 };
 
 export interface BasePageInterface {
@@ -203,6 +239,15 @@ export interface ChecklistTemplatePage extends BasePageInterface {
   props: ChecklistTemplateOwnProps;
 }
 
+export interface GoalTemplateOwnProps {
+  goal: Goal | null;
+}
+
+export interface GoalTemplatePage extends BasePageInterface {
+  page: 'GoalTemplate';
+  props: GoalTemplateOwnProps;
+}
+
 export interface SignupPage extends BasePageInterface {
   page: 'Signup';
 }
@@ -217,33 +262,35 @@ export type NavigationActions =
   | TemplateSelectionPage
   | IdeaTemplatePage
   | ChecklistTemplatePage
+  | GoalTemplatePage
   | SignupPage;
 
 export type RouteParamsList = {
   IdeaTemplate: IdeaTemplateOwnProps;
   ChecklistTemplate: ChecklistTemplateOwnProps;
+  GoalTemplate: GoalTemplateOwnProps;
 };
 
 //---------Component-based interfaces-----------//
 
-export interface LoginProps {
+export interface NavigationProps {
   navigation: StackNavigationProp<any>;
 }
 
-export interface ForgotPasswordProps {
-  navigation: StackNavigationProp<any>;
-}
+export interface LoginProps extends NavigationProps {}
 
-export interface SignupProps {
-  navigation: StackNavigationProp<any>;
-}
+export interface ForgotPasswordProps extends NavigationProps {}
 
-export interface IdeaTemplateProps {
-  navigation: StackNavigationProp<any>;
+export interface SignupProps extends NavigationProps {}
+
+export interface IdeaTemplateProps extends NavigationProps {
   route: RouteProp<RouteParamsList, 'IdeaTemplate'>;
 }
 
-export interface ChecklistTemplateProps {
-  navigation: StackNavigationProp<any>;
+export interface ChecklistTemplateProps extends NavigationProps {
   route: RouteProp<RouteParamsList, 'ChecklistTemplate'>;
+}
+
+export interface GoalTemplateProps extends NavigationProps {
+  route: RouteProp<RouteParamsList, 'GoalTemplate'>;
 }

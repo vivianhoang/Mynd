@@ -23,6 +23,7 @@ import { screenSize, topSpace } from '../../utils/layout';
 const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
   Checklist: require('../../assets/checklist-icon.png'),
+  Goal: require('../../assets/goals-icon.png'),
 };
 
 export default () => {
@@ -143,6 +144,7 @@ export default () => {
               keyExtractor={item => {
                 return item.id;
               }}
+              style={{ paddingHorizontal: 16, paddingVertical: 16 }}
               renderItem={({
                 item,
                 index,
@@ -156,13 +158,20 @@ export default () => {
                     style={{
                       height: (375 - 32) / 3,
                       width: (screenSize.width - 64) / 3,
-                      backgroundColor: colors.placeholderGray,
+                      backgroundColor: colors.white,
                       marginHorizontal,
                       marginBottom: 12,
                       borderRadius: 10,
                       alignItems: 'center',
                       justifyContent: 'flex-end',
                       padding: 12,
+                      shadowColor: colors.offBlack,
+                      shadowRadius: 4,
+                      shadowOpacity: 0.2,
+                      shadowOffset: {
+                        width: 1,
+                        height: 1,
+                      },
                     }}
                     onPress={() => {
                       switch (item.type) {
@@ -203,31 +212,33 @@ export default () => {
   return (
     <View style={styles.container}>
       {hiveData.length ? (
-        <View style={{ flex: 1, paddingHorizontal: 16 }}>
-          <View
-            style={{
-              // paddingTop: 16,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <HiveText variant={'medium'} style={{ fontSize: 20 }}>
-              {`What's on your mind?`}
-            </HiveText>
-            <Image
-              source={require('../../assets/home-bee.png')}
-              style={{ height: 187 * 0.3, width: 276 * 0.3, marginRight: 16 }}
-              resizeMode={'contain'}
-            />
-          </View>
-          <View style={{ paddingVertical: 16 }}>
-            <SearchBar
-              placeholder={'Search the Hive...'}
-              value={searchText}
-              onChangeText={(text: string) => setSearchText(text)}
-              onDismiss={() => setSearchText('')}
-            />
+        <View style={{ flex: 1 }}>
+          <View style={{ paddingHorizontal: 16 }}>
+            <View
+              style={{
+                // paddingTop: 16,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <HiveText variant={'medium'} style={{ fontSize: 20 }}>
+                {`What's on your mind?`}
+              </HiveText>
+              <Image
+                source={require('../../assets/home-bee.png')}
+                style={{ height: 187 * 0.3, width: 276 * 0.3, marginRight: 16 }}
+                resizeMode={'contain'}
+              />
+            </View>
+            <View style={{ paddingVertical: 16 }}>
+              <SearchBar
+                placeholder={'Search the Hive...'}
+                value={searchText}
+                onChangeText={(text: string) => setSearchText(text)}
+                onDismiss={() => setSearchText('')}
+              />
+            </View>
           </View>
           {resultsView}
         </View>
@@ -281,6 +292,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingBottom: 16,
+    paddingHorizontal: 16,
     paddingTop: 8,
     backgroundColor: colors.white,
     flexDirection: 'row',

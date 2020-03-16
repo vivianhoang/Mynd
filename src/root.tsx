@@ -23,6 +23,7 @@ import signup from './screens/auth-flow/signup';
 import Loader from './screens/main-flow/loader';
 import IdeaTemplate from './screens/main-flow/idea-template';
 import ChecklistTemplate from './screens/main-flow/checklist-template';
+import GoalTemplate from './screens/main-flow/goal-template';
 import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
@@ -170,6 +171,10 @@ function MainFlow() {
       <MainStack.Screen
         name={Page.ChecklistTemplate}
         component={ChecklistTemplate}
+      ></MainStack.Screen>
+      <MainStack.Screen
+        name={Page.GoalTemplate}
+        component={GoalTemplate}
       ></MainStack.Screen>
     </MainStack.Navigator>
   );

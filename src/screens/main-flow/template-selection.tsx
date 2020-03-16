@@ -50,6 +50,18 @@ const templates: TemplateOption[] = [
       },
     },
   },
+  {
+    type: 'Goal',
+    title: 'Goals',
+    description: 'Keep track of your progress.',
+    image: require('../../assets/goals-icon.png'),
+    pageAction: {
+      page: 'GoalTemplate',
+      props: {
+        goal: null,
+      },
+    },
+  },
 ];
 
 const TemplateCard = (props: {
@@ -181,7 +193,7 @@ const styles = StyleSheet.create({
     tintColor: colors.white,
   },
   templateOptionContainer: {
-    backgroundColor: '#F3F3F3',
+    backgroundColor: '#FAFAFA',
     flexDirection: 'row',
     marginBottom: 16,
     borderRadius: 10,

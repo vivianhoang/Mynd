@@ -2,12 +2,13 @@ import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import * as _ from 'lodash';
 import { rootSaga, sagaAfterLogin } from './saga-service';
-import { ReduxState, ReduxActions } from '../models';
+import { ReduxState, ReduxActions, Goal } from '../models';
 
 const sagaMiddleware = createSagaMiddleware();
 const initialState: ReduxState = {
   userId: undefined,
   hiveData: undefined,
+  tempGoal: undefined,
 };
 
 const reducer = (state: ReduxState = initialState, action: ReduxActions) => {
@@ -22,6 +23,10 @@ const reducer = (state: ReduxState = initialState, action: ReduxActions) => {
     case 'RESET_REDUX':
       newState = initialState;
       return newState;
+    case 'UPDATE_TEMP_GOAL': {
+      newState.tempGoal = action.goal;
+      return newState;
+    }
     default:
       return newState;
   }

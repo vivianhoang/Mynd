@@ -34,20 +34,20 @@ const {
   eq,
   call,
 } = Animated;
-import { useMemoOne } from 'use-memo-one';
 
 const ActionSheet = (props: ActionSheetProps) => {
   const { options } = props.route.params;
 
+  let onPressed: () => void;
   const clock = new Animated.Clock();
-  const actionSheetHeight = 200;
-  const RERENDER_TRIGGER = Math.random() * 999;
+  const actionSheetHeight =
+    4 + 16 + 36 + options.length * (50 + 8) + 16 + bottomSpace();
   const SNAP_TOP = 0;
-  const SNAP_BOTTOM = actionSheetHeight; //layout.screenSize.height / 2 + totalCardHeight / 2;
-  const translationY = useMemoOne(() => new Value(0), []);
-  const velocityY = useMemoOne(() => new Value(0), []);
-  const state = useMemoOne(() => new Value(State.UNDETERMINED), []);
-  const offset = useMemoOne(() => new Value(SNAP_BOTTOM), []);
+  const SNAP_BOTTOM = actionSheetHeight;
+  const translationY = new Value(0);
+  const velocityY = new Value(0);
+  const state = new Value(State.UNDETERMINED);
+  const offset = new Value(SNAP_BOTTOM);
   const springConfig = {
     damping: 50,
     mass: 0.2,
@@ -68,20 +68,16 @@ const ActionSheet = (props: ActionSheetProps) => {
         const offset = val[0];
         switch (offset) {
           case SNAP_BOTTOM:
-            // Navigator.popScreen();
-            break;
+            sharedNavigationService.goBack();
         }
       },
     }),
     SNAP_TOP,
     SNAP_BOTTOM,
   );
-  const triggerDismissActionSheet: Animated.Value<1 | 0> = new Value(0);
   const triggerShowActionSheet: Animated.Value<1 | 0> = new Value(0);
-  const gestureHandler = useMemoOne(
-    () => onGestureEvent({ translationY, velocityY, state }),
-    [],
-  );
+  const triggerDismissActionSheet: Animated.Value<1 | 0> = new Value(0);
+  const gestureHandler = onGestureEvent({ translationY, velocityY, state });
 
   useCode(
     () =>
@@ -102,7 +98,8 @@ const ActionSheet = (props: ActionSheetProps) => {
             block([
               set(triggerDismissActionSheet, 0),
               call([], () => {
-                // Navigator.popScreen();
+                sharedNavigationService.goBack();
+                onPressed && onPressed();
               }),
             ]),
           ),
@@ -124,9 +121,11 @@ const ActionSheet = (props: ActionSheetProps) => {
           ),
         ]),
       ]),
-    [SNAP_BOTTOM, RERENDER_TRIGGER],
+    [],
   );
+
   useEffect(() => {
+    // Show action sheet
     triggerShowActionSheet.setValue(1);
   }, []);
 
@@ -191,8 +190,9 @@ const ActionSheet = (props: ActionSheetProps) => {
               <TouchableOpacity
                 onPress={() => {
                   // Trigger animation before press
-
-                  onPress();
+                  // onPress();
+                  onPressed = onPress;
+                  triggerDismissActionSheet.setValue(1);
                 }}
               >
                 <LinearGradient

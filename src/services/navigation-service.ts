@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainerRef, StackActions } from '@react-navigation/native';
 import { NavigationActions } from '../models';
 
 class NavigationService {
@@ -8,6 +8,12 @@ class NavigationService {
   navigate(navAction: NavigationActions) {
     const props = (navAction as any).props;
     this.navRef.current && this.navRef.current.navigate(navAction.page, props);
+  }
+
+  push(navAction: NavigationActions) {
+    const props = (navAction as any).props;
+    this.navRef.current &&
+      this.navRef.current.dispatch(StackActions.push(navAction.page, props));
   }
 
   goBack() {

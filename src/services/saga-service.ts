@@ -19,25 +19,15 @@ function* subscribeToHiveInfo() {
   }, userId);
 }
 
-function* takeIdeasChannel() {
+function* takeHiveChannel() {
   while (true) {
     const action = yield take(hiveChannel);
     yield put(action);
   }
 }
 
-function* takeUpdateIdea() {
-  while (true) {
-    const action = yield take('UPDATE_IDEA');
-    const { id, title, description, timestamp } = action;
-    const userId: string = yield select((state: ReduxState) => state.userId);
-    yield call(() => updateIdea({ title, description, userId, id, timestamp }));
-    sharedNavigationService.goBack();
-  }
-}
-
 export const rootSaga = function*() {
-  yield all([takeUpdateIdea(), takeIdeasChannel()]);
+  yield all([takeHiveChannel()]);
 };
 
 export const sagaAfterLogin = function*() {

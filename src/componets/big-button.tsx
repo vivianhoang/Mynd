@@ -18,7 +18,7 @@ interface Props {
   style?: StyleProp<ViewStyle>;
 }
 
-export default (props: Props) => {
+const BigButton = (props: Props) => {
   const { title, onPress, type, color, style } = props;
 
   let finalButtonStyle = { ...styles.button };
@@ -77,3 +77,5 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 });
+
+export default BigButton;

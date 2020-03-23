@@ -1,18 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
-  Platform,
+  // Platform,
   StyleSheet,
   Image,
   TextInput,
-  KeyboardAvoidingView,
+  // KeyboardAvoidingView,
   Alert,
 } from 'react-native';
 import {
   ReduxState,
-  GoalTemplateProps,
-  Goals,
   Goal,
+  GoalTaskDetailsProps,
   DispatchAction,
   ActionSheetOwnProps,
 } from '../../../models';
@@ -22,98 +21,72 @@ import colors from '../../../utils/colors';
 import { useSelector, useDispatch } from 'react-redux';
 import * as _ from 'lodash';
 import { TouchableOpacity } from 'react-native';
-import { topSpace } from '../../../utils/layout';
+import // deleteIdea,
+// updateIdea,
+// createIdea,
+'../../../services/firebase-service';
+// import { topSpace } from '../../../utils/layout';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
-import {
-  updateGoal,
-  createGoal,
-  deleteGoal,
-} from '../../../services/firebase-service';
 import HiveText from '../../../componets/hive-text';
 import { FlatList } from 'react-native-gesture-handler';
 
-export default (props: GoalTemplateProps) => {
-  const existingGoal = props.route.params?.goal;
-  // const tempGoal = existingGoal ||
-  // const [_goalTitle, setGoalTitle] = useState(existingGoal?.title || '');
-  // const [_goalDescription, setGoalDescription] = useState(
-  //   existingGoal?.description || '',
-  // );
-  // const [_goalTask, setGoalTasks] = useState<Goals>(existingGoal?.tasks || []);
-  // const [_goalCompleted, setGoalCompleted] = useState(
-  //   existingGoal?.completed || false,
-  // );
-  const dispatch = useDispatch<DispatchAction>();
+export default (props: GoalTaskDetailsProps) => {
+  const { breadcrumbs } = props.route.params;
+  // const existingGoal = task;
 
-  useEffect(() => {
-    dispatch({
-      type: 'UPDATE_TEMP_GOAL',
-      goal: existingGoal || {
-        id: 'dummy',
-        title: 'new',
-        description: '',
-        timestamp: new Date().getTime().toString(),
-        completed: false,
-        type: 'Goal',
-      },
-    });
-  }, []);
+  const constructKeysFromBreadcrumbs = () => {
+    let setKeys = [];
+    for (const i in breadcrumbs) {
+      let index = parseInt(i);
+      const breadcrumb = breadcrumbs[index];
+      setKeys.push('tasks');
+      setKeys.push(breadcrumb.taskIndex);
+    }
+    return setKeys as string[];
+  };
 
   const tempGoal = useSelector<ReduxState, Goal>(state => state.tempGoal);
-  const goalTitle = tempGoal?.title || '';
-  const goalDescription = tempGoal?.description || '';
-  const goalTasks = tempGoal?.tasks || [];
-  const goalCompleted = tempGoal?.completed || false;
+  const breadcrumbKeys = constructKeysFromBreadcrumbs();
+  let tempTask = _.get(tempGoal, breadcrumbKeys) as Goal;
+
+  const goalTitle = tempTask?.title || '';
+  const goalDescription = tempTask?.description || '';
+  const goalTasks = tempTask?.tasks || [];
+  const goalCompleted = tempTask?.completed || false;
 
   const userId = useSelector<ReduxState, string>(state => state.userId);
+  const dispatch = useDispatch<DispatchAction>();
   const descriptionInputRef = useRef<TextInput>(null);
 
-  const updateOrCreateGoal = async () => {
-    sharedNavigationService.navigate({ page: 'Loader' });
-    try {
-      if (existingGoal) {
-        await updateGoal({
-          id: existingGoal.id,
-          title: _.trim(goalTitle) || `Untitled`,
-          description: goalDescription,
-          tasks: goalTasks,
-          completed: goalCompleted,
-          timestamp: existingGoal.timestamp,
-          userId,
-        });
-      } else {
-        const newGoalDescription = _.trim(goalDescription) || `Description`;
-        const newGoalTitle = _.trim(goalTitle) || `Untitled`;
+  const constructAndSetGoal = (newTempGoal: Goal, key: string, value: any) => {
+    _.set(newTempGoal, [...breadcrumbKeys, key], value);
+  };
 
-        await createGoal({
-          title: newGoalTitle,
-          description: newGoalDescription,
-          completed: false,
-          tasks: goalTasks || [],
-          userId,
-        });
-      }
-      sharedNavigationService.navigate({ page: 'HomeReset' });
-    } catch (error) {
-      // Same as dismissing loader
-      sharedNavigationService.navigate({
-        page: 'GoalTemplate',
-        props: {
-          goal: existingGoal
-            ? {
-                type: 'Goal',
-                id: existingGoal.id,
-                title: _.trim(goalTitle) || `Untitled`,
-                description: _.trim(goalDescription) || `Description`,
-                tasks: existingGoal.tasks,
-                completed: existingGoal.completed,
-                timestamp: existingGoal.timestamp,
-              }
-            : null,
-        },
-      });
-      Alert.alert('Uh oh!', `Couldn't save goal. ${error.message}`);
-    }
+  const setTitle = (text: string) => {
+    let newTempGoal = { ...tempGoal };
+    constructAndSetGoal(newTempGoal, 'title', text);
+    dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
+  };
+  const setDescription = (text: string) => {
+    let newTempGoal = { ...tempGoal };
+    constructAndSetGoal(newTempGoal, 'description', text);
+    dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
+  };
+  const setTask = (task: Goal) => {
+    let newTempGoal = { ...tempGoal };
+    const tasks: Goal[] = [...(tempTask.tasks || []), task];
+    constructAndSetGoal(newTempGoal, 'tasks', tasks);
+    dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
+    // setComplete(false);
+  };
+  const setComplete = (completed: boolean) => {
+    let newTempGoal = { ...tempGoal };
+    // Set top level
+    constructAndSetGoal(newTempGoal, 'completed', completed);
+    const tasks: Goal[] = _.get(newTempGoal, [...breadcrumbKeys, 'tasks']);
+    // Set nested levels
+    toggleCompleteAllNestedTasks(tasks, completed);
+    dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
   };
 
   props.navigation.setOptions({
@@ -131,13 +104,14 @@ export default (props: GoalTemplateProps) => {
             description: goalDescription,
           };
           const initialTitleAndDescription = {
-            title: existingGoal ? existingGoal.title : '',
-            description: existingGoal ? existingGoal.description : '',
+            title: tempTask.title,
+            description: tempTask.description,
           };
           if (_.isEqual(finalTitleAndDescription, initialTitleAndDescription)) {
-            sharedNavigationService.navigate({
-              page: 'HomeReset',
-            });
+            // sharedNavigationService.navigate({
+            //   page: 'HomeReset',
+            // });
+            sharedNavigationService.goBack();
           } else {
             Alert.alert(
               'It looks like you have some unsaved changes',
@@ -155,40 +129,14 @@ export default (props: GoalTemplateProps) => {
             );
           }
         }}
-        title={'Cancel'}
+        title={'Back'}
         position={'left'}
       />
     ),
-    headerRight: existingGoal
-      ? () => (
-          <NavButton
-            onPress={() => {
-              Alert.alert(
-                'Are you sure you want to delete this idea?',
-                'This action cannot be undone.',
-                [
-                  { text: 'Cancel' },
-                  {
-                    text: 'Delete',
-                    onPress: triggerDeleteGoal,
-                  },
-                ],
-              );
-            }}
-            title={'Delete'}
-            position={'right'}
-            color={'red'}
-          />
-        )
-      : null,
     headerStyle: { shadowColor: colors.lightGray },
   });
 
-  const getTasksProgress = (
-    tasks: Goal[],
-    // totalTasks: number,
-    // totalComplete: number,
-  ) => {
+  const getTasksProgress = (tasks: Goal[]) => {
     let totalTasks = 0;
     let totalComplete = 0;
     for (const index in tasks) {
@@ -263,11 +211,11 @@ export default (props: GoalTemplateProps) => {
     }
   };
 
-  const triggerCompleteGoal = () => {
+  const triggerCompleteTask = () => {
     if (!!goalTasks.length) {
       Alert.alert(
-        'Complete Goal?',
-        'This will complete all tasks you may have.',
+        'Complete Task?',
+        'This will complete all subtasks you may have.',
         [
           {
             text: 'No',
@@ -275,71 +223,45 @@ export default (props: GoalTemplateProps) => {
           },
           {
             text: 'Yes',
-            onPress: () => {
-              // Complete all nested tasks
-              const newGoal = { ...tempGoal };
-              newGoal.completed = true;
-              toggleCompleteAllNestedTasks(newGoal.tasks, true);
-              dispatch({
-                type: 'UPDATE_TEMP_GOAL',
-                goal: newGoal,
-              });
-            },
+            onPress: () => setComplete(true),
           },
         ],
       );
     } else {
-      const newTask: Goal = {
-        ...tempGoal,
-        completed: true,
-      };
-      dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTask });
+      setComplete(true);
     }
   };
 
-  const triggerResetGoal = () => {
-    Alert.alert('Reset this goal?', 'This will reset all tasks you may have.', [
-      {
-        text: 'Cancel',
-        onPress: () => {},
-      },
-      {
-        text: 'Reset',
-        onPress: () => {
-          // Complete all nested tasks
-          const newGoal = { ...tempGoal };
-          newGoal.completed = false;
-          toggleCompleteAllNestedTasks(newGoal.tasks, false);
-          dispatch({
-            type: 'UPDATE_TEMP_GOAL',
-            goal: newGoal,
-          });
-
-          // else {
-          // sharedNavigationService.navigate({ page: 'Loader' });
-          // try {
-          //   await deleteGoal({ id: existingGoal.id, userId });
-          //   sharedNavigationService.navigate({ page: 'HomeReset' });
-          // } catch (error) {
-          //   // Same as dismissing loader
-          //   sharedNavigationService.navigate({
-          //     page: 'GoalTemplate',
-          //     props: {
-          //       goal: existingGoal || null,
-          //     },
-          //   });
-          //   Alert.alert('Uh oh!', `Couldn't delete idea. ${error.message}`);
-          // }
-          // }
+  const triggerResetTask = () => {
+    Alert.alert(
+      'Reset this task?',
+      'This will reset all subtasks you may have.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
         },
-      },
-    ]);
+        {
+          text: 'Reset',
+          onPress: () => {
+            const newTempGoal = { ...tempGoal };
+            const task = _.get(newTempGoal, breadcrumbKeys) as Goal;
+            task.completed = false;
+            toggleCompleteAllNestedTasks(task.tasks || [], false);
+            dispatch({
+              type: 'UPDATE_TEMP_GOAL',
+              goal: newTempGoal,
+            });
+          },
+        },
+      ],
+    );
   };
 
-  const triggerDeleteGoal = () => {
+  const triggerDeleteTask = () => {
     Alert.alert(
-      'Delete this goal?',
-      'This will delete any tasks you may have.',
+      'Delete this task?',
+      'This will delete any subtasks you may have.',
       [
         {
           text: 'Cancel',
@@ -347,28 +269,25 @@ export default (props: GoalTemplateProps) => {
         },
         {
           text: 'Delete',
-          onPress: async () => {
-            sharedNavigationService.navigate({ page: 'Loader' });
-            try {
-              await deleteGoal({ id: existingGoal.id, userId });
-              sharedNavigationService.navigate({ page: 'HomeReset' });
-            } catch (error) {
-              // Same as dismissing loader
-              sharedNavigationService.navigate({
-                page: 'GoalTemplate',
-                props: {
-                  goal: existingGoal || null,
-                },
-              });
-              Alert.alert('Uh oh!', `Couldn't delete idea. ${error.message}`);
-            }
+          onPress: () => {
+            const newTempGoal = { ...tempGoal };
+            const currentTaskIndex =
+              breadcrumbs[breadcrumbs.length - 1].taskIndex;
+            const parentPath = breadcrumbKeys.slice(
+              0,
+              breadcrumbKeys.length - 1,
+            ); // Slice doesn't include second index
+            const parentElementTasks = _.get(newTempGoal, parentPath);
+            _.pullAt(parentElementTasks, currentTaskIndex);
+            dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
+            sharedNavigationService.goBack();
           },
         },
       ],
     );
   };
 
-  const progress = getGoalProgress(tempGoal);
+  const progress = getGoalProgress(tempTask);
   const isCompleted = getCompleteStatusFromGoal();
 
   const renderStatusLabel = () => {
@@ -417,7 +336,7 @@ export default (props: GoalTemplateProps) => {
           </View>
           {!isCompleted ? (
             <TouchableOpacity
-              onPress={triggerCompleteGoal}
+              onPress={triggerCompleteTask}
               style={[
                 styles.completeGoalButton,
                 {
@@ -446,7 +365,7 @@ export default (props: GoalTemplateProps) => {
     return (
       <View style={styles.emptyTaskContainer}>
         <TouchableOpacity
-          onPress={createNewTask}
+          onPress={createSubtask}
           style={styles.emptyTaskButton}
         >
           <Image
@@ -455,7 +374,7 @@ export default (props: GoalTemplateProps) => {
             source={require('../../../assets/bee-hive.png')}
           />
           <HiveText style={styles.emptyTaskLabel} variant={'medium'}>
-            {'Break into smaller tasks.'}
+            {'Break into smaller subtasks.'}
           </HiveText>
         </TouchableOpacity>
       </View>
@@ -474,7 +393,10 @@ export default (props: GoalTemplateProps) => {
             page: 'GoalTaskDetails',
             props: {
               // task: item,
-              breadcrumbs: [{ title: newBreadcrumbTitle, taskIndex: index }],
+              breadcrumbs: [
+                ...breadcrumbs,
+                { title: newBreadcrumbTitle, taskIndex: index },
+              ],
             },
           })
         }
@@ -520,45 +442,35 @@ export default (props: GoalTemplateProps) => {
             }}
           />
         </View>
-        {/* <View style={styles.progressContainer}>
-          <View style={styles.progressLabelsContainer}>
-            <HiveText>{'Progress'}</HiveText>
-          </View>
-          <View style={styles.barBackground}>
-            <View style={styles.barForeground}></View>
-          </View>
-        </View> */}
       </TouchableOpacity>
     );
   };
 
-  const createNewTask = () => {
+  const createSubtask = () => {
     if (goalTitle) {
       sharedNavigationService.push({
         page: 'GoalTaskCreation',
         props: {
           onCreateTask: ({ title, description }) => {
-            const newGoal: Goal = {
-              ...tempGoal,
-              tasks: [
-                ...(tempGoal.tasks || []),
-                {
-                  id: `${Math.random() * 100}`,
-                  title,
-                  description,
-                  timestamp: '123412',
-                  completed: false,
-                  type: 'Goal',
-                },
-              ],
+            // Append task
+            const newTask: Goal = {
+              id: `${Math.random() * 100}`,
+              title,
+              description,
+              timestamp: '123412',
+              completed: false,
+              type: 'Goal',
             };
-            newGoal.completed = false;
-            dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newGoal });
+            setTask(newTask);
           },
         },
+        // props: {
+        //   task: null,
+        //   breadcrumbs: [`${goalTitle.slice(0, 5)}...`],
+        // },
       });
     } else {
-      Alert.alert('You must give your goal a title before creating a task!');
+      Alert.alert('You must give your task a title before creating a subtask!');
     }
   };
 
@@ -567,13 +479,13 @@ export default (props: GoalTemplateProps) => {
       <View style={styles.taskSection}>
         <View style={styles.taskHeaderContainer}>
           <HiveText variant={'bold'} style={styles.taskHeaderLabel}>
-            {`Tasks `}
+            {`Subtasks `}
             <HiveText variant={'light'} style={styles.taskHeaderOptionalLabel}>
               {'(Optional)'}
             </HiveText>
           </HiveText>
           <TouchableOpacity
-            onPress={createNewTask}
+            onPress={createSubtask}
             style={{ height: 36, width: 36 }}
           >
             <Image
@@ -603,31 +515,81 @@ export default (props: GoalTemplateProps) => {
     );
   };
 
+  const renderBreadcrumbs = () => {
+    const currentTitle =
+      goalTitle.length > 8 ? `${goalTitle.slice(0, 8)}...` : goalTitle;
+    return (
+      <FlatList
+        data={[...breadcrumbs.map(crumb => crumb.title), currentTitle]}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingVertical: 8, paddingHorizontal: 16 }}
+        ItemSeparatorComponent={() => (
+          <Image
+            source={require('../../../assets/back-icon.png')}
+            resizeMode={'contain'}
+            style={{
+              height: 24,
+              width: 24,
+              marginHorizontal: 4,
+              tintColor: colors.inactiveGray,
+              transform: [
+                {
+                  rotate: '180deg',
+                },
+              ],
+            }}
+          />
+        )}
+        keyExtractor={(item, index) => `${item}-${index}`}
+        renderItem={({ item, index }) => {
+          const isLastItem = index === breadcrumbs.length;
+          return (
+            <TouchableOpacity
+              disabled={isLastItem}
+              hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
+              onPress={() => props.navigation.pop(breadcrumbs.length - index)}
+            >
+              <HiveText
+                variant={'medium'}
+                style={{
+                  color: isLastItem ? colors.inactiveGray : '#C57BFF',
+                  opacity: 0.75,
+                  fontSize: 18,
+                }}
+              >
+                {item}
+              </HiveText>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    );
+  };
+
   const subMenuOptions: ActionSheetOwnProps = {
     options: [],
   };
 
   if (!isCompleted) {
     subMenuOptions.options.push({
-      onPress: triggerCompleteGoal,
+      onPress: triggerCompleteTask,
       buttonType: 'first',
-      title: 'Complete Goal',
+      title: 'Complete Task',
     });
   }
 
   subMenuOptions.options.push({
-    onPress: triggerResetGoal,
+    onPress: triggerResetTask,
     buttonType: 'second',
-    title: 'Reset Goal',
+    title: 'Reset Task',
   });
 
-  if (existingGoal) {
-    subMenuOptions.options.push({
-      onPress: triggerDeleteGoal,
-      buttonType: 'third',
-      title: 'Delete Goal',
-    });
-  }
+  subMenuOptions.options.push({
+    onPress: triggerDeleteTask,
+    buttonType: 'third',
+    title: 'Delete Task',
+  });
 
   return (
     <View style={{ flex: 1 }}>
@@ -637,22 +599,19 @@ export default (props: GoalTemplateProps) => {
         keyboardShouldPersistTaps={'handled'}
         automaticallyAdjustContentInsets={false}
       >
+        {renderBreadcrumbs()}
         <View style={styles.goalSection}>
           <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 4 }}>
             <TextInput
               selectionColor={colors.salmonRed}
               placeholderTextColor={colors.lightPurple}
               style={styles.titleInput}
-              placeholder={'Goal'}
+              placeholder={'Task'}
               defaultValue={goalTitle}
               onEndEditing={e => {
-                const newTask: Goal = {
-                  ...tempGoal,
-                  title: e.nativeEvent.text,
-                };
-                dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTask });
+                const text = e.nativeEvent.text;
+                setTitle(text);
               }}
-              // onChangeText={text => setGoalTitle(text)}
               onSubmitEditing={() => {
                 descriptionInputRef.current.focus();
               }}
@@ -678,25 +637,21 @@ export default (props: GoalTemplateProps) => {
             selectionColor={colors.salmonRed}
             placeholderTextColor={colors.lightPurple}
             style={styles.descriptionInput}
-            onEndEditing={e => {
-              const newTask: Goal = {
-                ...tempGoal,
-                description: e.nativeEvent.text,
-              };
-              dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTask });
-            }}
             scrollEnabled={false}
             multiline={true}
-            placeholder={'Describe this goal...'}
+            placeholder={'Describe this task...'}
             defaultValue={goalDescription}
-            // onChangeText={text => setGoalDescription(text)}
+            onEndEditing={e => {
+              const text = e.nativeEvent.text;
+              setDescription(text);
+            }}
           />
           {renderProgressSection()}
         </View>
         <View style={styles.sectionSeparator} />
         {renderTaskSection()}
       </KeyboardAwareScrollView>
-      <KeyboardAvoidingView
+      {/* <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
         keyboardVerticalOffset={44 + topSpace()}
       >
@@ -710,7 +665,7 @@ export default (props: GoalTemplateProps) => {
             resizeMode={'contain'}
           />
         </TouchableOpacity>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingView> */}
     </View>
   );
 };
@@ -726,10 +681,10 @@ const styles = StyleSheet.create({
     width: 44,
   },
   titleInput: {
+    flex: 1,
     fontFamily: 'PulpDisplay-Bold',
     fontSize: 30,
     color: colors.offBlack,
-    flex: 1,
   },
   descriptionInput: {
     flex: 1,
@@ -854,9 +809,9 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 999,
     backgroundColor: '#F1EBF3',
-    flexDirection: 'row',
     marginTop: 12,
     overflow: 'hidden',
+    flexDirection: 'row',
   },
   taskItemProgressBar: {
     flex: 1,

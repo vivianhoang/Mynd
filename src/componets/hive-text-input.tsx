@@ -18,7 +18,7 @@ interface Props extends TextInputProps {
   showIcon?: boolean;
 }
 
-export default (props: Props) => {
+const HiveTextInput = (props: Props) => {
   const [viewPassword, setViewPassword] = useState(true);
   const { style, title, showIcon, secureText } = props;
   const finalProps = _.omit(props, 'style');
@@ -85,3 +85,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
+
+export default HiveTextInput;

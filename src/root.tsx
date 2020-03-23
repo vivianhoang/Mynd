@@ -24,6 +24,8 @@ import Loader from './screens/main-flow/loader';
 import IdeaTemplate from './screens/main-flow/idea-template';
 import ChecklistTemplate from './screens/main-flow/checklist-template';
 import GoalTemplate from './screens/main-flow/goal-template';
+import GoalTaskCreation from './screens/main-flow/goal-template/task-creation';
+import GoalTaskDetails from './screens/main-flow/goal-template/task-details';
 import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
@@ -33,6 +35,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import HiveText from './componets/hive-text';
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 import { bottomSpace } from './utils/layout';
+import ActionSheet from './screens/main-flow/action-sheet';
 const hiveIcon = require('./assets/hive-icon.png');
 const settingsIcon = require('./assets/settings-icon.png');
 
@@ -42,6 +45,7 @@ const RootStack = createStackNavigator();
 const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
 const TemplateSelectionStack = createStackNavigator();
+const GoalStack = createStackNavigator();
 
 const Tabs = createBottomTabNavigator();
 
@@ -146,6 +150,59 @@ function TabFlow() {
   );
 }
 
+function GoalStackFlow() {
+  return (
+    <GoalStack.Navigator
+      initialRouteName={'GoalStackFlow'}
+      screenOptions={{ gestureEnabled: false }}
+    >
+      <GoalStack.Screen
+        name={'GoalStackFlow'}
+        component={GoalTemplate}
+      ></GoalStack.Screen>
+      <GoalStack.Screen
+        name={Page.GoalTaskDetails}
+        component={GoalTaskDetails}
+      ></GoalStack.Screen>
+    </GoalStack.Navigator>
+  );
+}
+
+function GoalFlow() {
+  return (
+    <GoalStack.Navigator
+      initialRouteName={'GoalFlow'}
+      mode={'modal'}
+      screenOptions={{ gestureEnabled: false, headerShown: false }}
+    >
+      <GoalStack.Screen name={'GoalFlow'} component={GoalStackFlow} />
+      <GoalStack.Screen
+        name={Page.GoalTaskCreation}
+        component={GoalTaskCreation}
+        options={{
+          cardStyle: {
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          },
+          transitionSpec: {
+            open: {
+              animation: 'timing',
+              config: {
+                duration: 0,
+              },
+            },
+            close: {
+              animation: 'timing',
+              config: {
+                duration: 0,
+              },
+            },
+          },
+        }}
+      />
+    </GoalStack.Navigator>
+  );
+}
+
 function MainFlow() {
   return (
     <MainStack.Navigator
@@ -173,8 +230,9 @@ function MainFlow() {
         component={ChecklistTemplate}
       ></MainStack.Screen>
       <MainStack.Screen
+        options={{ headerShown: false }}
         name={Page.GoalTemplate}
-        component={GoalTemplate}
+        component={GoalFlow}
       ></MainStack.Screen>
     </MainStack.Navigator>
   );
@@ -275,6 +333,30 @@ function ModalStack1Flow() {
         name={Page.TemplateSelection}
         component={TemplateSelectionFlow}
         options={{ headerShown: false }}
+      />
+      <ModalStack1.Screen
+        name={Page.ActionSheet}
+        component={ActionSheet}
+        options={{
+          headerShown: false,
+          cardStyle: {
+            backgroundColor: 'transparent',
+          },
+          transitionSpec: {
+            open: {
+              animation: 'timing',
+              config: {
+                duration: 0,
+              },
+            },
+            close: {
+              animation: 'timing',
+              config: {
+                duration: 0,
+              },
+            },
+          },
+        }}
       />
     </ModalStack1.Navigator>
   );

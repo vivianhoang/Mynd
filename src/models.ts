@@ -6,11 +6,8 @@ import { RouteProp } from '@react-navigation/native';
 export interface ReduxState {
   userId: string;
   hiveData: HiveData;
+  tempGoal: Goal;
 }
-
-// export interface BaseTemplate {
-//   type: TemplateType;
-// }
 
 export type TemplateData = Checklist | Idea;
 
@@ -64,72 +61,9 @@ export type Goals = Goal[];
 
 //---------Actions-related interfaces-----------//
 
-export interface CreateIdea {
-  type: 'CREATE_IDEA';
-  title: string;
-  description: string;
-}
-
-export interface UpdateIdea {
-  type: 'UPDATE_IDEA';
-  title: string;
-  description: string;
-  ideaId: string;
-  timestamp: string;
-}
-
-export interface DeleteIdea {
-  type: 'DELETE_IDEA';
-  id: string;
-}
-
-export interface CreateChecklist {
-  type: 'CREATE_CHECKLIST';
-  title: string;
-  items: ChecklistItem[];
-}
-
-export interface UpdateChecklist {
-  type: 'UPDATE_CHECKLIST';
-  title: string;
-  items: ChecklistItem[];
-  id: string;
-  timestamp: string;
-}
-
-export interface DeleteChecklist {
-  type: 'DELETE_CHECKLIST';
-  id: string;
-}
-
-export interface CreateGoal {
-  type: 'CREATE_GOAL';
-  title: string;
-  description: string;
-  tasks?: Goal[];
-}
-
-export interface UpdateGoal {
-  type: 'UPDATE_GOAL';
-  title: string;
-  description: string;
-  tasks?: Goal[];
-  completed: boolean;
-}
-
-export interface DeleteGoal {
-  type: 'DELETE_GOAL';
-  id: string;
-}
-
 export interface SetUser {
   type: 'SET_USER';
   userId: string;
-}
-
-export interface UnsubscribeFromIdea {
-  type: 'UNSUBSCRIBE_FROM_IDEA';
-  id: string;
 }
 
 export interface SetHiveData {
@@ -141,20 +75,12 @@ export interface ResetRedux {
   type: 'RESET_REDUX';
 }
 
-export type ReduxActions =
-  | CreateIdea
-  | UpdateIdea
-  | DeleteIdea
-  | CreateChecklist
-  | UpdateChecklist
-  | DeleteChecklist
-  | CreateGoal
-  | UpdateGoal
-  | DeleteGoal
-  | SetUser
-  | SetHiveData
-  | UnsubscribeFromIdea
-  | ResetRedux;
+export interface UpdateTempGoal {
+  type: 'UPDATE_TEMP_GOAL';
+  goal: Goal;
+}
+
+export type ReduxActions = SetUser | SetHiveData | ResetRedux | UpdateTempGoal;
 
 export type DispatchAction = Dispatch<ReduxActions>;
 
@@ -172,7 +98,10 @@ export type PageName =
   | 'TemplateSelection'
   | 'IdeaTemplate'
   | 'ChecklistTemplate'
-  | 'GoalTemplate';
+  | 'GoalTemplate'
+  | 'GoalTaskCreation'
+  | 'GoalTaskDetails'
+  | 'ActionSheet';
 
 export const Page: {
   [key in PageName]: PageName;
@@ -189,6 +118,9 @@ export const Page: {
   IdeaTemplate: 'IdeaTemplate',
   ChecklistTemplate: 'ChecklistTemplate',
   GoalTemplate: 'GoalTemplate',
+  GoalTaskDetails: 'GoalTaskDetails',
+  GoalTaskCreation: 'GoalTaskCreation',
+  ActionSheet: 'ActionSheet',
 };
 
 export interface BasePageInterface {
@@ -248,6 +180,38 @@ export interface GoalTemplatePage extends BasePageInterface {
   props: GoalTemplateOwnProps;
 }
 
+export interface GoalTaskCreationOwnProps {
+  onCreateTask: (params: { title: string; description: string }) => void;
+}
+export interface GoalTaskCreationPage {
+  page: 'GoalTaskCreation';
+  props: GoalTaskCreationOwnProps;
+}
+
+export interface GoalTaskDetailsOwnProps {
+  // task: Goal | null;
+  breadcrumbs: { title: string; taskIndex: number }[];
+  // taskIndex: number;
+  // onSaveTask: (task: Goal) => void;
+}
+export interface GoalTaskDetailsPage extends BasePageInterface {
+  page: 'GoalTaskDetails';
+  props: GoalTaskDetailsOwnProps;
+}
+
+export interface ActionSheetOwnProps {
+  options: {
+    onPress: () => void;
+    buttonType: 'first' | 'second' | 'third';
+    title: string;
+  }[];
+}
+
+export interface ActionSheetPage extends BasePageInterface {
+  page: 'ActionSheet';
+  props: ActionSheetOwnProps;
+}
+
 export interface SignupPage extends BasePageInterface {
   page: 'Signup';
 }
@@ -263,12 +227,18 @@ export type NavigationActions =
   | IdeaTemplatePage
   | ChecklistTemplatePage
   | GoalTemplatePage
+  | GoalTaskDetailsPage
+  | GoalTaskCreationPage
+  | ActionSheetPage
   | SignupPage;
 
 export type RouteParamsList = {
   IdeaTemplate: IdeaTemplateOwnProps;
   ChecklistTemplate: ChecklistTemplateOwnProps;
   GoalTemplate: GoalTemplateOwnProps;
+  GoalTaskDetails: GoalTaskDetailsOwnProps;
+  GoalTaskCreation: GoalTaskCreationOwnProps;
+  ActionSheet: ActionSheetOwnProps;
 };
 
 //---------Component-based interfaces-----------//
@@ -293,4 +263,16 @@ export interface ChecklistTemplateProps extends NavigationProps {
 
 export interface GoalTemplateProps extends NavigationProps {
   route: RouteProp<RouteParamsList, 'GoalTemplate'>;
+}
+
+export interface GoalTaskDetailsProps extends NavigationProps {
+  route: RouteProp<RouteParamsList, 'GoalTaskDetails'>;
+}
+
+export interface GoalTaskCreationProps extends NavigationProps {
+  route: RouteProp<RouteParamsList, 'GoalTaskCreation'>;
+}
+
+export interface ActionSheetProps extends NavigationProps {
+  route: RouteProp<RouteParamsList, 'ActionSheet'>;
 }

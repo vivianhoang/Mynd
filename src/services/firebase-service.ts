@@ -188,7 +188,7 @@ export const deleteChecklist = async (params: {
 export const createGoal = async (params: {
   title: string;
   description: string;
-  tasks: Goal[];
+  tasks: Goals;
   completed: boolean;
   userId: string;
 }) => {
@@ -204,6 +204,7 @@ export const createGoal = async (params: {
     timestamp: new Date().getTime().toString(),
     type: 'Goal',
   };
+  console.log('createGoal');
   try {
     await hiveRef.doc(goalId).set(newGoal);
   } catch (error) {
@@ -213,7 +214,7 @@ export const createGoal = async (params: {
 
 export const updateGoal = async (params: {
   title: string;
-  tasks: Goal[];
+  tasks: Goals;
   userId: string;
   id: string;
   description: string;

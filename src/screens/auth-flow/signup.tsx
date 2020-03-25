@@ -37,15 +37,16 @@ export default (props: SignupProps) => {
   return (
     <View style={styles.container}>
       <HiveText style={styles.headerLabel}>{'Signup'}</HiveText>
-      <HiveTextInput
-        style={styles.input}
-        title="EMAIL"
-        value={email}
-        onChangeText={text => {
-          setEmail(text);
-        }}
-        autoFocus={true}
-      />
+      <View style={styles.input}>
+        <HiveTextInput
+          title="EMAIL"
+          value={email}
+          onChangeText={text => {
+            setEmail(text);
+          }}
+          autoFocus={true}
+        />
+      </View>
       <HiveTextInput
         title="PASSWORD"
         value={password}

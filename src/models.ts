@@ -9,7 +9,7 @@ export interface ReduxState {
   tempGoal: Goal;
 }
 
-export type TemplateData = Checklist | Idea;
+export type TemplateData = Checklist | Idea | Goal;
 
 export type JsonHiveData = {
   [key in TemplateType]: TemplateData[];
@@ -48,7 +48,7 @@ export interface Goal {
   title: string;
   description: string;
   timestamp: string;
-  tasks?: Goal[];
+  tasks?: Goals;
   completed: boolean;
   type: 'Goal';
 }

@@ -14,6 +14,7 @@ import {
   GoalTaskDetailsProps,
   DispatchAction,
   ActionSheetOwnProps,
+  Goals,
 } from '../../../models';
 import NavButton from '../../../componets/nav-button';
 import sharedNavigationService from '../../../services/navigation-service';
@@ -56,7 +57,9 @@ export default (props: GoalTaskDetailsProps) => {
 
   const userId = useSelector<ReduxState, string>(state => state.userId);
   const dispatch = useDispatch<DispatchAction>();
+  const titleInputRef = useRef<TextInput>(null);
   const descriptionInputRef = useRef<TextInput>(null);
+  const breadcrumbList = useRef<FlatList<string>>(null);
 
   const constructAndSetGoal = (newTempGoal: Goal, key: string, value: any) => {
     _.set(newTempGoal, [...breadcrumbKeys, key], value);
@@ -74,7 +77,7 @@ export default (props: GoalTaskDetailsProps) => {
   };
   const setTask = (task: Goal) => {
     let newTempGoal = { ...tempGoal };
-    const tasks: Goal[] = [...(tempTask.tasks || []), task];
+    const tasks: Goals = [...(tempTask.tasks || []), task];
     constructAndSetGoal(newTempGoal, 'tasks', tasks);
     dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
     // setComplete(false);
@@ -83,7 +86,7 @@ export default (props: GoalTaskDetailsProps) => {
     let newTempGoal = { ...tempGoal };
     // Set top level
     constructAndSetGoal(newTempGoal, 'completed', completed);
-    const tasks: Goal[] = _.get(newTempGoal, [...breadcrumbKeys, 'tasks']);
+    const tasks: Goals = _.get(newTempGoal, [...breadcrumbKeys, 'tasks']);
     // Set nested levels
     toggleCompleteAllNestedTasks(tasks, completed);
     dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTempGoal });
@@ -136,7 +139,7 @@ export default (props: GoalTaskDetailsProps) => {
     headerStyle: { shadowColor: colors.lightGray },
   });
 
-  const getTasksProgress = (tasks: Goal[]) => {
+  const getTasksProgress = (tasks: Goals) => {
     let totalTasks = 0;
     let totalComplete = 0;
     for (const index in tasks) {
@@ -173,7 +176,7 @@ export default (props: GoalTaskDetailsProps) => {
     return { totalTasks, totalComplete };
   };
 
-  const getCompeleteStatusFromTasks = (tasks: Goal[]) => {
+  const getCompeleteStatusFromTasks = (tasks: Goals) => {
     for (const index in tasks) {
       const task = tasks[index];
       if (!task.completed) {
@@ -200,7 +203,7 @@ export default (props: GoalTaskDetailsProps) => {
     return getCompeleteStatusFromTasks(goalTasks);
   };
 
-  const toggleCompleteAllNestedTasks = (tasks: Goal[], complete: boolean) => {
+  const toggleCompleteAllNestedTasks = (tasks: Goals, complete: boolean) => {
     for (const index in tasks) {
       const task = tasks[index];
       tasks[index].completed = complete;
@@ -371,7 +374,7 @@ export default (props: GoalTaskDetailsProps) => {
           <Image
             style={styles.emptyTaskImage}
             resizeMode={'contain'}
-            source={require('../../../assets/bee-hive.png')}
+            source={require('../../../assets/bee-tasks.png')}
           />
           <HiveText style={styles.emptyTaskLabel} variant={'medium'}>
             {'Break into smaller subtasks.'}
@@ -447,14 +450,19 @@ export default (props: GoalTaskDetailsProps) => {
   };
 
   const createSubtask = () => {
-    if (goalTitle) {
+    titleInputRef.current.blur();
+    descriptionInputRef.current.blur();
+    const lastestGoalTitle = _.trim(
+      (titleInputRef.current as any)._lastNativeText || goalTitle,
+    );
+    if (lastestGoalTitle) {
       sharedNavigationService.push({
         page: 'GoalTaskCreation',
         props: {
           onCreateTask: ({ title, description }) => {
             // Append task
             const newTask: Goal = {
-              id: `${Math.random() * 100}`,
+              id: `${Math.random() * 9999}`,
               title,
               description,
               timestamp: '123412',
@@ -520,6 +528,11 @@ export default (props: GoalTaskDetailsProps) => {
       goalTitle.length > 8 ? `${goalTitle.slice(0, 8)}...` : goalTitle;
     return (
       <FlatList
+        ref={breadcrumbList}
+        keyboardShouldPersistTaps={'handled'}
+        onContentSizeChange={e => {
+          (breadcrumbList.current as any).scrollToEnd({ animated: false });
+        }}
         data={[...breadcrumbs.map(crumb => crumb.title), currentTitle]}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
@@ -547,6 +560,7 @@ export default (props: GoalTaskDetailsProps) => {
           return (
             <TouchableOpacity
               disabled={isLastItem}
+              style={{ paddingRight: isLastItem ? 16 : 0 }}
               hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
               onPress={() => props.navigation.pop(breadcrumbs.length - index)}
             >
@@ -603,13 +617,19 @@ export default (props: GoalTaskDetailsProps) => {
         <View style={styles.goalSection}>
           <View style={{ flexDirection: 'row', marginTop: 8, marginBottom: 4 }}>
             <TextInput
+              ref={titleInputRef}
+              autoCorrect={false}
               selectionColor={colors.salmonRed}
               placeholderTextColor={colors.lightPurple}
               style={styles.titleInput}
               placeholder={'Task'}
               defaultValue={goalTitle}
               onEndEditing={e => {
-                const text = e.nativeEvent.text;
+                let text = _.trim(e.nativeEvent.text);
+                if (!text) {
+                  text = 'New Task';
+                  titleInputRef.current.setNativeProps({ text });
+                }
                 setTitle(text);
               }}
               onSubmitEditing={() => {
@@ -634,6 +654,7 @@ export default (props: GoalTaskDetailsProps) => {
           </View>
           <TextInput
             ref={descriptionInputRef}
+            autoCorrect={false}
             selectionColor={colors.salmonRed}
             placeholderTextColor={colors.lightPurple}
             style={styles.descriptionInput}
@@ -642,7 +663,10 @@ export default (props: GoalTaskDetailsProps) => {
             placeholder={'Describe this task...'}
             defaultValue={goalDescription}
             onEndEditing={e => {
-              const text = e.nativeEvent.text;
+              let text = _.trim(e.nativeEvent.text);
+              if (!text) {
+                descriptionInputRef.current.setNativeProps({ text: '' });
+              }
               setDescription(text);
             }}
           />
@@ -815,7 +839,7 @@ const styles = StyleSheet.create({
   },
   taskItemProgressBar: {
     flex: 1,
-    backgroundColor: colors.inactiveGray,
+    backgroundColor: '#ECC3FF',
   },
   progressLabel: {
     fontSize: 18,

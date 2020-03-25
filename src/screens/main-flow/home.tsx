@@ -13,7 +13,14 @@ import {
 import sharedNavigationService from '../../services/navigation-service';
 import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
-import { ReduxState, HiveData, TemplateType, TemplateData } from '../../models';
+import {
+  ReduxState,
+  HiveData,
+  TemplateType,
+  TemplateData,
+  Goal,
+  Goals,
+} from '../../models';
 import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
 import SearchBar from '../../componets/search-bar';
@@ -29,7 +36,6 @@ const iconMap: { [key in TemplateType]: ImageRequireSource } = {
 export default () => {
   const hiveData = useSelector<ReduxState, HiveData>(state => state.hiveData);
   const [searchText, setSearchText] = useState('');
-
   if (hiveData == undefined) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -57,6 +63,17 @@ export default () => {
             }).length
           );
         } else if (templateData.type == 'Idea') {
+          return (
+            _.includes(
+              templateData.title.toLowerCase(),
+              searchText.toLowerCase(),
+            ) ||
+            _.includes(
+              templateData.description.toLowerCase(),
+              searchText.toLowerCase(),
+            )
+          );
+        } else if (templateData.type == 'Goal') {
           return (
             _.includes(
               templateData.title.toLowerCase(),
@@ -136,10 +153,14 @@ export default () => {
             </View>
           );
         }}
-        renderItem={({ item }) => {
+        renderItem={e => {
+          const title = e.section.title as string;
+          const item = e.item;
+          const numColumns = title === 'Goal' ? 1 : 3;
+          console.log(e);
           return (
             <FlatList
-              numColumns={3}
+              numColumns={numColumns}
               data={[...item]}
               keyExtractor={item => {
                 return item.id;
@@ -153,55 +174,186 @@ export default () => {
                 index: number;
               }) => {
                 let marginHorizontal = index % 3 == 1 ? 16 : 0;
-                return (
-                  <TouchableOpacity
-                    style={{
-                      height: (375 - 32) / 3,
-                      width: (screenSize.width - 64) / 3,
-                      backgroundColor: colors.white,
-                      marginHorizontal,
-                      marginBottom: 12,
-                      borderRadius: 10,
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      padding: 12,
-                      shadowColor: colors.offBlack,
-                      shadowRadius: 4,
-                      shadowOpacity: 0.2,
-                      shadowOffset: {
-                        width: 1,
-                        height: 1,
-                      },
-                    }}
-                    onPress={() => {
-                      switch (item.type) {
-                        case 'Idea':
-                          {
-                            sharedNavigationService.navigate({
-                              page: 'IdeaTemplate',
-                              props: { idea: item },
-                            });
+                switch (item.type) {
+                  case 'Idea':
+                    return (
+                      <TouchableOpacity
+                        style={[styles.cardStyle, { marginHorizontal }]}
+                        onPress={() =>
+                          sharedNavigationService.navigate({
+                            page: 'IdeaTemplate',
+                            props: { idea: item },
+                          })
+                        }
+                      >
+                        <HiveText
+                          style={{ textAlign: 'center' }}
+                          variant={'medium'}
+                        >
+                          {item.title}
+                        </HiveText>
+                      </TouchableOpacity>
+                    );
+                  case 'Checklist':
+                    return (
+                      <TouchableOpacity
+                        style={[styles.cardStyle, { marginHorizontal }]}
+                        onPress={() =>
+                          sharedNavigationService.navigate({
+                            page: 'ChecklistTemplate',
+                            props: { checklist: item },
+                          })
+                        }
+                      >
+                        <HiveText
+                          style={{ textAlign: 'center' }}
+                          variant={'medium'}
+                        >
+                          {item.title}
+                        </HiveText>
+                      </TouchableOpacity>
+                    );
+                  case 'Goal': {
+                    const getTasksProgress = (tasks: Goals) => {
+                      let totalTasks = 0;
+                      let totalComplete = 0;
+                      for (const index in tasks) {
+                        const task = tasks[index];
+                        if (task?.tasks?.length) {
+                          // SPLIT
+                          const total = getTasksProgress(task.tasks);
+                          totalTasks += total.totalTasks;
+                          totalComplete += total.totalComplete;
+                        } else {
+                          totalTasks += 1;
+                          if (task?.completed) {
+                            totalComplete += 1;
                           }
-                          break;
-                        case 'Checklist':
-                          {
-                            sharedNavigationService.navigate({
-                              page: 'ChecklistTemplate',
-                              props: { checklist: item },
-                            });
-                          }
-                          break;
+                        }
                       }
-                    }}
-                  >
-                    <HiveText
-                      style={{ textAlign: 'center' }}
-                      variant={'medium'}
-                    >
-                      {item.title}
-                    </HiveText>
-                  </TouchableOpacity>
-                );
+                      return { totalTasks, totalComplete };
+                    };
+                    const getGoalProgress = (goal: Goal) => {
+                      let totalTasks = 0;
+                      let totalComplete = 0;
+                      const tasks = goal?.tasks || [];
+
+                      if (tasks.length) {
+                        return getTasksProgress(tasks);
+                      } else {
+                        totalTasks = 1;
+                        if (goal?.completed) {
+                          totalComplete = 1;
+                        }
+                      }
+
+                      return { totalTasks, totalComplete };
+                    };
+                    const taskProgress = getGoalProgress(item);
+
+                    return (
+                      <TouchableOpacity
+                        style={[styles.taskItem]}
+                        onPress={() =>
+                          sharedNavigationService.navigate({
+                            page: 'GoalTemplate',
+                            props: { goal: item },
+                          })
+                        }
+                      >
+                        <View style={styles.progressLabelsContainer}>
+                          <HiveText
+                            style={styles.taskItemLabel}
+                            variant={'medium'}
+                          >
+                            {item.title}
+                          </HiveText>
+                          {item.tasks?.length ? (
+                            <HiveText
+                              style={[
+                                styles.taskItemLabel,
+                                {
+                                  color: colors.inactiveGray,
+                                },
+                              ]}
+                              variant={'medium'}
+                            >
+                              {`${taskProgress.totalComplete}/`}
+                              <HiveText
+                                style={styles.taskItemLabel}
+                                variant={'medium'}
+                              >
+                                {`${taskProgress.totalTasks}`}
+                              </HiveText>
+                            </HiveText>
+                          ) : (
+                            <HiveText style={styles.progressLabel}>
+                              {item.completed ? 'Complete' : 'Incomplete'}
+                            </HiveText>
+                          )}
+                        </View>
+                        <View style={styles.taskItemProgressBarContainer}>
+                          <View
+                            style={[
+                              styles.taskItemProgressBar,
+                              {
+                                flex: taskProgress.totalComplete,
+                              },
+                            ]}
+                          />
+                          <View
+                            style={{
+                              flex:
+                                taskProgress.totalTasks -
+                                taskProgress.totalComplete,
+                            }}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  }
+                }
+                // return (
+                //   <TouchableOpacity
+                //     style={[styles.cardStyle, { marginHorizontal }]}
+                //     onPress={() => {
+                //       console.log(item);
+                //       switch (item.type) {
+                //         case 'Idea':
+                //           {
+                //             sharedNavigationService.navigate({
+                //               page: 'IdeaTemplate',
+                //               props: { idea: item },
+                //             });
+                //           }
+                //           break;
+                //         case 'Checklist':
+                //           {
+                //             sharedNavigationService.navigate({
+                //               page: 'ChecklistTemplate',
+                //               props: { checklist: item },
+                //             });
+                //           }
+                //           break;
+                //         case 'Goal':
+                //           {
+                //             sharedNavigationService.navigate({
+                //               page: 'GoalTemplate',
+                //               props: { goal: item },
+                //             });
+                //           }
+                //           break;
+                //       }
+                //     }}
+                //   >
+                //     <HiveText
+                //       style={{ textAlign: 'center' }}
+                //       variant={'medium'}
+                //     >
+                //       {item.title}
+                //     </HiveText>
+                //   </TouchableOpacity>
+                // );
               }}
             />
           );
@@ -274,6 +426,62 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     marginBottom: 16,
+  },
+  cardStyle: {
+    height: (375 - 32) / 3,
+    width: (screenSize.width - 64) / 3,
+    backgroundColor: colors.white,
+    marginBottom: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: 12,
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+  },
+  taskItem: {
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    padding: 16,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  taskItemProgressBarContainer: {
+    height: 10,
+    flex: 1,
+    borderRadius: 999,
+    backgroundColor: '#F1EBF3',
+    marginTop: 12,
+    overflow: 'hidden',
+    flexDirection: 'row',
+  },
+  taskItemProgressBar: {
+    flex: 1,
+    backgroundColor: '#E09DFF',
+  },
+  progressLabel: {
+    fontSize: 18,
+    color: colors.inactiveGray,
+  },
+  taskItemLabel: {
+    fontSize: 18,
+  },
+  progressLabelsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   addButton: {
     position: 'absolute',

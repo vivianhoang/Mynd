@@ -29,7 +29,7 @@ import GoalTaskDetails from './screens/main-flow/goal-template/task-details';
 import sharedNavigationService from './services/navigation-service';
 import { Provider } from 'react-redux';
 import store from './services/redux-service';
-import { Page } from './models';
+import { Page, GoalTemplateProps } from './models';
 import colors from './utils/colors';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // import HiveText from './componets/hive-text';
@@ -150,7 +150,7 @@ function TabFlow() {
   );
 }
 
-function GoalStackFlow() {
+function GoalStackFlow(props: GoalTemplateProps) {
   return (
     <GoalStack.Navigator
       initialRouteName={'GoalStackFlow'}
@@ -159,6 +159,7 @@ function GoalStackFlow() {
       <GoalStack.Screen
         name={'GoalStackFlow'}
         component={GoalTemplate}
+        initialParams={props.route.params}
       ></GoalStack.Screen>
       <GoalStack.Screen
         name={Page.GoalTaskDetails}
@@ -168,20 +169,24 @@ function GoalStackFlow() {
   );
 }
 
-function GoalFlow() {
+function GoalFlow(props: GoalTemplateProps) {
   return (
     <GoalStack.Navigator
       initialRouteName={'GoalFlow'}
       mode={'modal'}
       screenOptions={{ gestureEnabled: false, headerShown: false }}
     >
-      <GoalStack.Screen name={'GoalFlow'} component={GoalStackFlow} />
+      <GoalStack.Screen
+        name={'GoalFlow'}
+        component={GoalStackFlow}
+        initialParams={props.route.params}
+      />
       <GoalStack.Screen
         name={Page.GoalTaskCreation}
         component={GoalTaskCreation}
         options={{
           cardStyle: {
-            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            backgroundColor: 'transparent',
           },
           transitionSpec: {
             open: {

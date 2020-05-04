@@ -627,7 +627,7 @@ export default (props: GoalTemplateProps) => {
               selectionColor={colors.salmonRed}
               placeholderTextColor={colors.lightPurple}
               style={styles.titleInput}
-              placeholder={'Goal'}
+              placeholder={'Goal Title'}
               defaultValue={goalTitle}
               onEndEditing={e => {
                 let text = _.trim(e.nativeEvent.text);

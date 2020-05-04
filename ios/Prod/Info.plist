@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mynd</string>
+	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(IOS_VERSION_NUMBER)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(IOS_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -38,11 +38,11 @@
 		</dict>
 	</dict>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>To let you know when you've left and arrived</string>
+	<string>To let you know when you&apos;ve left and arrived</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>To let you know when you've left and arrived</string>
+	<string>To let you know when you&apos;ve left and arrived</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>To let you know when you've left and arrived</string>
+	<string>To let you know when you&apos;ve left and arrived</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>PulpDisplay-RegularItalic.ttf</string>

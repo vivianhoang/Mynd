@@ -15,6 +15,7 @@ import NavButton from '../../componets/nav-button';
 import colors from '../../utils/colors';
 import BigButton from '../../componets/big-button';
 import HiveText from '../../componets/hive-text';
+import { topSpace } from '../../utils/layout';
 
 export default (props: LoginProps) => {
   const [email, setEmail] = useState('');
@@ -35,42 +36,37 @@ export default (props: LoginProps) => {
   return (
     <View style={styles.container}>
       <HiveText style={styles.headerLabel}>{'Login'}</HiveText>
-      <HiveTextInput
-        style={styles.input}
-        title="EMAIL"
-        value={email}
-        onChangeText={text => {
-          setEmail(text);
-        }}
-        autoFocus={true}
-      />
+      <View style={styles.input}>
+        <HiveTextInput
+          title="EMAIL"
+          value={email}
+          onChangeText={text => {
+            setEmail(text);
+          }}
+          autoFocus={true}
+        />
+      </View>
       <HiveTextInput
         title="PASSWORD"
         value={password}
         onChangeText={password => {
           setPassword(password);
         }}
+        secureText={true}
       />
       <TouchableOpacity
         hitSlop={{ left: 12, top: 12, right: 12, bottom: 12 }}
         onPress={() =>
           sharedNavigationService.navigate({ page: 'ForgotPassword' })
         }
+        style={{ alignSelf: 'flex-end' }}
       >
-        <HiveText
-          style={{
-            color: colors.lightPurple,
-            textAlign: 'right',
-            marginTop: 16,
-          }}
-        >
-          {'Forgot Password'}
-        </HiveText>
+        <HiveText style={styles.forgotPassword}>{'Forgot Password?'}</HiveText>
       </TouchableOpacity>
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 44 + 16}
+        keyboardVerticalOffset={44 + topSpace() + 16}
       >
         <BigButton
           style={styles.button}
@@ -81,7 +77,10 @@ export default (props: LoginProps) => {
               sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
               sharedNavigationService.navigate({ page: 'Login' });
-              Alert.alert('Uh oh!', error.message);
+              Alert.alert(
+                'Uh oh!',
+                error.message.replace(/ *\[[^)]*\] */g, ''), // Removes Firebase error code, and only displays the Firebase error messsage);
+              );
             }
           }}
           title={'Login'}
@@ -112,5 +111,9 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
+  },
+  forgotPassword: {
+    color: colors.lightPurple,
+    marginTop: 16,
   },
 });

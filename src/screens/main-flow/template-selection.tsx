@@ -15,6 +15,7 @@ import HiveText from '../../componets/hive-text';
 import { TemplateType, NavigationActions } from '../../models';
 import SearchBar from '../../componets/search-bar';
 import _ from 'lodash';
+import { topSpace } from '../../utils/layout';
 
 interface TemplateOption {
   type: TemplateType;
@@ -28,7 +29,7 @@ const templates: TemplateOption[] = [
   {
     type: 'Checklist',
     title: 'Checklists',
-    description: 'Create a checklist. This is a longer list of things.',
+    description: 'A list for your daily needs.',
     image: require('../../assets/checklist-icon.png'),
     pageAction: {
       page: 'ChecklistTemplate',
@@ -40,12 +41,24 @@ const templates: TemplateOption[] = [
   {
     type: 'Idea',
     title: 'Ideas',
-    description: 'You have great ideas!',
+    description: 'Quickly write down your thoughts.',
     image: require('../../assets/ideas-icon.png'),
     pageAction: {
       page: 'IdeaTemplate',
       props: {
         idea: null,
+      },
+    },
+  },
+  {
+    type: 'Goal',
+    title: 'Goals',
+    description: 'Keep track of your progress.',
+    image: require('../../assets/goals-icon.png'),
+    pageAction: {
+      page: 'GoalTemplate',
+      props: {
+        goal: null,
       },
     },
   },
@@ -128,31 +141,29 @@ export default () => {
       source={require('../../assets/templates_screen.png')}
       style={styles.background}
     >
-      <SafeAreaView style={styles.safeAreaView}>
-        <View style={styles.container}>
-          <View style={styles.topBar}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => sharedNavigationService.goBack()}
-            >
-              <Image
-                source={require('../../assets/close-icon.png')}
-                style={styles.closeIcon}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={{ marginVertical: 16 }}>
-            <SearchBar
-              placeholder={'Find a template'}
-              value={searchText}
-              onChangeText={(text: string) => setSearchText(text)}
-              onDismiss={() => setSearchText('')}
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => sharedNavigationService.goBack()}
+          >
+            <Image
+              source={require('../../assets/close-icon.png')}
+              style={styles.closeIcon}
+              resizeMode={'contain'}
             />
-          </View>
-          {resultsView}
+          </TouchableOpacity>
         </View>
-      </SafeAreaView>
+        <View style={{ marginVertical: 16 }}>
+          <SearchBar
+            placeholder={'Find a template...'}
+            value={searchText}
+            onChangeText={(text: string) => setSearchText(text)}
+            onDismiss={() => setSearchText('')}
+          />
+        </View>
+        {resultsView}
+      </View>
     </ImageBackground>
   );
 };
@@ -163,7 +174,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   topBar: {
-    height: 44,
+    height: 44 + topSpace(),
+    paddingTop: topSpace(),
     alignItems: 'flex-end',
   },
   background: {
@@ -181,7 +193,7 @@ const styles = StyleSheet.create({
     tintColor: colors.white,
   },
   templateOptionContainer: {
-    backgroundColor: '#F3F3F3',
+    backgroundColor: '#FAFAFA',
     flexDirection: 'row',
     marginBottom: 16,
     borderRadius: 10,
@@ -219,8 +231,5 @@ const styles = StyleSheet.create({
   noResultsLabel: {
     marginLeft: 8,
     fontSize: 18,
-  },
-  safeAreaView: {
-    flex: 1,
   },
 });

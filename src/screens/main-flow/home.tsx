@@ -1,50 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
   FlatList,
   TouchableOpacity,
   Image,
-  Dimensions,
   SectionList,
   SafeAreaView,
   ImageRequireSource,
+  ActivityIndicator,
 } from 'react-native';
-import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
 import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 import {
-  HomeProps,
   ReduxState,
   HiveData,
   TemplateType,
   TemplateData,
+  Goal,
+  Goals,
 } from '../../models';
 import colors from '../../utils/colors';
 import HiveText from '../../componets/hive-text';
 import SearchBar from '../../componets/search-bar';
-import sharedGeoNotificationService from '../../services/geo-notification';
-import { screenSize } from '../../utils/layout';
+// import sharedGeoNotificationService from '../../services/geo-notification';
+import { screenSize, topSpace } from '../../utils/layout';
 
 const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
   Checklist: require('../../assets/checklist-icon.png'),
+  Goal: require('../../assets/goals-icon.png'),
 };
 
-export default (props: HomeProps) => {
-  const hiveData =
-    useSelector<ReduxState, HiveData>(state => state.hiveData) || [];
+export default () => {
+  const hiveData = useSelector<ReduxState, HiveData>(state => state.hiveData);
   const [searchText, setSearchText] = useState('');
+  if (hiveData == undefined) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size={'large'} color={colors.offBlack} />
+      </View>
+    );
+  }
 
   const filterHiveData = () => {
     const finalHiveData = hiveData.reduce((data, value) => {
       const clonedValue = _.cloneDeep(value);
+
       clonedValue.data[0] = clonedValue.data[0].filter(templateData => {
-        return _.includes(
-          templateData.title.toLowerCase(),
-          searchText.toLowerCase(),
-        );
+        if (templateData.type == 'Checklist') {
+          return (
+            _.includes(
+              templateData.title.toLowerCase(),
+              searchText.toLowerCase(),
+            ) ||
+            !!templateData.items.filter(item => {
+              return _.includes(
+                item.title.toLowerCase(),
+                searchText.toLowerCase(),
+              );
+            }).length
+          );
+        } else if (templateData.type == 'Idea') {
+          return (
+            _.includes(
+              templateData.title.toLowerCase(),
+              searchText.toLowerCase(),
+            ) ||
+            _.includes(
+              templateData.description.toLowerCase(),
+              searchText.toLowerCase(),
+            )
+          );
+        } else if (templateData.type == 'Goal') {
+          return (
+            _.includes(
+              templateData.title.toLowerCase(),
+              searchText.toLowerCase(),
+            ) ||
+            _.includes(
+              templateData.description.toLowerCase(),
+              searchText.toLowerCase(),
+            )
+          );
+        }
       });
       if (clonedValue.data[0].length) {
         data.push(clonedValue);
@@ -101,15 +141,7 @@ export default (props: HomeProps) => {
           const sectionTitle = `${title}s`;
           const icon = iconMap[title as TemplateType];
           return (
-            <View
-              style={{
-                paddingBottom: 16,
-                paddingTop: 8,
-                backgroundColor: colors.white,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
+            <View style={styles.headerContainer}>
               <Image
                 source={icon}
                 style={{ height: 34, width: 34, marginRight: 12 }}
@@ -121,14 +153,19 @@ export default (props: HomeProps) => {
             </View>
           );
         }}
-        renderItem={({ item }) => {
+        renderItem={e => {
+          const title = e.section.title as string;
+          const item = e.item;
+          const numColumns = title === 'Goal' ? 1 : 3;
+          console.log(e);
           return (
             <FlatList
-              numColumns={3}
+              numColumns={numColumns}
               data={[...item]}
               keyExtractor={item => {
                 return item.id;
               }}
+              style={{ paddingHorizontal: 16, paddingVertical: 16 }}
               renderItem={({
                 item,
                 index,
@@ -137,48 +174,186 @@ export default (props: HomeProps) => {
                 index: number;
               }) => {
                 let marginHorizontal = index % 3 == 1 ? 16 : 0;
-                return (
-                  <TouchableOpacity
-                    style={{
-                      height: (375 - 32) / 3,
-                      width: (Dimensions.get('window').width - 64) / 3,
-                      backgroundColor: colors.placeholderGray,
-                      marginHorizontal,
-                      marginBottom: 12,
-                      borderRadius: 10,
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                      padding: 12,
-                    }}
-                    onPress={() => {
-                      switch (item.type) {
-                        case 'Idea':
-                          {
-                            sharedNavigationService.navigate({
-                              page: 'IdeaTemplate',
-                              props: { idea: item },
-                            });
+                switch (item.type) {
+                  case 'Idea':
+                    return (
+                      <TouchableOpacity
+                        style={[styles.cardStyle, { marginHorizontal }]}
+                        onPress={() =>
+                          sharedNavigationService.navigate({
+                            page: 'IdeaTemplate',
+                            props: { idea: item },
+                          })
+                        }
+                      >
+                        <HiveText
+                          style={{ textAlign: 'center' }}
+                          variant={'medium'}
+                        >
+                          {item.title}
+                        </HiveText>
+                      </TouchableOpacity>
+                    );
+                  case 'Checklist':
+                    return (
+                      <TouchableOpacity
+                        style={[styles.cardStyle, { marginHorizontal }]}
+                        onPress={() =>
+                          sharedNavigationService.navigate({
+                            page: 'ChecklistTemplate',
+                            props: { checklist: item },
+                          })
+                        }
+                      >
+                        <HiveText
+                          style={{ textAlign: 'center' }}
+                          variant={'medium'}
+                        >
+                          {item.title}
+                        </HiveText>
+                      </TouchableOpacity>
+                    );
+                  case 'Goal': {
+                    const getTasksProgress = (tasks: Goals) => {
+                      let totalTasks = 0;
+                      let totalComplete = 0;
+                      for (const index in tasks) {
+                        const task = tasks[index];
+                        if (task?.tasks?.length) {
+                          // SPLIT
+                          const total = getTasksProgress(task.tasks);
+                          totalTasks += total.totalTasks;
+                          totalComplete += total.totalComplete;
+                        } else {
+                          totalTasks += 1;
+                          if (task?.completed) {
+                            totalComplete += 1;
                           }
-                          break;
-                        case 'Checklist':
-                          {
-                            sharedNavigationService.navigate({
-                              page: 'ChecklistTemplate',
-                              props: { checklist: item },
-                            });
-                          }
-                          break;
+                        }
                       }
-                    }}
-                  >
-                    <HiveText
-                      style={{ textAlign: 'center' }}
-                      variant={'medium'}
-                    >
-                      {item.title}
-                    </HiveText>
-                  </TouchableOpacity>
-                );
+                      return { totalTasks, totalComplete };
+                    };
+                    const getGoalProgress = (goal: Goal) => {
+                      let totalTasks = 0;
+                      let totalComplete = 0;
+                      const tasks = goal?.tasks || [];
+
+                      if (tasks.length) {
+                        return getTasksProgress(tasks);
+                      } else {
+                        totalTasks = 1;
+                        if (goal?.completed) {
+                          totalComplete = 1;
+                        }
+                      }
+
+                      return { totalTasks, totalComplete };
+                    };
+                    const taskProgress = getGoalProgress(item);
+
+                    return (
+                      <TouchableOpacity
+                        style={[styles.taskItem]}
+                        onPress={() =>
+                          sharedNavigationService.navigate({
+                            page: 'GoalTemplate',
+                            props: { goal: item },
+                          })
+                        }
+                      >
+                        <View style={styles.progressLabelsContainer}>
+                          <HiveText
+                            style={styles.taskItemLabel}
+                            variant={'medium'}
+                          >
+                            {item.title}
+                          </HiveText>
+                          {item.tasks?.length ? (
+                            <HiveText
+                              style={[
+                                styles.taskItemLabel,
+                                {
+                                  color: colors.inactiveGray,
+                                },
+                              ]}
+                              variant={'medium'}
+                            >
+                              {`${taskProgress.totalComplete}/`}
+                              <HiveText
+                                style={styles.taskItemLabel}
+                                variant={'medium'}
+                              >
+                                {`${taskProgress.totalTasks}`}
+                              </HiveText>
+                            </HiveText>
+                          ) : (
+                            <HiveText style={styles.progressLabel}>
+                              {item.completed ? 'Complete' : 'Incomplete'}
+                            </HiveText>
+                          )}
+                        </View>
+                        <View style={styles.taskItemProgressBarContainer}>
+                          <View
+                            style={[
+                              styles.taskItemProgressBar,
+                              {
+                                flex: taskProgress.totalComplete,
+                              },
+                            ]}
+                          />
+                          <View
+                            style={{
+                              flex:
+                                taskProgress.totalTasks -
+                                taskProgress.totalComplete,
+                            }}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  }
+                }
+                // return (
+                //   <TouchableOpacity
+                //     style={[styles.cardStyle, { marginHorizontal }]}
+                //     onPress={() => {
+                //       console.log(item);
+                //       switch (item.type) {
+                //         case 'Idea':
+                //           {
+                //             sharedNavigationService.navigate({
+                //               page: 'IdeaTemplate',
+                //               props: { idea: item },
+                //             });
+                //           }
+                //           break;
+                //         case 'Checklist':
+                //           {
+                //             sharedNavigationService.navigate({
+                //               page: 'ChecklistTemplate',
+                //               props: { checklist: item },
+                //             });
+                //           }
+                //           break;
+                //         case 'Goal':
+                //           {
+                //             sharedNavigationService.navigate({
+                //               page: 'GoalTemplate',
+                //               props: { goal: item },
+                //             });
+                //           }
+                //           break;
+                //       }
+                //     }}
+                //   >
+                //     <HiveText
+                //       style={{ textAlign: 'center' }}
+                //       variant={'medium'}
+                //     >
+                //       {item.title}
+                //     </HiveText>
+                //   </TouchableOpacity>
+                // );
               }}
             />
           );
@@ -187,10 +362,10 @@ export default (props: HomeProps) => {
     );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <View style={styles.container}>
-        {hiveData.length ? (
-          <View style={{ flex: 1, paddingHorizontal: 16 }}>
+    <View style={styles.container}>
+      {hiveData.length ? (
+        <View style={{ flex: 1 }}>
+          <View style={{ paddingHorizontal: 16 }}>
             <View
               style={{
                 // paddingTop: 16,
@@ -210,61 +385,19 @@ export default (props: HomeProps) => {
             </View>
             <View style={{ paddingVertical: 16 }}>
               <SearchBar
-                placeholder={'Search for something...'}
+                placeholder={'Search the Hive...'}
                 value={searchText}
                 onChangeText={(text: string) => setSearchText(text)}
                 onDismiss={() => setSearchText('')}
               />
             </View>
-            {resultsView}
           </View>
-        ) : (
-          zeroDataView()
-        )}
-        <View style={styles.tabContainer}>
-          <View style={styles.tabLabel}>
-            <TouchableOpacity onPress={() => sharedAuthService.logout()}>
-              <Image
-                style={styles.tabIcon}
-                source={require('../../assets/ellipsis-icon.png')}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.tabLabel}>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() =>
-                sharedNavigationService.navigate({
-                  page: 'TemplateSelection',
-                })
-              }
-            >
-              <Image
-                style={[
-                  styles.tabIcon,
-                  {
-                    height: 70,
-                    width: 70,
-                  },
-                ]}
-                source={require('../../assets/templates_button.png')}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.tabLabel}>
-            <TouchableOpacity>
-              <Image
-                style={styles.tabIcon}
-                source={require('../../assets/user-icon.png')}
-                resizeMode={'contain'}
-              />
-            </TouchableOpacity>
-          </View>
+          {resultsView}
         </View>
-      </View>
-    </SafeAreaView>
+      ) : (
+        zeroDataView()
+      )}
+    </View>
   );
 };
 
@@ -272,7 +405,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    paddingTop: 16,
+    paddingTop: 16 + topSpace(),
   },
   tabIcon: {
     height: 44,
@@ -294,6 +427,62 @@ const styles = StyleSheet.create({
   searchInput: {
     marginBottom: 16,
   },
+  cardStyle: {
+    height: (375 - 32) / 3,
+    width: (screenSize.width - 64) / 3,
+    backgroundColor: colors.white,
+    marginBottom: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: 12,
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+  },
+  taskItem: {
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    padding: 16,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  taskItemProgressBarContainer: {
+    height: 10,
+    flex: 1,
+    borderRadius: 999,
+    backgroundColor: '#F1EBF3',
+    marginTop: 12,
+    overflow: 'hidden',
+    flexDirection: 'row',
+  },
+  taskItemProgressBar: {
+    flex: 1,
+    backgroundColor: '#E09DFF',
+  },
+  progressLabel: {
+    fontSize: 18,
+    color: colors.inactiveGray,
+  },
+  taskItemLabel: {
+    fontSize: 18,
+  },
+  progressLabelsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   addButton: {
     position: 'absolute',
     right: 16,
@@ -308,5 +497,13 @@ const styles = StyleSheet.create({
   noResultsLabel: {
     marginLeft: 8,
     fontSize: 18,
+  },
+  headerContainer: {
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    backgroundColor: colors.white,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

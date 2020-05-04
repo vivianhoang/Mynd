@@ -1,0 +1,72 @@
+diff --git a/node_modules/react-native/Libraries/Text/TextInput/Multiline/RCTMultilineTextInputView.m b/node_modules/react-native/Libraries/Text/TextInput/Multiline/RCTMultilineTextInputView.m
+index 7ccef0e..cdca6bb 100644
+--- a/node_modules/react-native/Libraries/Text/TextInput/Multiline/RCTMultilineTextInputView.m
++++ b/node_modules/react-native/Libraries/Text/TextInput/Multiline/RCTMultilineTextInputView.m
+@@ -21,6 +21,7 @@ - (instancetype)initWithBridge:(RCTBridge *)bridge
+   if (self = [super initWithBridge:bridge]) {
+     // `blurOnSubmit` defaults to `false` for <TextInput multiline={true}> by design.
+     self.blurOnSubmit = NO;
++      self.enableNewLine = YES;
+ 
+     _backedTextInputView = [[RCTUITextView alloc] initWithFrame:self.bounds];
+     _backedTextInputView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+diff --git a/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.h b/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.h
+index ead7096..43e0707 100644
+--- a/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.h
++++ b/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.h
+@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
+ 
+ @property (nonatomic, assign) NSInteger mostRecentEventCount;
+ @property (nonatomic, assign) BOOL blurOnSubmit;
++@property (nonatomic, assign) BOOL enableNewLine;
+ @property (nonatomic, assign) BOOL selectTextOnFocus;
+ @property (nonatomic, assign) BOOL clearTextOnFocus;
+ @property (nonatomic, assign) BOOL secureTextEntry;
+diff --git a/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.m b/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.m
+index 6057a48..dabecfd 100644
+--- a/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.m
++++ b/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputView.m
+@@ -372,6 +372,11 @@ - (void)textInputDidReturn
+ 
+ - (BOOL)textInputShouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
+ {
++    if (!_enableNewLine && [text isEqualToString:@"\n"]) {
++        
++        return NO;
++    }
++    
+   id<RCTBackedTextInputViewProtocol> backedTextInputView = self.backedTextInputView;
+ 
+   if (!backedTextInputView.textWasPasted) {
+diff --git a/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputViewManager.m b/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputViewManager.m
+index f57b69d..1fe78db 100644
+--- a/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputViewManager.m
++++ b/node_modules/react-native/Libraries/Text/TextInput/RCTBaseTextInputViewManager.m
+@@ -50,6 +50,7 @@ @implementation RCTBaseTextInputViewManager
+ RCT_REMAP_VIEW_PROPERTY(scrollEnabled, backedTextInputView.scrollEnabled, BOOL)
+ RCT_EXPORT_VIEW_PROPERTY(secureTextEntry, BOOL)
+ RCT_EXPORT_VIEW_PROPERTY(blurOnSubmit, BOOL)
++RCT_EXPORT_VIEW_PROPERTY(enableNewLine, BOOL)
+ RCT_EXPORT_VIEW_PROPERTY(clearTextOnFocus, BOOL)
+ RCT_EXPORT_VIEW_PROPERTY(keyboardType, UIKeyboardType)
+ RCT_EXPORT_VIEW_PROPERTY(maxLength, NSNumber)
+diff --git a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/AndroidInfoModule.java b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/AndroidInfoModule.java
+index ef2ae93..2795802 100644
+--- a/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/AndroidInfoModule.java
++++ b/node_modules/react-native/ReactAndroid/src/main/java/com/facebook/react/modules/systeminfo/AndroidInfoModule.java
+@@ -92,7 +92,7 @@ public class AndroidInfoModule extends ReactContextBaseJavaModule implements Tur
+ 
+   private Boolean isRunningScreenshotTest() {
+     try {
+-      Class.forName("android.support.test.rule.ActivityTestRule");
++      Class.forName("androidx.test.rule.ActivityTestRule");
+       return true;
+     } catch (ClassNotFoundException ignored) {
+       return false;
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081

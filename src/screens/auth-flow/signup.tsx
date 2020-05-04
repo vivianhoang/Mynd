@@ -5,6 +5,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 import sharedAuthService from '../../services/auth-service';
 import sharedNavigationService from '../../services/navigation-service';
@@ -14,6 +16,7 @@ import HiveText from '../../componets/hive-text';
 import { SignupProps } from '../../models';
 import colors from '../../utils/colors';
 import NavButton from '../../componets/nav-button';
+import { topSpace } from '../../utils/layout';
 
 export default (props: SignupProps) => {
   const [email, setEmail] = useState('');
@@ -34,26 +37,38 @@ export default (props: SignupProps) => {
   return (
     <View style={styles.container}>
       <HiveText style={styles.headerLabel}>{'Signup'}</HiveText>
-      <HiveTextInput
-        style={styles.input}
-        title="EMAIL"
-        value={email}
-        onChangeText={text => {
-          setEmail(text);
-        }}
-        autoFocus={true}
-      />
+      <View style={styles.input}>
+        <HiveTextInput
+          title="EMAIL"
+          value={email}
+          onChangeText={text => {
+            setEmail(text);
+          }}
+          autoFocus={true}
+        />
+      </View>
       <HiveTextInput
         title="PASSWORD"
         value={password}
         onChangeText={password => {
           setPassword(password);
         }}
+        secureText={true}
+        showIcon={true}
+        style={{ flexDirection: 'row' }}
       />
+      <HiveText
+        variant={'light'}
+        style={{
+          color: colors.lightPurple,
+        }}
+      >
+        {'At least 6 characters'}
+      </HiveText>
       <View style={styles.fill} />
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 44 + 16}
+        keyboardVerticalOffset={44 + topSpace() + 16}
       >
         <View style={styles.fill} />
         <BigButton
@@ -66,7 +81,10 @@ export default (props: SignupProps) => {
               sharedNavigationService.navigate({ page: 'Home' });
             } catch (error) {
               sharedNavigationService.navigate({ page: 'Signup' });
-              Alert.alert('Uh oh!', error.message);
+              Alert.alert(
+                'Something went wrong!',
+                error.message.replace(/ *\[[^)]*\] */g, ''), // Removes Firebase error code, and only displays the Firebase error messsage
+              );
             }
           }}
         />
@@ -96,5 +114,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
+  },
+  titleIcon: {
+    height: 44,
+    width: 44,
+  },
+  eyeIconContainer: {
+    marginLeft: 8,
   },
 });

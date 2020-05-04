@@ -7,7 +7,7 @@ interface Props extends TextProps {
   variant?: 'light' | 'regular' | 'medium' | 'semi-bold' | 'bold';
 }
 
-export default (props: Props) => {
+const HiveText = (props: Props) => {
   const { children, style, variant } = props;
   let fontFamily = 'PulpDisplay-Regular';
 
@@ -45,3 +45,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export default HiveText;

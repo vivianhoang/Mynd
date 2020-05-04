@@ -14,7 +14,6 @@ import {
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
-  ScrollView,
   Alert,
 } from 'react-native';
 import {
@@ -33,26 +32,40 @@ import {
   updateChecklist,
 } from '../../services/firebase-service';
 import { topSpace } from '../../utils/layout';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import HiveText from '../../componets/hive-text';
+import { TapGestureHandler, State } from 'react-native-gesture-handler';
 
 const CheckListRow = (props: {
   item: ChecklistItem;
   onToggle: () => void;
   inputRef: RefObject<TextInput>;
   onEndEditing: (text: string) => void;
-  onSubmitEditing: () => void;
+  onSubmitEditing: (text: string) => void;
+  onChangeText?: (text: string) => void;
+  isLastRow?: boolean;
 }) => {
   const { title, checked } = props.item;
   return (
-    <View style={styles.rowContainer}>
+    <View
+      style={props.isLastRow ? styles.lastRowContainer : styles.rowContainer}
+    >
       <TextInput
         ref={props.inputRef}
         placeholderTextColor={colors.lightPurple}
         placeholder={'Item'}
         defaultValue={title}
-        onSubmitEditing={props.onSubmitEditing}
+        onChangeText={props.onChangeText}
+        enableNewLine={false}
+        onSubmitEditing={e => {
+          props.onSubmitEditing(e.nativeEvent.text);
+        }}
         selectionColor={colors.salmonRed}
         style={styles.rowInput}
-        // multiline={true}
+        multiline={true}
+        scrollEnabled={false}
+        blurOnSubmit={false}
         onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
       />
       <TouchableOpacity style={styles.checkBox} onPress={props.onToggle}>
@@ -76,21 +89,33 @@ export default (props: ChecklistTemplateProps) => {
   const [checklistTitle, setChecklistTitle] = useState(
     existingChecklist?.title || '',
   );
-  const [checklistItems, setChecklistItems] = useState(
-    existingChecklist?.items || [],
+  const dummyChecklistItems: ChecklistItem[] = [
+    { title: '', checked: false, timestamp: new Date().getTime().toString() },
+    {
+      title: '',
+      checked: false,
+      timestamp: (new Date().getTime() + 1).toString(),
+    },
+  ];
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
+    existingChecklist?.items.concat(dummyChecklistItems) || dummyChecklistItems,
   );
-  const [newItemTitle, setNewItemTitle] = useState('');
-  const [newItemChecked, setNewItemChecked] = useState(false);
   const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
   let inputRefList = useRef(checklistItems.map(() => createRef<TextInput>()));
-  const newInputRef = useRef<TextInput>(null);
+  let swipeableRefList = useRef(
+    checklistItems.map(() => createRef<Swipeable>()),
+  );
+
   const newTitleInputRef = useRef<TextInput>(null);
+
+  let savedIndex: number = undefined;
 
   const userId = useSelector<ReduxState, string>(state => state.userId);
 
   useEffect(() => {
     inputRefList.current = checklistItems.map(() => createRef<TextInput>());
+    swipeableRefList.current = checklistItems.map(() => createRef<Swipeable>());
     forceUpdate();
   }, [checklistItems.length]);
 
@@ -123,15 +148,8 @@ export default (props: ChecklistTemplateProps) => {
       }
     }
 
-    // Check for new item
-    if (_.trim(newItemTitle)) {
-      const newItem: ChecklistItem = {
-        title: _.trim(newItemTitle),
-        checked: newItemChecked,
-        timestamp: new Date().getTime().toString(),
-      };
-      newItems.push(newItem);
-    }
+    // Remove all empty items on save
+    newItems = _.filter(newItems, item => !!item.title);
 
     return { newTitle, newItems };
   };
@@ -264,155 +282,146 @@ export default (props: ChecklistTemplateProps) => {
     headerStyle: { shadowColor: colors.lightGray },
   });
 
+  const saveItemIndex = (currentIndex: number) => {
+    if (currentIndex != undefined) {
+      savedIndex = currentIndex;
+    }
+  };
+
+  const closeAllItems = () => {
+    if (savedIndex != undefined) {
+      swipeableRefList.current[savedIndex].current.close();
+      savedIndex = undefined;
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 400 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         keyboardShouldPersistTaps={'handled'}
+        automaticallyAdjustContentInsets={false}
       >
-        <TextInput
-          selectionColor={colors.salmonRed}
-          placeholderTextColor={colors.lightPurple}
-          style={styles.titleInput}
-          placeholder={'Untitled'}
-          value={checklistTitle}
-          onChangeText={text => setChecklistTitle(text)}
-          ref={newTitleInputRef}
-        />
-        {checklistItems.map((item, index) => {
-          // Adding timestamp fixed issue of focusing on later items after previous has been removed
-          const key = `${item.title}-${item.timestamp}`;
-          const ref = inputRefList.current[index];
-
-          return (
-            <CheckListRow
-              key={key}
-              inputRef={ref}
-              item={item}
-              onSubmitEditing={() => {
-                const nextInputRef = inputRefList?.current[index + 1];
-                if (nextInputRef && nextInputRef.current) {
-                  console.log('focusing next...');
-                  nextInputRef.current && nextInputRef.current.focus();
-                } else {
-                  console.log('focusing new', newInputRef);
-                  newInputRef.current && newInputRef.current.focus();
-                }
-              }}
-              onToggle={() => {
-                let newItems = [...checklistItems];
-                newItems[index] = { ...item, checked: !item.checked };
-
-                setChecklistItems(newItems);
-              }}
-              onEndEditing={text => {
-                let newItems = [...checklistItems];
-                if (!_.trim(text)) {
-                  // Remove
-                  newItems.splice(index, 1);
-                } else {
-                  newItems[index] = { ...item, title: text };
-                }
-
-                setChecklistItems(newItems);
-              }}
-            />
-          );
-        })}
-        {/* New input */}
-        <View style={[styles.rowContainer]}>
+        <View style={{ flex: 1 }}>
           <TextInput
-            ref={newInputRef}
-            onBlur={() => {
-              if (_.trim(newItemTitle)) {
-                const newItem: ChecklistItem = {
-                  title: _.trim(newItemTitle),
-                  checked: newItemChecked,
-                  timestamp: new Date().getTime().toString(),
-                };
-                const newItems = [...checklistItems, newItem];
-                setChecklistItems(newItems);
-              }
-              setNewItemTitle('');
-              setNewItemChecked(false);
-            }}
-            onSubmitEditing={() => {
-              if (_.trim(newItemTitle)) {
-                const newItem: ChecklistItem = {
-                  title: _.trim(newItemTitle),
-                  checked: newItemChecked,
-                  timestamp: new Date().getTime().toString(),
-                };
-                const newItems = [...checklistItems, newItem];
-                setChecklistItems(newItems);
-              } else {
-                newInputRef.current && newInputRef.current.blur();
-              }
-              setNewItemTitle('');
-              setNewItemChecked(false);
-            }}
-            blurOnSubmit={false}
-            placeholderTextColor={colors.lightPurple}
-            placeholder={'New item'}
-            value={newItemTitle}
-            onChangeText={text => setNewItemTitle(text)}
             selectionColor={colors.salmonRed}
-            style={styles.rowInput}
-            // multiline={true}
-          />
-          <TouchableOpacity
-            style={styles.checkBox}
-            onPress={() => setNewItemChecked(!newItemChecked)}
-            onBlur={() => {
-              if (_.trim(newItemTitle)) {
-                const newItem: ChecklistItem = {
-                  title: _.trim(newItemTitle),
-                  checked: newItemChecked,
-                  timestamp: new Date().getTime().toString(),
-                };
-                const newItems = [...checklistItems, newItem];
-                setChecklistItems(newItems);
-              }
-              setNewItemTitle('');
-              setNewItemChecked(false);
+            placeholderTextColor={colors.lightPurple}
+            style={styles.titleInput}
+            placeholder={'Untitled'}
+            value={checklistTitle}
+            onChangeText={text => setChecklistTitle(text)}
+            ref={newTitleInputRef}
+            blurOnSubmit={true}
+            onSubmitEditing={() => {
+              inputRefList.current[0].current.focus();
             }}
-          >
-            <View
-              style={[
-                styles.activeCheckBox,
-                {
-                  opacity: newItemChecked ? 1 : 0,
-                },
-              ]}
-            />
-          </TouchableOpacity>
+          />
+          {checklistItems.map((item, index) => {
+            const maxDummyIndices = checklistItems.length - 3;
+            const isNewInput = index > maxDummyIndices;
+            // Adding timestamp fixed issue of focusing on later items after previous has been removed
+            const key = `${item.title}-${item.timestamp}`;
+            const ref = inputRefList.current[index];
+            const swipeableRef = swipeableRefList.current[index];
+
+            return (
+              <TapGestureHandler
+                key={key}
+                onHandlerStateChange={event => {
+                  switch (event.nativeEvent.state) {
+                    case State.BEGAN:
+                      // Close all
+                      closeAllItems();
+                      break;
+                  }
+                }}
+              >
+                <View>
+                  <Swipeable
+                    ref={swipeableRef}
+                    overshootRight={false}
+                    shouldCancelWhenOutside={true}
+                    onSwipeableWillOpen={() => {
+                      saveItemIndex(index);
+                    }}
+                    renderRightActions={() => (
+                      <TouchableOpacity
+                        style={styles.delete}
+                        onPress={() => {
+                          let newItems = [...checklistItems];
+                          newItems.splice(index, 1);
+                          setChecklistItems(newItems);
+                        }}
+                      >
+                        <HiveText style={{ color: colors.white }}>
+                          {'Delete'}
+                        </HiveText>
+                      </TouchableOpacity>
+                    )}
+                    overshootLeft={false}
+                    friction={1}
+                  >
+                    <CheckListRow
+                      inputRef={ref}
+                      item={item}
+                      isLastRow={checklistItems.length - 1 == index}
+                      onSubmitEditing={latestText => {
+                        const nextInputRef = inputRefList?.current[index + 1];
+                        if (nextInputRef && nextInputRef.current) {
+                          if (
+                            index === checklistItems.length - 2 &&
+                            !latestText
+                          ) {
+                            ref.current.blur();
+                            return;
+                          }
+                          nextInputRef.current && nextInputRef.current.focus();
+                        }
+                      }}
+                      onToggle={() => {
+                        let newItems = [...checklistItems];
+                        newItems[index] = { ...item, checked: !item.checked };
+                        setChecklistItems(newItems);
+                      }}
+                      onEndEditing={text => {
+                        // When clicking out
+                        let newItems = [...checklistItems];
+                        if (isNewInput) {
+                          if (_.trim(text)) {
+                            // Append second to last item as latest checklist item
+                            newItems[index] = { ...item, title: text };
+                            // Append new empty checklist item to always maintain two empty items
+                            newItems.push({
+                              title: '',
+                              checked: false,
+                              timestamp: new Date().getTime().toString(),
+                            });
+                            setChecklistItems(newItems);
+                          }
+                        } else {
+                          if (!_.trim(text)) {
+                            // Remove
+                            newItems.splice(index, 1);
+                          }
+                          setChecklistItems(newItems);
+                        }
+                      }}
+                    />
+                  </Swipeable>
+                </View>
+              </TapGestureHandler>
+            );
+          })}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 16 + topSpace()}
+        keyboardVerticalOffset={44 + topSpace()}
       >
         <TouchableOpacity
           onPress={updateOrCreateList}
-          style={{
-            position: 'absolute',
-            right: 16,
-            bottom: 16,
-            backgroundColor: colors.honeyOrange,
-            height: 60,
-            width: 60,
-            borderRadius: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowColor: colors.darkGray,
-            shadowRadius: 4,
-            shadowOpacity: 0.2,
-            shadowOffset: {
-              width: 2,
-              height: 2,
-            },
-          }}
+          style={styles.saveButton}
         >
           <Image
             style={styles.icon}
@@ -429,7 +438,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-    padding: 16,
+    paddingVertical: 16,
   },
   titleIcon: {
     height: 44,
@@ -440,11 +449,20 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: colors.offBlack,
     marginVertical: 8,
+    paddingHorizontal: 16,
   },
   rowContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderColor: colors.placeholderGray,
+    backgroundColor: colors.white,
+    paddingHorizontal: 16,
+  },
+  lastRowContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    opacity: 0, // make last row invisible
+    paddingHorizontal: 16,
   },
   rowInput: {
     margin: 0,
@@ -477,5 +495,30 @@ const styles = StyleSheet.create({
     height: 44,
     width: 44,
     tintColor: colors.white,
+  },
+  saveButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: colors.honeyOrange,
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+  },
+  delete: {
+    width: 100,
+    backgroundColor: 'red',
+    opacity: 0.75,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

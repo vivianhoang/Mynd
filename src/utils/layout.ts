@@ -21,5 +21,9 @@ export function isIPhoneXrSize(dim) {
 }
 
 export function topSpace() {
-  return isIphoneX() ? 44 : 0;
+  return isIphoneX() ? 44 : 20;
+}
+
+export function bottomSpace() {
+  return isIphoneX() ? 32 : 0;
 }

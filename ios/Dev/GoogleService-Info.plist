@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1074176159599-uao50bipe0jseuocil9do5ieshanslju.apps.googleusercontent.com</string>
+	<string>1074176159599-fb7jhtvv5m2rh1sfa5r4vulp0250p1b7.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1074176159599-uao50bipe0jseuocil9do5ieshanslju</string>
+	<string>com.googleusercontent.apps.1074176159599-fb7jhtvv5m2rh1sfa5r4vulp0250p1b7</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBboB4WpHjDkaZHRS1smpjlyr2xZK-Li30</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.mynd.app</string>
+	<string>com.kudasai.mynd.dev</string>
 	<key>PROJECT_ID</key>
 	<string>mynd-a5488</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1074176159599:ios:0e8d83d0bce68ed1b5829a</string>
+	<string>1:1074176159599:ios:c11ded5cb097c436b5829a</string>
 	<key>DATABASE_URL</key>
 	<string>https://mynd-a5488.firebaseio.com</string>
 </dict>

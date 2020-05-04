@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Platform,
   StyleSheet,
   Image,
   TextInput,
-  ScrollView,
   KeyboardAvoidingView,
   Alert,
 } from 'react-native';
@@ -22,6 +21,7 @@ import {
   createIdea,
 } from '../../services/firebase-service';
 import { topSpace } from '../../utils/layout';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 
 export default (props: IdeaTemplateProps) => {
   const existingIdea = props.route.params?.idea;
@@ -32,8 +32,10 @@ export default (props: IdeaTemplateProps) => {
   );
 
   const userId = useSelector<ReduxState, string>(state => state.userId);
+  const descriptionInputRef = useRef<TextInput>(null);
 
   const updateOrCreateIdea = async () => {
+    sharedNavigationService.navigate({ page: 'Loader' });
     try {
       if (existingIdea) {
         await updateIdea({
@@ -163,9 +165,11 @@ export default (props: IdeaTemplateProps) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 400 }}
+        contentContainerStyle={{ paddingBottom: 130 }}
+        keyboardShouldPersistTaps={'handled'}
+        automaticallyAdjustContentInsets={false}
       >
         <TextInput
           selectionColor={colors.salmonRed}
@@ -174,8 +178,12 @@ export default (props: IdeaTemplateProps) => {
           placeholder={'Untitled'}
           value={ideaTitle}
           onChangeText={text => setIdeaTitle(text)}
+          onSubmitEditing={() => {
+            descriptionInputRef.current.focus();
+          }}
         />
         <TextInput
+          ref={descriptionInputRef}
           selectionColor={colors.salmonRed}
           placeholderTextColor={colors.lightPurple}
           style={styles.ideaInput}
@@ -185,31 +193,14 @@ export default (props: IdeaTemplateProps) => {
           value={ideaDescription}
           onChangeText={text => setIdeaDescription(text)}
         />
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + 16 + topSpace()}
+        keyboardVerticalOffset={44 + topSpace()}
       >
         <TouchableOpacity
           onPress={updateOrCreateIdea}
-          style={{
-            position: 'absolute',
-            right: 16,
-            bottom: 16,
-            backgroundColor: colors.honeyOrange,
-            height: 60,
-            width: 60,
-            borderRadius: 30,
-            justifyContent: 'center',
-            alignItems: 'center',
-            shadowColor: colors.darkGray,
-            shadowRadius: 4,
-            shadowOpacity: 0.2,
-            shadowOffset: {
-              width: 2,
-              height: 2,
-            },
-          }}
+          style={styles.saveButton}
         >
           <Image
             style={styles.doneIcon}
@@ -248,5 +239,23 @@ const styles = StyleSheet.create({
     height: 44,
     width: 44,
     tintColor: colors.white,
+  },
+  saveButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: colors.honeyOrange,
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
   },
 });

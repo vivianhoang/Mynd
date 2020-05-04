@@ -16,14 +16,17 @@ interface Props {
   onPress: () => void;
   type?: `second` | 'third';
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 }
 
-export default (props: Props) => {
-  const { title, onPress, type, color, style } = props;
+const BigButton = (props: Props) => {
+  const { title, onPress, type, color, style, disabled } = props;
 
   let finalButtonStyle = { ...styles.button };
   let finalTextStyle = { ...styles.buttonLabel };
-  let gradientColors = [colors.honeyOrange, colors.honeyYellow];
+  let gradientColors = disabled
+    ? [colors.lightGray, colors.lightGray]
+    : [colors.honeyOrange, colors.honeyYellow];
   if (type) {
     switch (type) {
       case 'second':
@@ -47,7 +50,7 @@ export default (props: Props) => {
   }
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity disabled={disabled} onPress={onPress}>
       <LinearGradient
         style={[finalButtonStyle, style as any]}
         start={{ x: 0, y: -5 }}
@@ -64,8 +67,8 @@ export default (props: Props) => {
 
 const styles = StyleSheet.create({
   button: {
-    height: 60,
-    borderRadius: 30,
+    height: 50,
+    borderRadius: 999,
     backgroundColor: defaultButtonColor,
     borderColor: defaultButtonColor,
     justifyContent: 'center',
@@ -77,3 +80,5 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 });
+
+export default BigButton;

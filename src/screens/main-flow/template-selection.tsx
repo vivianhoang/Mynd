@@ -62,6 +62,18 @@ const templates: TemplateOption[] = [
       },
     },
   },
+  {
+    type: 'Habit',
+    title: 'Habits',
+    description: 'Keep yourself accountable.',
+    image: require('../../assets/ideas-icon.png'),
+    pageAction: {
+      page: 'HabitTemplate',
+      props: {
+        habit: null,
+      },
+    },
+  },
 ];
 
 const TemplateCard = (props: {

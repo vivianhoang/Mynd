@@ -2,7 +2,6 @@ import { all, take, put, call, select } from 'redux-saga/effects';
 import { ReduxState, ReduxActions } from '../models';
 import { channel } from 'redux-saga';
 import { subscribeToHive, updateIdea } from './firebase-service';
-import sharedNavigationService from './navigation-service';
 
 function* initialize() {
   console.log('Sagas initalized...');

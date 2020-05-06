@@ -22,18 +22,12 @@ import colors from '../../../utils/colors';
 import { useSelector, useDispatch } from 'react-redux';
 import * as _ from 'lodash';
 import { TouchableOpacity } from 'react-native';
-import // deleteIdea,
-// updateIdea,
-// createIdea,
-'../../../services/firebase-service';
-// import { topSpace } from '../../../utils/layout';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import HiveText from '../../../componets/hive-text';
 import { FlatList } from 'react-native-gesture-handler';
 
 export default (props: GoalTaskDetailsProps) => {
   const { breadcrumbs } = props.route.params;
-  // const existingGoal = task;
 
   const constructKeysFromBreadcrumbs = () => {
     let setKeys = [];
@@ -111,9 +105,6 @@ export default (props: GoalTaskDetailsProps) => {
             description: tempTask.description,
           };
           if (_.isEqual(finalTitleAndDescription, initialTitleAndDescription)) {
-            // sharedNavigationService.navigate({
-            //   page: 'HomeReset',
-            // });
             sharedNavigationService.goBack();
           } else {
             Alert.alert(
@@ -395,7 +386,6 @@ export default (props: GoalTaskDetailsProps) => {
           sharedNavigationService.push({
             page: 'GoalTaskDetails',
             props: {
-              // task: item,
               breadcrumbs: [
                 ...breadcrumbs,
                 { title: newBreadcrumbTitle, taskIndex: index },
@@ -675,21 +665,6 @@ export default (props: GoalTaskDetailsProps) => {
         <View style={styles.sectionSeparator} />
         {renderTaskSection()}
       </KeyboardAwareScrollView>
-      {/* <KeyboardAvoidingView
-        behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + topSpace()}
-      >
-        <TouchableOpacity
-          onPress={updateOrCreateGoal}
-          style={styles.saveButton}
-        >
-          <Image
-            style={styles.doneIcon}
-            source={require('../../../assets/check-icon.png')}
-            resizeMode={'contain'}
-          />
-        </TouchableOpacity>
-      </KeyboardAvoidingView> */}
     </View>
   );
 };

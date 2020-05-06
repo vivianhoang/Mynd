@@ -3,7 +3,6 @@ import {
   View,
   Image,
   StyleSheet,
-  Text,
   TextInput,
   KeyboardAvoidingView,
   TouchableOpacity,
@@ -161,7 +160,6 @@ export default (props: GoalTaskCreationProps) => {
       </Animated.View>
       <KeyboardAvoidingView
         behavior={Platform.select({ ios: 'position', android: undefined })}
-        // keyboardVerticalOffset={44 + topSpace()}
       >
         <PanGestureHandler {...gestureHandler}>
           <Animated.View
@@ -197,9 +195,6 @@ export default (props: GoalTaskCreationProps) => {
                 placeholder={'Title'}
                 value={title}
                 onChangeText={setTitle}
-                onSubmitEditing={() => {
-                  // descriptionInputRef.current.focus();
-                }}
               />
               <TextInput
                 selectionColor={colors.salmonRed}
@@ -209,9 +204,6 @@ export default (props: GoalTaskCreationProps) => {
                 value={description}
                 onChangeText={setDescription}
                 multiline={true}
-                onSubmitEditing={() => {
-                  // descriptionInputRef.current.focus();
-                }}
               />
               <BigButton
                 title={'Done'}
@@ -221,7 +213,7 @@ export default (props: GoalTaskCreationProps) => {
                   triggerDismissModal.setValue(1);
                 }}
                 style={styles.doneButton}
-              ></BigButton>
+              />
             </View>
           </Animated.View>
         </PanGestureHandler>

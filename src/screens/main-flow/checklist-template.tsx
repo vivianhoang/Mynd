@@ -20,6 +20,7 @@ import {
   ChecklistTemplateProps,
   ChecklistItem,
   ReduxState,
+  ActionSheetOwnProps,
 } from '../../models';
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
@@ -36,6 +37,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import HiveText from '../../componets/hive-text';
 import { TapGestureHandler, State } from 'react-native-gesture-handler';
+import DoneButton from '../../componets/done-button';
 
 const CheckListRow = (props: {
   item: ChecklistItem;
@@ -196,6 +198,47 @@ export default (props: ChecklistTemplateProps) => {
     }
   };
 
+  const triggerDeleteChecklist = () => {
+    Alert.alert(
+      'Are you sure you want to delete this checklist?',
+      'This action cannot be undone.',
+      [
+        { text: 'Cancel' },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            sharedNavigationService.navigate({ page: 'Loader' });
+            try {
+              await deleteChecklist({
+                id: existingChecklist.id,
+                userId,
+              });
+              sharedNavigationService.navigate({
+                page: 'HomeReset',
+              });
+            } catch (error) {
+              // Same as dismissing loader
+              sharedNavigationService.navigate({
+                page: 'ChecklistTemplate',
+                props: {
+                  checklist: existingChecklist || null,
+                },
+              });
+              Alert.alert(
+                'Uh oh!',
+                `Couldn't delete list. ${error.message}`,
+              );
+            }
+          },
+        },
+      ],
+    );
+  }
+
+  const subMenuOptions: ActionSheetOwnProps = {
+    options: [{onPress: triggerDeleteChecklist, buttonType: 'third', title: 'Delete Checklist'}]
+  }
+
   props.navigation.setOptions({
     headerTitle: () => (
       <Image
@@ -236,48 +279,15 @@ export default (props: ChecklistTemplateProps) => {
     ),
     headerRight: existingChecklist
       ? () => (
-          <NavButton
-            onPress={() => {
-              Alert.alert(
-                'Are you sure you want to delete this checklist?',
-                'This action cannot be undone.',
-                [
-                  { text: 'Cancel' },
-                  {
-                    text: 'Delete',
-                    onPress: async () => {
-                      sharedNavigationService.navigate({ page: 'Loader' });
-                      try {
-                        await deleteChecklist({
-                          id: existingChecklist.id,
-                          userId,
-                        });
-                        sharedNavigationService.navigate({
-                          page: 'HomeReset',
-                        });
-                      } catch (error) {
-                        // Same as dismissing loader
-                        sharedNavigationService.navigate({
-                          page: 'ChecklistTemplate',
-                          props: {
-                            checklist: existingChecklist || null,
-                          },
-                        });
-                        Alert.alert(
-                          'Uh oh!',
-                          `Couldn't delete list. ${error.message}`,
-                        );
-                      }
-                    },
-                  },
-                ],
-              );
-            }}
-            title={'Delete'}
-            position={'right'}
-            color={'red'}
-          />
-        )
+        <NavButton
+          onPress={() => sharedNavigationService.navigate({
+            page: 'ActionSheet',
+            props: subMenuOptions,
+          })}
+          icon={'subMenu'}
+          position={'right'}
+        />
+      )
       : null,
     headerStyle: { shadowColor: colors.lightGray },
   });
@@ -415,21 +425,7 @@ export default (props: ChecklistTemplateProps) => {
           })}
         </View>
       </KeyboardAwareScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + topSpace()}
-      >
-        <TouchableOpacity
-          onPress={updateOrCreateList}
-          style={styles.saveButton}
-        >
-          <Image
-            style={styles.icon}
-            source={require('../../assets/check-icon.png')}
-            resizeMode={'contain'}
-          />
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+      <DoneButton onPress={updateOrCreateList} />
     </View>
   );
 };
@@ -490,29 +486,6 @@ const styles = StyleSheet.create({
     width: 22,
     borderRadius: 12,
     backgroundColor: colors.salmonRed,
-  },
-  icon: {
-    height: 44,
-    width: 44,
-    tintColor: colors.white,
-  },
-  saveButton: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
-    backgroundColor: colors.honeyOrange,
-    height: 60,
-    width: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.offBlack,
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
   },
   delete: {
     width: 100,

@@ -9,6 +9,7 @@ import {
   ChecklistItem,
   Goal,
   Goals,
+  Habit,
 } from '../models';
 import * as _ from 'lodash';
 
@@ -66,6 +67,70 @@ export const subscribeToHive = (
   subscriptionById['hive'] = subscription;
 };
 
+export const createHabit = async (params: {
+  title: string;
+  color: string;
+  counter: number;
+  userId: string;
+}) => {
+  const { title, color, counter, userId } = params;
+  const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
+  const habitId = hiveRef.doc().id;
+
+  const newHabit: Habit = {
+    id: habitId,
+    title: title,
+    color: color,
+    counter: counter,
+    timestamp: new Date().getTime().toString(),
+    type: 'Habit',
+  };
+
+  try {
+    await hiveRef.doc(habitId).set(newHabit);
+  } catch (error) {
+    console.log('Failed to create habit!', error.message);
+  }
+};
+
+export const updateHabit = async (params: {
+  id: string;
+  title: string;
+  color: string;
+  counter: number;
+  timestamp: string;
+  userId: string;
+}) => {
+  const { id, title, color, counter, timestamp, userId } = params;
+  const habitRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
+
+  const updatedHabit: Habit = {
+    id,
+    title,
+    color,
+    counter,
+    timestamp,
+    type: 'Habit',
+  };
+
+  try {
+    await habitRef.update(updatedHabit);
+  } catch (error) {
+    console.log('Failed to update habit!', error.message);
+  }
+};
+
+export const deleteHabit = async (params: { id: string; userId: string }) => {
+  const { id, userId } = params;
+  const habitRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
+
+  try {
+    habitRef.delete();
+  } catch (error) {
+    console.log('Failed to delete habit!', error.message);
+  }
+};
+
 export const createIdea = async (params: {
   title: string;
   description: string;
@@ -74,6 +139,7 @@ export const createIdea = async (params: {
   const { title, description, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const ideaId = hiveRef.doc().id;
+
   const newIdea: Idea = {
     id: ideaId,
     title: title,
@@ -81,6 +147,7 @@ export const createIdea = async (params: {
     timestamp: new Date().getTime().toString(),
     type: 'Idea',
   };
+
   try {
     await hiveRef.doc(ideaId).set(newIdea);
   } catch (error) {
@@ -132,6 +199,7 @@ export const createChecklist = async (params: {
   const { title, items, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const checklistId = hiveRef.doc().id;
+
   const newChecklist: Checklist = {
     id: checklistId,
     title: title,
@@ -139,6 +207,7 @@ export const createChecklist = async (params: {
     timestamp: new Date().getTime().toString(),
     type: 'Checklist',
   };
+
   try {
     await hiveRef.doc(checklistId).set(newChecklist);
   } catch (error) {
@@ -195,6 +264,7 @@ export const createGoal = async (params: {
   const { title, description, tasks, completed, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const goalId = hiveRef.doc().id;
+
   const newGoal: Goal = {
     id: goalId,
     title: title,
@@ -204,7 +274,7 @@ export const createGoal = async (params: {
     timestamp: new Date().getTime().toString(),
     type: 'Goal',
   };
-  console.log('createGoal');
+
   try {
     await hiveRef.doc(goalId).set(newGoal);
   } catch (error) {

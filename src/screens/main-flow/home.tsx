@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   SectionList,
-  SafeAreaView,
   ImageRequireSource,
   ActivityIndicator,
 } from 'react-native';
@@ -31,6 +30,7 @@ const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
   Checklist: require('../../assets/checklist-icon.png'),
   Goal: require('../../assets/goals-icon.png'),
+  Habit: require('../../assets/goals-icon.png'), // UPDATE WITH REAL ICON
 };
 
 export default () => {
@@ -156,7 +156,7 @@ export default () => {
         renderItem={e => {
           const title = e.section.title as string;
           const item = e.item;
-          const numColumns = title === 'Goal' ? 1 : 3;
+          const numColumns = title === ('Goal' || 'Habit') ? 1 : 3;
           console.log(e);
           return (
             <FlatList
@@ -253,7 +253,7 @@ export default () => {
 
                     return (
                       <TouchableOpacity
-                        style={[styles.taskItem]}
+                        style={[styles.fullRowCardStyle]}
                         onPress={() =>
                           sharedNavigationService.navigate({
                             page: 'GoalTemplate',
@@ -311,49 +311,27 @@ export default () => {
                         </View>
                       </TouchableOpacity>
                     );
-                  }
+                  };
+                case 'Habit':
+                  return (
+                    <TouchableOpacity
+                      style={styles.fullRowCardStyle}
+                      onPress={() =>
+                        sharedNavigationService.navigate({
+                          page: 'HabitTemplate',
+                          props: { habit: item },
+                        })
+                      }
+                    >
+                      <HiveText
+                        style={{ textAlign: 'center' }}
+                        variant={'medium'}
+                      >
+                        {item.title}
+                      </HiveText>
+                    </TouchableOpacity>
+                  );
                 }
-                // return (
-                //   <TouchableOpacity
-                //     style={[styles.cardStyle, { marginHorizontal }]}
-                //     onPress={() => {
-                //       console.log(item);
-                //       switch (item.type) {
-                //         case 'Idea':
-                //           {
-                //             sharedNavigationService.navigate({
-                //               page: 'IdeaTemplate',
-                //               props: { idea: item },
-                //             });
-                //           }
-                //           break;
-                //         case 'Checklist':
-                //           {
-                //             sharedNavigationService.navigate({
-                //               page: 'ChecklistTemplate',
-                //               props: { checklist: item },
-                //             });
-                //           }
-                //           break;
-                //         case 'Goal':
-                //           {
-                //             sharedNavigationService.navigate({
-                //               page: 'GoalTemplate',
-                //               props: { goal: item },
-                //             });
-                //           }
-                //           break;
-                //       }
-                //     }}
-                //   >
-                //     <HiveText
-                //       style={{ textAlign: 'center' }}
-                //       variant={'medium'}
-                //     >
-                //       {item.title}
-                //     </HiveText>
-                //   </TouchableOpacity>
-                // );
               }}
             />
           );
@@ -368,7 +346,6 @@ export default () => {
           <View style={{ paddingHorizontal: 16 }}>
             <View
               style={{
-                // paddingTop: 16,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -444,7 +421,7 @@ const styles = StyleSheet.create({
       height: 1,
     },
   },
-  taskItem: {
+  fullRowCardStyle: {
     shadowColor: colors.offBlack,
     shadowRadius: 4,
     shadowOpacity: 0.2,

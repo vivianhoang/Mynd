@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Alert,
 } from 'react-native';
-import { IdeaTemplateProps, ReduxState } from '../../models';
+import { IdeaTemplateProps, ReduxState, ActionSheetOwnProps } from '../../models';
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
@@ -22,6 +22,7 @@ import {
 } from '../../services/firebase-service';
 import { topSpace } from '../../utils/layout';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
+import DoneButton from '../../componets/done-button';
 
 export default (props: IdeaTemplateProps) => {
   const existingIdea = props.route.params?.idea;
@@ -77,6 +78,42 @@ export default (props: IdeaTemplateProps) => {
     }
   };
 
+  const triggerDeleteIdea = () => {
+    Alert.alert(
+      'Are you sure you want to delete this idea?',
+      'This action cannot be undone.',
+      [
+        { text: 'Cancel' },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            sharedNavigationService.navigate({ page: 'Loader' });
+            try {
+              await deleteIdea({ id: existingIdea.id, userId });
+              sharedNavigationService.navigate({ page: 'HomeReset' });
+            } catch (error) {
+              // Same as dismissing loader
+              sharedNavigationService.navigate({
+                page: 'IdeaTemplate',
+                props: {
+                  idea: existingIdea || null,
+                },
+              });
+              Alert.alert(
+                'Uh oh!',
+                `Couldn't delete idea. ${error.message}`,
+              );
+            }
+          },
+        },
+      ],
+    );
+  }
+
+  const subMenuOptions: ActionSheetOwnProps = {
+    options: [{onPress: triggerDeleteIdea, buttonType: 'third', title: 'Delete Idea'}],
+  }
+
   props.navigation.setOptions({
     headerTitle: () => (
       <Image
@@ -123,40 +160,12 @@ export default (props: IdeaTemplateProps) => {
     headerRight: existingIdea
       ? () => (
           <NavButton
-            onPress={() => {
-              Alert.alert(
-                'Are you sure you want to delete this idea?',
-                'This action cannot be undone.',
-                [
-                  { text: 'Cancel' },
-                  {
-                    text: 'Delete',
-                    onPress: async () => {
-                      sharedNavigationService.navigate({ page: 'Loader' });
-                      try {
-                        await deleteIdea({ id: existingIdea.id, userId });
-                        sharedNavigationService.navigate({ page: 'HomeReset' });
-                      } catch (error) {
-                        // Same as dismissing loader
-                        sharedNavigationService.navigate({
-                          page: 'IdeaTemplate',
-                          props: {
-                            idea: existingIdea || null,
-                          },
-                        });
-                        Alert.alert(
-                          'Uh oh!',
-                          `Couldn't delete idea. ${error.message}`,
-                        );
-                      }
-                    },
-                  },
-                ],
-              );
-            }}
-            title={'Delete'}
+            onPress={() => sharedNavigationService.navigate({
+              page: 'ActionSheet',
+              props: subMenuOptions,
+            })}
+            icon={'subMenu'}
             position={'right'}
-            color={'red'}
           />
         )
       : null,
@@ -194,21 +203,7 @@ export default (props: IdeaTemplateProps) => {
           onChangeText={text => setIdeaDescription(text)}
         />
       </KeyboardAwareScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + topSpace()}
-      >
-        <TouchableOpacity
-          onPress={updateOrCreateIdea}
-          style={styles.saveButton}
-        >
-          <Image
-            style={styles.doneIcon}
-            source={require('../../assets/check-icon.png')}
-            resizeMode={'contain'}
-          />
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+      <DoneButton onPress={updateOrCreateIdea} />
     </View>
   );
 };
@@ -234,28 +229,5 @@ const styles = StyleSheet.create({
     fontFamily: 'PulpDisplay-Regular',
     fontSize: 20,
     color: colors.offBlack,
-  },
-  doneIcon: {
-    height: 44,
-    width: 44,
-    tintColor: colors.white,
-  },
-  saveButton: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
-    backgroundColor: colors.honeyOrange,
-    height: 60,
-    width: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.offBlack,
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
   },
 });

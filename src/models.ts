@@ -55,7 +55,7 @@ export interface Habit {
   id: string;
   title: string;
   timestamp: string;
-  counter: number;
+  count: number;
   color: string;
   type: 'Habit';
 }

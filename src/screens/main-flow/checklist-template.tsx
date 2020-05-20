@@ -8,12 +8,10 @@ import React, {
 } from 'react';
 import {
   View,
-  Platform,
   StyleSheet,
   Image,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
   Alert,
 } from 'react-native';
 import {
@@ -32,7 +30,6 @@ import {
   createChecklist,
   updateChecklist,
 } from '../../services/firebase-service';
-import { topSpace } from '../../utils/layout';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import HiveText from '../../componets/hive-text';

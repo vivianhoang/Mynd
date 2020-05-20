@@ -1,6 +1,6 @@
 import React, { useState, } from 'react';
 import { HabitTemplateProps, ActionSheetOwnProps, ReduxState } from '../../models';
-import { View, StyleSheet, Image, Alert } from 'react-native';
+import { View, StyleSheet, Image, Alert, TextInput, TouchableOpacity } from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
 import NavButton from '../../componets/nav-button';
@@ -9,12 +9,13 @@ import { useSelector } from 'react-redux';
 import { deleteHabit, updateHabit, createHabit } from '../../services/firebase-service';
 import _ from 'lodash';
 import DoneButton from '../../componets/done-button';
+import HiveText from '../../componets/hive-text';
 
 export default (props: HabitTemplateProps) => {
   const existingHabit = props.route.params?.habit;
 
   const [habitTitle, setHabitTitle] = useState(existingHabit?.title || '');
-  const [counter, setCounter] = useState(existingHabit?.counter);
+  const [count, setCount] = useState(existingHabit?.count || 0);
   const [color, setColor] = useState(existingHabit?.color);
   const userId = useSelector<ReduxState, string>(state => state.userId);
 
@@ -26,7 +27,7 @@ export default (props: HabitTemplateProps) => {
             id: existingHabit.id,
             title: _.trim(habitTitle) || `Untitled`,
             color: color,
-            counter: counter,
+            count: count,
             timestamp: existingHabit.timestamp,
             userId,
           });
@@ -37,7 +38,7 @@ export default (props: HabitTemplateProps) => {
             await createHabit({
               title: newHabitTitle,
               color: color,
-              counter: counter,
+              count: count,
               userId,
             });
           } else {
@@ -92,7 +93,7 @@ export default (props: HabitTemplateProps) => {
   props.navigation.setOptions({
     headerTitle: () => (
       <Image
-        style={styles.titleIcon}
+        style={styles.templateIcon}
         source={require('../../assets/ideas-icon.png')} // UPDATE WITH REAL ICON
       />
     ),
@@ -119,6 +120,52 @@ export default (props: HabitTemplateProps) => {
     : null,
     headerStyle: { shadowColor: colors.lightGray },
   });
+  const renderHabitTitleSection = () => {
+
+    return (
+    <View style={styles.habitContainer}>
+      <HiveText style={styles.titleSection} variant={'semi-bold'}>{'Habit Name:'}</HiveText>
+      <TextInput
+          selectionColor={colors.salmonRed}
+          placeholderTextColor={colors.lightPurple}
+          style={styles.titleInput}
+          placeholder={'Untitled'}
+          value={habitTitle}
+          onChangeText={text => setHabitTitle(text)}
+        />
+      <TextInput></TextInput>
+    </View>)
+  }
+
+  const renderCountSection = () => {
+    return (
+
+    <View style={styles.countContainer}>
+      <HiveText style={styles.titleSection} variant={'semi-bold'}>{'Current Count:'}</HiveText>
+      <TextInput
+        selectionColor={colors.salmonRed}
+        placeholderTextColor={colors.lightPurple}
+        style={styles.countInput}
+        value={count.toString()}
+      />
+      <TouchableOpacity style={styles.iconContainer} onPress={() => {
+        setCount(0);
+      }}>
+        <Image
+          style={styles.clearIcon}
+          source={require('../../assets/clear-icon.png')}
+        ></Image>
+      </TouchableOpacity>
+    </View>
+    )
+  }
+
+  // const renderColorPaletteSection = () => {
+  //   <View style={styles.colorPaletteSection}>
+  //      <HiveText variant={'semi-bold'}>{'Select a Color:'}</HiveText>
+  //   </View>
+  // }
+
   return (
     <View style={styles.container}>
       <KeyboardAwareScrollView 
@@ -127,7 +174,9 @@ export default (props: HabitTemplateProps) => {
         keyboardShouldPersistTaps={'handled'}
         automaticallyAdjustContentInsets={false}
       >
-        <View></View>
+        {renderHabitTitleSection()}
+        {renderCountSection()}
+        {/* {renderColorPalette()} */}
       </KeyboardAwareScrollView>
       <DoneButton onPress={updateOrCreateHabit}/>
     </View>
@@ -140,8 +189,40 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     padding: 16,
   },
-  titleIcon: {
+  templateIcon: {
     height: 44,
     width: 44,
+  },
+  habitContainer: {
+    flex: 1
+  },
+  titleSection: {
+    color: colors.offBlack,
+    fontSize: 25,
+    fontFamily: 'PulpDisplay-Bold',
+  },
+  titleInput: {
+    fontFamily: 'PulpDisplay-Regular',
+    color: colors.offBlack,
+    marginVertical: 8,
+    fontSize: 20
+  },
+  countContainer: {
+    flex: 1,
+  },
+  countInput:{
+    flex: 1,
+    fontFamily: 'PulpDisplay-Medium',
+    fontSize: 20,
+    color: colors.offBlack,
+    paddingLeft: 4,
+  },
+  iconContainer: {
+    justifyContent: 'center',
+  },
+  clearIcon: {
+    height: 32,
+    width: 32,
+    tintColor: colors.lightPurple,
   },
 });

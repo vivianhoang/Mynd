@@ -14,7 +14,6 @@ import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
 import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
-import { TouchableOpacity } from 'react-native';
 import {
   deleteIdea,
   updateIdea,

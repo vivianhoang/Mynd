@@ -70,10 +70,10 @@ export const subscribeToHive = (
 export const createHabit = async (params: {
   title: string;
   color: string;
-  counter: number;
+  count: number;
   userId: string;
 }) => {
-  const { title, color, counter, userId } = params;
+  const { title, color, count, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const habitId = hiveRef.doc().id;
 
@@ -81,7 +81,7 @@ export const createHabit = async (params: {
     id: habitId,
     title: title,
     color: color,
-    counter: counter,
+    count: count,
     timestamp: new Date().getTime().toString(),
     type: 'Habit',
   };
@@ -97,18 +97,18 @@ export const updateHabit = async (params: {
   id: string;
   title: string;
   color: string;
-  counter: number;
+  count: number;
   timestamp: string;
   userId: string;
 }) => {
-  const { id, title, color, counter, timestamp, userId } = params;
+  const { id, title, color, count, timestamp, userId } = params;
   const habitRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
 
   const updatedHabit: Habit = {
     id,
     title,
     color,
-    counter,
+    count,
     timestamp,
     type: 'Habit',
   };

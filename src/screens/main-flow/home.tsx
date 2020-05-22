@@ -30,7 +30,7 @@ const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
   Checklist: require('../../assets/checklist-icon.png'),
   Goal: require('../../assets/goals-icon.png'),
-  Habit: require('../../assets/goals-icon.png'), // UPDATE WITH REAL ICON
+  Habit: require('../../assets/habit-icon.png'),
 };
 
 export default () => {

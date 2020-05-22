@@ -94,7 +94,7 @@ export default (props: HabitTemplateProps) => {
     headerTitle: () => (
       <Image
         style={styles.templateIcon}
-        source={require('../../assets/ideas-icon.png')} // UPDATE WITH REAL ICON
+        source={require('../../assets/habit-icon.png')}
       />
     ),
     headerLeft: () => (
@@ -124,7 +124,6 @@ export default (props: HabitTemplateProps) => {
 
     return (
     <View style={styles.habitContainer}>
-      <HiveText style={styles.titleSection} variant={'semi-bold'}>{'Habit Name:'}</HiveText>
       <TextInput
           selectionColor={colors.salmonRed}
           placeholderTextColor={colors.lightPurple}
@@ -133,29 +132,45 @@ export default (props: HabitTemplateProps) => {
           value={habitTitle}
           onChangeText={text => setHabitTitle(text)}
         />
-      <TextInput></TextInput>
     </View>)
   }
 
   const renderCountSection = () => {
     return (
 
-    <View style={styles.countContainer}>
-      <HiveText style={styles.titleSection} variant={'semi-bold'}>{'Current Count:'}</HiveText>
-      <TextInput
-        selectionColor={colors.salmonRed}
-        placeholderTextColor={colors.lightPurple}
-        style={styles.countInput}
-        value={count.toString()}
-      />
-      <TouchableOpacity style={styles.iconContainer} onPress={() => {
-        setCount(0);
-      }}>
-        <Image
-          style={styles.clearIcon}
-          source={require('../../assets/clear-icon.png')}
-        ></Image>
-      </TouchableOpacity>
+    <View style={styles.countSectionContainer}>
+      <HiveText style={styles.countDescriptionLabel} variant={'bold'}>{'NUMBER OF TIMES COMPLETED'}</HiveText>
+      <View style={styles.countBar}>
+        <View style={styles.countButtonContainer}>
+          <TouchableOpacity style={styles.buttonIconContainer} onPress={() => {
+            if (count) {
+              setCount(count - 1);
+            }
+          }}>
+            <Image
+              style={styles.buttonIcon}
+              resizeMode={'contain'}
+              source={require('../../assets/minus-icon.png')}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.countLabelContainer}>
+          <HiveText variant={'bold'} style={styles.countLabel}>
+            {count.toString()}
+            </HiveText>
+          </View>
+        <View style={styles.countButtonContainer}>
+          <TouchableOpacity style={styles.buttonIconContainer} onPress={() => {
+            setCount(count + 1);
+          }}>
+            <Image
+              style={styles.buttonIcon}
+              resizeMode={'contain'}
+              source={require('../../assets/add-icon.png')}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
     )
   }
@@ -167,7 +182,7 @@ export default (props: HabitTemplateProps) => {
   // }
 
   return (
-    <View style={styles.container}>
+    <View style={{flex: 1}}>
       <KeyboardAwareScrollView 
         style={styles.container}
         contentContainerStyle={{paddingBottom: 130}}
@@ -193,36 +208,60 @@ const styles = StyleSheet.create({
     height: 44,
     width: 44,
   },
-  habitContainer: {
+  habitContainer: { 
     flex: 1
   },
-  titleSection: {
-    color: colors.offBlack,
-    fontSize: 25,
-    fontFamily: 'PulpDisplay-Bold',
-  },
   titleInput: {
-    fontFamily: 'PulpDisplay-Regular',
+    fontFamily: 'PulpDisplay-Bold',
     color: colors.offBlack,
     marginVertical: 8,
-    fontSize: 20
+    fontSize: 30
   },
-  countContainer: {
-    flex: 1,
+  countSectionContainer: {
+    paddingVertical: 24,
   },
-  countInput:{
-    flex: 1,
-    fontFamily: 'PulpDisplay-Medium',
-    fontSize: 20,
+  countDescriptionLabel: {
     color: colors.offBlack,
-    paddingLeft: 4,
+    fontSize: 16,
+    fontFamily: 'PulpDisplay-Bold',
   },
-  iconContainer: {
+  countBar: {
+    flexDirection: 'row',
+    height: 50,
+    width: 220,
+    backgroundColor: 'rgba(203, 192, 211, 0.2)', // light purple w/ opacity
+    borderRadius: 999,
+    alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 16
   },
-  clearIcon: {
+  countButtonContainer: {
+    height: 40,
+    width: 40,
+    borderRadius: 999,
+    backgroundColor: colors.skyBlue,
+    margin: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonIconContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 35,
+    width: 35,
+  },
+  buttonIcon: {
     height: 32,
     width: 32,
-    tintColor: colors.lightPurple,
+    color: colors.white
   },
+  countLabelContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  countLabel: {
+    fontSize: 30,
+  }
 });

@@ -33,9 +33,7 @@ export default (props: HabitTemplateProps) => {
   // month starts at index 0
   const today = `${moment()
     .year()
-    .toString()}-${moment().month().toString()}-${(
-    moment().date() + 1
-  ).toString()}`;
+    .toString()}-${moment().month().toString()}-${moment().date().toString()}`;
 
   const [habitTitle, setHabitTitle] = useState(existingHabit?.title || '');
   const [count, setCount] = useState(existingHabit?.count || 0);
@@ -199,11 +197,11 @@ export default (props: HabitTemplateProps) => {
       else if (distanceInDays == 1) {
         console.log('increment once');
         setCurrentStreak(currentStreak + 1);
+      }
 
-        if (currentStreak > bestStreak) {
-          console.log('best');
-          setBestStreak(currentStreak);
-        }
+      if (currentStreak > bestStreak) {
+        console.log('best');
+        setBestStreak(currentStreak);
       }
 
       setLatestTimestamp(today);

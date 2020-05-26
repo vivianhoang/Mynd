@@ -21,6 +21,7 @@
     "@react-navigation/native": "5.0.5",
     "@react-navigation/stack": "5.0.5",
     "lodash": "^4.17.15",
+    "moment": "^2.26.0",
     "patch-package": "^6.2.0",
     "react": "16.9.0",
     "react-native": "0.61.5",
@@ -53,7 +54,8 @@
     "eslint": "^6.5.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
-    "react-test-renderer": "16.9.0"
+    "react-test-renderer": "16.9.0",
+    "prettier": "prettier/prettier#master"
   },
   "jest": {
     "preset": "react-native"

@@ -56,7 +56,11 @@ export interface Habit {
   title: string;
   timestamp: string;
   count: number;
-  color: string;
+  streak: {
+    currentStreak: number;
+    bestStreak: number;
+    latestTimestamp: string;
+  };
   type: 'Habit';
 }
 

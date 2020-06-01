@@ -12,6 +12,7 @@ import {
   Habit,
 } from '../models';
 import * as _ from 'lodash';
+import moment from 'moment';
 
 let subscriptionById = {};
 
@@ -23,7 +24,7 @@ export const subscribeToHive = (
   const subscription = FirebaseFirestore()
     .collection(path)
     .onSnapshot(
-      snapshot => {
+      (snapshot) => {
         console.log(snapshot);
         if (!snapshot.empty) {
           const jsonHiveData = _.reduce(
@@ -33,7 +34,7 @@ export const subscribeToHive = (
               const existingData = finalHiveData[templateData.type] || [];
               finalHiveData[templateData.type] = _.orderBy(
                 [...existingData, templateData],
-                data => {
+                (data) => {
                   return data.timestamp;
                 },
                 ['asc'],
@@ -52,14 +53,13 @@ export const subscribeToHive = (
           ).sort((a, b) => {
             return a.title > b.title ? 1 : -1;
           });
-          // console.log(hiveData);
           onTrigger(hiveData);
         } else {
           console.log('EMPTY');
           onTrigger([]);
         }
       },
-      error => {
+      (error) => {
         console.log('ERROR!', error);
       },
     );
@@ -69,20 +69,30 @@ export const subscribeToHive = (
 
 export const createHabit = async (params: {
   title: string;
-  color: string;
   count: number;
   userId: string;
 }) => {
-  const { title, color, count, userId } = params;
+  const { title, count, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const habitId = hiveRef.doc().id;
+
+  // month starts at index 0
+  const today = `${moment()
+    .year()
+    .toString()}-${moment().month().toString()}-${moment().date().toString()}`;
 
   const newHabit: Habit = {
     id: habitId,
     title: title,
-    color: color,
     count: count,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
+    streak: {
+      currentStreak: 0,
+      bestStreak: 0,
+      latestTimestamp: today,
+    },
     type: 'Habit',
   };
 
@@ -96,20 +106,29 @@ export const createHabit = async (params: {
 export const updateHabit = async (params: {
   id: string;
   title: string;
-  color: string;
   count: number;
   timestamp: string;
+  streak: {
+    currentStreak: number;
+    bestStreak: number;
+    latestTimestamp: string;
+  };
   userId: string;
 }) => {
-  const { id, title, color, count, timestamp, userId } = params;
+  const { id, title, count, timestamp, streak, userId } = params;
+  const { currentStreak, bestStreak, latestTimestamp } = streak;
   const habitRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
 
   const updatedHabit: Habit = {
     id,
     title,
-    color,
     count,
     timestamp,
+    streak: {
+      currentStreak,
+      bestStreak,
+      latestTimestamp,
+    },
     type: 'Habit',
   };
 
@@ -144,7 +163,9 @@ export const createIdea = async (params: {
     id: ideaId,
     title: title,
     description: description,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
     type: 'Idea',
   };
 
@@ -204,7 +225,9 @@ export const createChecklist = async (params: {
     id: checklistId,
     title: title,
     items,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
     type: 'Checklist',
   };
 
@@ -271,7 +294,9 @@ export const createGoal = async (params: {
     description,
     tasks,
     completed,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
     type: 'Goal',
   };
 

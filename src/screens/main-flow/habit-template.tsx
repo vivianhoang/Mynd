@@ -1,58 +1,123 @@
-import React, { useState, } from 'react';
-import { HabitTemplateProps, ActionSheetOwnProps, ReduxState } from '../../models';
-import { View, StyleSheet, Image, Alert, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  HabitTemplateProps,
+  ActionSheetOwnProps,
+  ReduxState,
+} from '../../models';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Alert,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
 import colors from '../../utils/colors';
 import NavButton from '../../componets/nav-button';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import { useSelector } from 'react-redux';
-import { deleteHabit, updateHabit, createHabit } from '../../services/firebase-service';
+import {
+  deleteHabit,
+  updateHabit,
+  createHabit,
+} from '../../services/firebase-service';
 import _ from 'lodash';
 import DoneButton from '../../componets/done-button';
 import HiveText from '../../componets/hive-text';
+import moment from 'moment';
 
 export default (props: HabitTemplateProps) => {
   const existingHabit = props.route.params?.habit;
 
+  // month starts at index 0
+  const today = `${moment()
+    .year()
+    .toString()}-${moment().month().toString()}-${moment().date().toString()}`;
+
   const [habitTitle, setHabitTitle] = useState(existingHabit?.title || '');
   const [count, setCount] = useState(existingHabit?.count || 0);
-  const [color, setColor] = useState(existingHabit?.color);
-  const userId = useSelector<ReduxState, string>(state => state.userId);
+  const [latestTimestamp, setLatestTimestamp] = useState(
+    existingHabit?.streak.latestTimestamp || today,
+  );
+  const userId = useSelector<ReduxState, string>((state) => state.userId);
+  const savedTime = moment(latestTimestamp, 'YYYY-MM-DD');
+  const [bestStreak, setBestStreak] = useState(
+    existingHabit?.streak.bestStreak || 0,
+  );
+
+  const convertedToday = moment(today, 'YYYY-MM-DD');
+  const distanceInDays = moment
+    .duration(convertedToday.diff(savedTime))
+    .asDays();
+
+  let defaultStreak = existingHabit?.streak.currentStreak;
+
+  console.log('today', convertedToday);
+  console.log('difference in ms:', convertedToday.diff(savedTime));
+  console.log('difference in days: ' + distanceInDays);
+
+  // set streak to zero if more than one day has passed
+  if (distanceInDays > 1) {
+    console.log('clear streak');
+    defaultStreak = 0;
+  }
+
+  const [currentStreak, setCurrentStreak] = useState(defaultStreak || 0);
+
+  const updateStreak = () => {
+    // if one day has passed, increment streak
+    if (distanceInDays == 1) {
+      console.log('increment once');
+      setCurrentStreak(currentStreak + 1);
+    }
+
+    if (currentStreak > bestStreak) {
+      console.log('best');
+      setBestStreak(currentStreak);
+    }
+
+    setLatestTimestamp(today);
+  };
 
   const updateOrCreateHabit = async () => {
-      sharedNavigationService.navigate({ page: 'Loader' });
-      try {
-        if (existingHabit) {
-          await updateHabit({
-            id: existingHabit.id,
-            title: _.trim(habitTitle) || `Untitled`,
-            color: color,
+    try {
+      if (existingHabit) {
+        sharedNavigationService.navigate({ page: 'Loader' });
+        await updateHabit({
+          id: existingHabit.id,
+          title: _.trim(habitTitle) || `Untitled`,
+          count: count,
+          timestamp: existingHabit.timestamp,
+          streak: {
+            currentStreak: currentStreak,
+            bestStreak: bestStreak,
+            latestTimestamp: latestTimestamp,
+          },
+          userId,
+        });
+        sharedNavigationService.navigate({ page: 'HomeReset' });
+      } else {
+        const newHabitTitle = _.trim(habitTitle);
+
+        if (newHabitTitle) {
+          sharedNavigationService.navigate({ page: 'Loader' });
+          await createHabit({
+            title: newHabitTitle,
             count: count,
-            timestamp: existingHabit.timestamp,
             userId,
           });
+          sharedNavigationService.navigate({ page: 'HomeReset' });
         } else {
-          const newHabitTitle = _.trim(habitTitle)
-
-          if (_.trim(habitTitle)) {
-            await createHabit({
-              title: newHabitTitle,
-              color: color,
-              count: count,
-              userId,
-            });
-          } else {
-            Alert.alert('You must give your habit a title before creating it!')
-          }
-  
+          Alert.alert('You must give your habit a title before creating it!');
         }
-        sharedNavigationService.navigate({ page: 'HomeReset' });
-      } catch (error) {
-        // Same as dismissing loader
+      }
+    } catch (error) {
+      // Same as dismissing loader
       sharedNavigationService.goBack();
-        Alert.alert('Uh oh!', `Couldn't save habit. ${error.message}`);
-    };
-  }
+      Alert.alert('Uh oh!', `Couldn't save habit. ${error.message}`);
+    }
+  };
 
   const triggerDeleteHabit = () => {
     Alert.alert(
@@ -75,20 +140,23 @@ export default (props: HabitTemplateProps) => {
                   habit: existingHabit || null,
                 },
               });
-              Alert.alert(
-                'Uh oh!',
-                `Couldn't delete habit. ${error.message}`,
-              );
+              Alert.alert('Uh oh!', `Couldn't delete habit. ${error.message}`);
             }
           },
         },
       ],
     );
-  }
+  };
 
   const subMenuOptions: ActionSheetOwnProps = {
-    options: [{onPress: triggerDeleteHabit, buttonType: 'third', title: 'Delete Habit'}]
-  }
+    options: [
+      {
+        onPress: triggerDeleteHabit,
+        buttonType: 'third',
+        title: 'Delete Habit',
+      },
+    ],
+  };
 
   props.navigation.setOptions({
     headerTitle: () => (
@@ -100,6 +168,7 @@ export default (props: HabitTemplateProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => {
+          updateOrCreateHabit();
           sharedNavigationService.navigate({
             page: 'HomeReset',
           });
@@ -108,72 +177,115 @@ export default (props: HabitTemplateProps) => {
         position={'left'}
       />
     ),
-    headerRight: () => existingHabit ?
-      <NavButton 
-      onPress={() => sharedNavigationService.navigate({
-        page: 'ActionSheet',
-        props: subMenuOptions
-      })}
-      position={'right'}
-      icon={'subMenu'}
-      />
-    : null,
+    headerRight: () =>
+      existingHabit ? (
+        <NavButton
+          onPress={() =>
+            sharedNavigationService.navigate({
+              page: 'ActionSheet',
+              props: subMenuOptions,
+            })
+          }
+          position={'right'}
+          icon={'subMenu'}
+        />
+      ) : null,
     headerStyle: { shadowColor: colors.lightGray },
   });
-  const renderHabitTitleSection = () => {
 
+  const renderHabitTitleSection = () => {
     return (
-    <View style={styles.habitContainer}>
-      <TextInput
+      <View style={styles.habitContainer}>
+        <TextInput
           selectionColor={colors.salmonRed}
           placeholderTextColor={colors.lightPurple}
           style={styles.titleInput}
           placeholder={'Untitled'}
           value={habitTitle}
-          onChangeText={text => setHabitTitle(text)}
+          onChangeText={(text) => setHabitTitle(text)}
         />
-    </View>)
-  }
+      </View>
+    );
+  };
 
   const renderCountSection = () => {
     return (
-
-    <View style={styles.countSectionContainer}>
-      <HiveText style={styles.countDescriptionLabel} variant={'bold'}>{'NUMBER OF TIMES COMPLETED'}</HiveText>
-      <View style={styles.countBar}>
-        <View style={styles.countButtonContainer}>
-          <TouchableOpacity style={styles.buttonIconContainer} onPress={() => {
-            if (count) {
-              setCount(count - 1);
-            }
-          }}>
-            <Image
-              style={styles.buttonIcon}
-              resizeMode={'contain'}
-              source={require('../../assets/minus-icon.png')}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.countLabelContainer}>
-          <HiveText variant={'bold'} style={styles.countLabel}>
-            {count.toString()}
+      <View style={styles.countSection}>
+        <HiveText style={styles.countDescriptionLabel} variant={'bold'}>
+          {'NUMBER OF TIMES COMPLETED'}
+        </HiveText>
+        <View style={styles.countBar}>
+          <View style={styles.countButtonContainer}>
+            <TouchableOpacity
+              style={styles.buttonIconContainer}
+              onPress={() => {
+                if (count) {
+                  setCount(count - 1);
+                  updateStreak();
+                }
+              }}
+            >
+              <Image
+                style={styles.buttonIcon}
+                resizeMode={'contain'}
+                source={require('../../assets/minus-icon.png')}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.countLabelContainer}>
+            <HiveText variant={'bold'} style={styles.countLabel}>
+              {count.toString()}
             </HiveText>
           </View>
-        <View style={styles.countButtonContainer}>
-          <TouchableOpacity style={styles.buttonIconContainer} onPress={() => {
-            setCount(count + 1);
-          }}>
-            <Image
-              style={styles.buttonIcon}
-              resizeMode={'contain'}
-              source={require('../../assets/add-icon.png')}
-            />
-          </TouchableOpacity>
+          <View style={styles.countButtonContainer}>
+            <TouchableOpacity
+              style={styles.buttonIconContainer}
+              onPress={() => {
+                setCount(count + 1);
+                updateStreak();
+              }}
+            >
+              <Image
+                style={styles.buttonIcon}
+                resizeMode={'contain'}
+                source={require('../../assets/add-icon.png')}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
-    )
-  }
+    );
+  };
+
+  const renderStreakSection = () => {
+    return (
+      <View style={styles.streakSection}>
+        <View style={styles.currentStreakSection}>
+          <HiveText
+            style={styles.currentStreakDescriptionLabel}
+            variant={'bold'}
+          >
+            {'CURRENT STREAK'}
+          </HiveText>
+          <View style={styles.currentStreakLabel}>
+            <HiveText variant={'bold'} style={styles.currentStreakValue}>
+              {currentStreak.toString()}
+            </HiveText>
+          </View>
+        </View>
+        <View style={styles.bestStreakSection}>
+          <HiveText style={styles.bestStreakDescriptionLabel} variant={'bold'}>
+            {'BEST STREAK'}
+          </HiveText>
+          <View style={styles.bestStreakLabel}>
+            <HiveText variant={'bold'} style={styles.bestStreakLabelValue}>
+              {bestStreak.toString()}
+            </HiveText>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   // const renderColorPaletteSection = () => {
   //   <View style={styles.colorPaletteSection}>
@@ -182,18 +294,19 @@ export default (props: HabitTemplateProps) => {
   // }
 
   return (
-    <View style={{flex: 1}}>
-      <KeyboardAwareScrollView 
+    <View style={{ flex: 1 }}>
+      <KeyboardAwareScrollView
         style={styles.container}
-        contentContainerStyle={{paddingBottom: 130}}
+        contentContainerStyle={{ paddingBottom: 130 }}
         keyboardShouldPersistTaps={'handled'}
         automaticallyAdjustContentInsets={false}
       >
         {renderHabitTitleSection()}
         {renderCountSection()}
+        {renderStreakSection()}
         {/* {renderColorPalette()} */}
       </KeyboardAwareScrollView>
-      <DoneButton onPress={updateOrCreateHabit}/>
+      <DoneButton onPress={updateOrCreateHabit} />
     </View>
   );
 };
@@ -208,16 +321,16 @@ const styles = StyleSheet.create({
     height: 44,
     width: 44,
   },
-  habitContainer: { 
-    flex: 1
+  habitContainer: {
+    flex: 1,
   },
   titleInput: {
     fontFamily: 'PulpDisplay-Bold',
     color: colors.offBlack,
     marginVertical: 8,
-    fontSize: 30
+    fontSize: 30,
   },
-  countSectionContainer: {
+  countSection: {
     paddingVertical: 24,
   },
   countDescriptionLabel: {
@@ -233,7 +346,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 16
+    marginTop: 16,
   },
   countButtonContainer: {
     height: 40,
@@ -254,14 +367,49 @@ const styles = StyleSheet.create({
   buttonIcon: {
     height: 32,
     width: 32,
-    color: colors.white
+    tintColor: colors.white,
   },
   countLabelContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   countLabel: {
     fontSize: 30,
-  }
+  },
+  streakSection: {
+    flex: 1,
+  },
+  currentStreakSection: {
+    marginBottom: 24,
+  },
+  currentStreakDescriptionLabel: {
+    color: colors.offBlack,
+    fontSize: 16,
+    fontFamily: 'PulpDisplay-Bold',
+    marginBottom: 4,
+  },
+  currentStreakLabel: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  currentStreakValue: {
+    fontSize: 30,
+  },
+  bestStreakSection: {
+    flex: 1,
+  },
+  bestStreakDescriptionLabel: {
+    color: colors.offBlack,
+    fontSize: 16,
+    fontFamily: 'PulpDisplay-Bold',
+    marginBottom: 4,
+  },
+  bestStreakLabel: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  bestStreakLabelValue: {
+    fontSize: 30,
+  },
 });

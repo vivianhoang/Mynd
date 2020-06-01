@@ -57,7 +57,7 @@ const CheckListRow = (props: {
         defaultValue={title}
         onChangeText={props.onChangeText}
         enableNewLine={false}
-        onSubmitEditing={e => {
+        onSubmitEditing={(e) => {
           props.onSubmitEditing(e.nativeEvent.text);
         }}
         selectionColor={colors.salmonRed}
@@ -65,7 +65,7 @@ const CheckListRow = (props: {
         multiline={true}
         scrollEnabled={false}
         blurOnSubmit={false}
-        onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
+        onEndEditing={(e) => props.onEndEditing(e.nativeEvent.text)}
       />
       <TouchableOpacity style={styles.checkBox} onPress={props.onToggle}>
         <View
@@ -83,13 +83,18 @@ const CheckListRow = (props: {
 
 export default (props: ChecklistTemplateProps) => {
   const existingChecklist = props.route.params?.checklist;
-  // const dispatch = useDispatch<DispatchAction>();
 
   const [checklistTitle, setChecklistTitle] = useState(
     existingChecklist?.title || '',
   );
   const dummyChecklistItems: ChecklistItem[] = [
-    { title: '', checked: false, timestamp: new Date().getTime().toString() },
+    {
+      title: '',
+      checked: false,
+      timestamp: new Date()
+        .getTime()
+        .toString(),
+    },
     {
       title: '',
       checked: false,
@@ -99,7 +104,7 @@ export default (props: ChecklistTemplateProps) => {
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
     existingChecklist?.items.concat(dummyChecklistItems) || dummyChecklistItems,
   );
-  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
   let inputRefList = useRef(checklistItems.map(() => createRef<TextInput>()));
   let swipeableRefList = useRef(
@@ -110,7 +115,7 @@ export default (props: ChecklistTemplateProps) => {
 
   let savedIndex: number = undefined;
 
-  const userId = useSelector<ReduxState, string>(state => state.userId);
+  const userId = useSelector<ReduxState, string>((state) => state.userId);
 
   useEffect(() => {
     inputRefList.current = checklistItems.map(() => createRef<TextInput>());
@@ -148,7 +153,7 @@ export default (props: ChecklistTemplateProps) => {
     }
 
     // Remove all empty items on save
-    newItems = _.filter(newItems, item => !!item.title);
+    newItems = _.filter(newItems, (item) => !!item.title);
 
     return { newTitle, newItems };
   };
@@ -221,20 +226,23 @@ export default (props: ChecklistTemplateProps) => {
                   checklist: existingChecklist || null,
                 },
               });
-              Alert.alert(
-                'Uh oh!',
-                `Couldn't delete list. ${error.message}`,
-              );
+              Alert.alert('Uh oh!', `Couldn't delete list. ${error.message}`);
             }
           },
         },
       ],
     );
-  }
+  };
 
   const subMenuOptions: ActionSheetOwnProps = {
-    options: [{onPress: triggerDeleteChecklist, buttonType: 'third', title: 'Delete Checklist'}]
-  }
+    options: [
+      {
+        onPress: triggerDeleteChecklist,
+        buttonType: 'third',
+        title: 'Delete Checklist',
+      },
+    ],
+  };
 
   props.navigation.setOptions({
     headerTitle: () => (
@@ -276,15 +284,17 @@ export default (props: ChecklistTemplateProps) => {
     ),
     headerRight: existingChecklist
       ? () => (
-        <NavButton
-          onPress={() => sharedNavigationService.navigate({
-            page: 'ActionSheet',
-            props: subMenuOptions,
-          })}
-          icon={'subMenu'}
-          position={'right'}
-        />
-      )
+          <NavButton
+            onPress={() =>
+              sharedNavigationService.navigate({
+                page: 'ActionSheet',
+                props: subMenuOptions,
+              })
+            }
+            icon={'subMenu'}
+            position={'right'}
+          />
+        )
       : null,
     headerStyle: { shadowColor: colors.lightGray },
   });
@@ -317,7 +327,7 @@ export default (props: ChecklistTemplateProps) => {
             style={styles.titleInput}
             placeholder={'Untitled'}
             value={checklistTitle}
-            onChangeText={text => setChecklistTitle(text)}
+            onChangeText={(text) => setChecklistTitle(text)}
             ref={newTitleInputRef}
             blurOnSubmit={true}
             onSubmitEditing={() => {
@@ -335,7 +345,7 @@ export default (props: ChecklistTemplateProps) => {
             return (
               <TapGestureHandler
                 key={key}
-                onHandlerStateChange={event => {
+                onHandlerStateChange={(event) => {
                   switch (event.nativeEvent.state) {
                     case State.BEGAN:
                       // Close all
@@ -373,7 +383,7 @@ export default (props: ChecklistTemplateProps) => {
                       inputRef={ref}
                       item={item}
                       isLastRow={checklistItems.length - 1 == index}
-                      onSubmitEditing={latestText => {
+                      onSubmitEditing={(latestText) => {
                         const nextInputRef = inputRefList?.current[index + 1];
                         if (nextInputRef && nextInputRef.current) {
                           if (
@@ -391,7 +401,7 @@ export default (props: ChecklistTemplateProps) => {
                         newItems[index] = { ...item, checked: !item.checked };
                         setChecklistItems(newItems);
                       }}
-                      onEndEditing={text => {
+                      onEndEditing={(text) => {
                         // When clicking out
                         let newItems = [...checklistItems];
                         if (isNewInput) {
@@ -402,7 +412,9 @@ export default (props: ChecklistTemplateProps) => {
                             newItems.push({
                               title: '',
                               checked: false,
-                              timestamp: new Date().getTime().toString(),
+                              timestamp: new Date()
+                                .getTime()
+                                .toString(),
                             });
                             setChecklistItems(newItems);
                           }

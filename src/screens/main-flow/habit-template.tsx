@@ -37,17 +37,48 @@ export default (props: HabitTemplateProps) => {
 
   const [habitTitle, setHabitTitle] = useState(existingHabit?.title || '');
   const [count, setCount] = useState(existingHabit?.count || 0);
-  const [currentStreak, setCurrentStreak] = useState(
-    existingHabit?.streak.currentStreak || 0,
-  );
-  const [bestStreak, setBestStreak] = useState(
-    existingHabit?.streak.bestStreak || 0,
-  );
   const [latestTimestamp, setLatestTimestamp] = useState(
     existingHabit?.streak.latestTimestamp || today,
   );
   const userId = useSelector<ReduxState, string>((state) => state.userId);
   const savedTime = moment(latestTimestamp, 'YYYY-MM-DD');
+  const [bestStreak, setBestStreak] = useState(
+    existingHabit?.streak.bestStreak || 0,
+  );
+
+  const convertedToday = moment(today, 'YYYY-MM-DD');
+  const distanceInDays = moment
+    .duration(convertedToday.diff(savedTime))
+    .asDays();
+
+  let defaultStreak = existingHabit?.streak.currentStreak;
+
+  console.log('today', convertedToday);
+  console.log('difference in ms:', convertedToday.diff(savedTime));
+  console.log('difference in days: ' + distanceInDays);
+
+  // set streak to zero if more than one day has passed
+  if (distanceInDays > 1) {
+    console.log('clear streak');
+    defaultStreak = 0;
+  }
+
+  const [currentStreak, setCurrentStreak] = useState(defaultStreak || 0);
+
+  const updateStreak = () => {
+    // if one day has passed, increment streak
+    if (distanceInDays == 1) {
+      console.log('increment once');
+      setCurrentStreak(currentStreak + 1);
+    }
+
+    if (currentStreak > bestStreak) {
+      console.log('best');
+      setBestStreak(currentStreak);
+    }
+
+    setLatestTimestamp(today);
+  };
 
   const updateOrCreateHabit = async () => {
     try {
@@ -137,6 +168,7 @@ export default (props: HabitTemplateProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => {
+          updateOrCreateHabit();
           sharedNavigationService.navigate({
             page: 'HomeReset',
           });
@@ -177,36 +209,6 @@ export default (props: HabitTemplateProps) => {
   };
 
   const renderCountSection = () => {
-    const updateStreak = () => {
-      const convertedToday = moment(today, 'YYYY-MM-DD');
-      const distanceInDays = moment
-        .duration(convertedToday.diff(savedTime))
-        .asDays();
-
-      console.log('today', convertedToday);
-      console.log('difference in ms:', convertedToday.diff(savedTime));
-      console.log('difference in days: ' + distanceInDays);
-
-      // set streak to zero if more than one day has passed
-      if (distanceInDays > 1) {
-        console.log('clear streak');
-        setCurrentStreak(0);
-      }
-
-      // if one day has passed, increment streak
-      else if (distanceInDays == 1) {
-        console.log('increment once');
-        setCurrentStreak(currentStreak + 1);
-      }
-
-      if (currentStreak > bestStreak) {
-        console.log('best');
-        setBestStreak(currentStreak);
-      }
-
-      setLatestTimestamp(today);
-    };
-
     return (
       <View style={styles.countSection}>
         <HiveText style={styles.countDescriptionLabel} variant={'bold'}>

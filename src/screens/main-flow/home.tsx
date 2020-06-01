@@ -133,7 +133,6 @@ export default () => {
   // useEffect(() => {
   //   sharedGeoNotificationService.initialize();
   // }, []);
-  console.log('final:', finalHiveData);
   const resultsView =
     hiveData.length && !finalHiveData.length ? (
       <HiveText style={styles.noResultsLabel}>{'No results.'}</HiveText>
@@ -178,7 +177,7 @@ export default () => {
               keyExtractor={(item) => {
                 return item.id;
               }}
-              style={{ paddingHorizontal: 16, paddingVertical: 16, flex: 1 }}
+              style={{ paddingHorizontal: 16, paddingVertical: 16 }}
               renderItem={({
                 item,
                 index,

@@ -57,12 +57,12 @@ export default () => {
           return (
             _.includes(
               templateData.title.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             ) ||
             !!templateData.items.filter((item) => {
               return _.includes(
                 item.title.toLowerCase(),
-                searchText.toLowerCase(),
+                searchText.toLowerCase()
               );
             }).length
           );
@@ -70,28 +70,28 @@ export default () => {
           return (
             _.includes(
               templateData.title.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             ) ||
             _.includes(
               templateData.description.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             )
           );
         } else if (templateData.type == 'Goal') {
           return (
             _.includes(
               templateData.title.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             ) ||
             _.includes(
               templateData.description.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             )
           );
         } else if (templateData.type == 'Habit') {
           return _.includes(
             templateData.title.toLowerCase(),
-            searchText.toLowerCase(),
+            searchText.toLowerCase()
           );
         }
       });
@@ -334,11 +334,12 @@ export default () => {
 
                     const savedTime = moment(
                       item.streak.latestTimestamp,
-                      'YYYY-MM-DD',
+                      'YYYY-MM-DD'
                     );
                     let currentStreak = item.streak.currentStreak;
                     let bestStreak = item.streak.bestStreak;
                     let latestTimestamp = item.streak.latestTimestamp;
+                    let updatedStreak;
 
                     const updateStreak = () => {
                       const convertedToday = moment(today, 'YYYY-MM-DD');
@@ -348,18 +349,17 @@ export default () => {
 
                       // more than a day has passed
                       if (distanceInDays > 1) {
-                        currentStreak = 0;
+                        updatedStreak = 0;
                       }
 
                       // if one day has passed, increment streak
                       else if (distanceInDays == 1) {
-                        currentStreak += 1;
-                      }
+                        updatedStreak = currentStreak + 1;
 
-                      if (currentStreak > bestStreak) {
-                        bestStreak = currentStreak;
+                        if (updatedStreak > bestStreak) {
+                          bestStreak = updatedStreak;
+                        }
                       }
-
                       latestTimestamp = today;
                     };
 
@@ -372,7 +372,7 @@ export default () => {
                           count: item.count + 1,
                           timestamp: item.timestamp,
                           streak: {
-                            currentStreak: currentStreak,
+                            currentStreak: updatedStreak,
                             bestStreak: bestStreak,
                             latestTimestamp: latestTimestamp,
                           },
@@ -381,7 +381,7 @@ export default () => {
                       } catch (error) {
                         Alert.alert(
                           'Uh oh!',
-                          `Couldn't increment habit. ${error.message}`,
+                          `Couldn't increment habit. ${error.message}`
                         );
                       }
                     };

@@ -35,15 +35,15 @@ export default (props: HabitTemplateProps) => {
     .year()
     .toString()}-${moment().month().toString()}-${moment().date().toString()}`;
 
-  const [habitTitle, setHabitTitle] = useState(existingHabit?.title || '');
+  const [title, setTitle] = useState(existingHabit?.title || '');
   const [count, setCount] = useState(existingHabit?.count || 0);
   const [latestTimestamp, setLatestTimestamp] = useState(
-    existingHabit?.streak.latestTimestamp || today,
+    existingHabit?.streak.latestTimestamp || today
   );
   const userId = useSelector<ReduxState, string>((state) => state.userId);
   const savedTime = moment(latestTimestamp, 'YYYY-MM-DD');
   const [bestStreak, setBestStreak] = useState(
-    existingHabit?.streak.bestStreak || 0,
+    existingHabit?.streak.bestStreak || 0
   );
 
   const convertedToday = moment(today, 'YYYY-MM-DD');
@@ -53,13 +53,8 @@ export default (props: HabitTemplateProps) => {
 
   let defaultStreak = existingHabit?.streak.currentStreak;
 
-  console.log('today', convertedToday);
-  console.log('difference in ms:', convertedToday.diff(savedTime));
-  console.log('difference in days: ' + distanceInDays);
-
   // set streak to zero if more than one day has passed
   if (distanceInDays > 1) {
-    console.log('clear streak');
     defaultStreak = 0;
   }
 
@@ -68,13 +63,12 @@ export default (props: HabitTemplateProps) => {
   const updateStreak = () => {
     // if one day has passed, increment streak
     if (distanceInDays == 1) {
-      console.log('increment once');
-      setCurrentStreak(currentStreak + 1);
-    }
+      const updatedStreak = currentStreak + 1;
+      setCurrentStreak(updatedStreak);
 
-    if (currentStreak > bestStreak) {
-      console.log('best');
-      setBestStreak(currentStreak);
+      if (updatedStreak > bestStreak) {
+        setBestStreak(updatedStreak);
+      }
     }
 
     setLatestTimestamp(today);
@@ -86,7 +80,7 @@ export default (props: HabitTemplateProps) => {
         sharedNavigationService.navigate({ page: 'Loader' });
         await updateHabit({
           id: existingHabit.id,
-          title: _.trim(habitTitle) || `Untitled`,
+          title: _.trim(title) || `Untitled`,
           count: count,
           timestamp: existingHabit.timestamp,
           streak: {
@@ -98,7 +92,7 @@ export default (props: HabitTemplateProps) => {
         });
         sharedNavigationService.navigate({ page: 'HomeReset' });
       } else {
-        const newHabitTitle = _.trim(habitTitle);
+        const newHabitTitle = _.trim(title);
 
         if (newHabitTitle) {
           sharedNavigationService.navigate({ page: 'Loader' });
@@ -144,7 +138,7 @@ export default (props: HabitTemplateProps) => {
             }
           },
         },
-      ],
+      ]
     );
   };
 
@@ -168,10 +162,37 @@ export default (props: HabitTemplateProps) => {
     headerLeft: () => (
       <NavButton
         onPress={() => {
-          updateOrCreateHabit();
-          sharedNavigationService.navigate({
-            page: 'HomeReset',
-          });
+          const initialTitleAndCount = {
+            title: existingHabit?.title,
+            count: existingHabit?.count,
+          };
+          const finalTitleAndCount = {
+            title: title,
+            count: count,
+          };
+          if (
+            _.isEqual(initialTitleAndCount, finalTitleAndCount) ||
+            (!existingHabit && !_.trim(title))
+          ) {
+            sharedNavigationService.navigate({
+              page: 'HomeReset',
+            });
+          } else {
+            Alert.alert(
+              'It looks like you have some unsaved changes',
+              'Do you wish to continue?',
+              [
+                {
+                  text: 'No',
+                },
+                {
+                  text: 'Yes',
+                  onPress: () =>
+                    sharedNavigationService.navigate({ page: 'HomeReset' }),
+                },
+              ]
+            );
+          }
         }}
         title={'Cancel'}
         position={'left'}
@@ -201,8 +222,8 @@ export default (props: HabitTemplateProps) => {
           placeholderTextColor={colors.lightPurple}
           style={styles.titleInput}
           placeholder={'Untitled'}
-          value={habitTitle}
-          onChangeText={(text) => setHabitTitle(text)}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
         />
       </View>
     );
@@ -269,7 +290,9 @@ export default (props: HabitTemplateProps) => {
           </HiveText>
           <View style={styles.currentStreakLabel}>
             <HiveText variant={'bold'} style={styles.currentStreakValue}>
-              {currentStreak.toString()}
+              {`${currentStreak.toString()} ${
+                currentStreak > 1 || !currentStreak ? 'days' : 'day'
+              }`}
             </HiveText>
           </View>
         </View>
@@ -279,7 +302,9 @@ export default (props: HabitTemplateProps) => {
           </HiveText>
           <View style={styles.bestStreakLabel}>
             <HiveText variant={'bold'} style={styles.bestStreakLabelValue}>
-              {bestStreak.toString()}
+              {`${bestStreak.toString()} ${
+                bestStreak > 1 || !bestStreak ? 'days' : 'day'
+              }`}
             </HiveText>
           </View>
         </View>

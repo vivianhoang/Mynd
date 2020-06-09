@@ -262,7 +262,7 @@ export default (props: ChecklistTemplateProps) => {
 
           if (_.isEqual(initialTitleAndItems, finalTitleAndItems)) {
             sharedNavigationService.navigate({ page: 'HomeReset' });
-          } else
+          } else {
             Alert.alert(
               'It looks like you have some unsaved changes',
               'Do you wish to continue?',
@@ -277,6 +277,7 @@ export default (props: ChecklistTemplateProps) => {
                 },
               ],
             );
+          }
         }}
         title={'Cancel'}
         position={'left'}

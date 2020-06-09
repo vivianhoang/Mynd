@@ -358,12 +358,12 @@ export default (props: ChecklistTemplateProps) => {
                   <Swipeable
                     ref={swipeableRef}
                     overshootRight={false}
+                    enabled={!isNewInput}
                     shouldCancelWhenOutside={true}
                     onSwipeableWillOpen={() => {
                       saveItemIndex(index);
                     }}
-                    renderRightActions={() => (
-                      isNewInput ? null : (<TouchableOpacity
+                    renderRightActions={() => ((<TouchableOpacity
                         style={styles.delete}
                         onPress={() => {
                           let newItems = [...checklistItems];

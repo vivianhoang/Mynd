@@ -10,6 +10,12 @@
     "lint": "eslint .",
     "postinstall": "patch-package && npx jetify"
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true
+  },
   "dependencies": {
     "@react-native-community/geolocation": "1.4.2",
     "@react-native-community/masked-view": "^0.1.6",

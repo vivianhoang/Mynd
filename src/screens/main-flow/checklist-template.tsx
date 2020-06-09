@@ -363,7 +363,7 @@ export default (props: ChecklistTemplateProps) => {
                       saveItemIndex(index);
                     }}
                     renderRightActions={() => (
-                      <TouchableOpacity
+                      isNewInput ? null : (<TouchableOpacity
                         style={styles.delete}
                         onPress={() => {
                           let newItems = [...checklistItems];
@@ -375,7 +375,7 @@ export default (props: ChecklistTemplateProps) => {
                           {'Delete'}
                         </HiveText>
                       </TouchableOpacity>
-                    )}
+                    ))}
                     overshootLeft={false}
                     friction={1}
                   >

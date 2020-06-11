@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   Image,
   SectionList,
-  SafeAreaView,
   ImageRequireSource,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import sharedNavigationService from '../../services/navigation-service';
 import { useSelector } from 'react-redux';
@@ -26,16 +26,20 @@ import HiveText from '../../componets/hive-text';
 import SearchBar from '../../componets/search-bar';
 // import sharedGeoNotificationService from '../../services/geo-notification';
 import { screenSize, topSpace } from '../../utils/layout';
+import { updateHabit } from '../../services/firebase-service';
+import moment from 'moment';
 
 const iconMap: { [key in TemplateType]: ImageRequireSource } = {
   Idea: require('../../assets/ideas-icon.png'),
   Checklist: require('../../assets/checklist-icon.png'),
   Goal: require('../../assets/goals-icon.png'),
+  Habit: require('../../assets/habit-icon.png'),
 };
 
 export default () => {
-  const hiveData = useSelector<ReduxState, HiveData>(state => state.hiveData);
+  const hiveData = useSelector<ReduxState, HiveData>((state) => state.hiveData);
   const [searchText, setSearchText] = useState('');
+  const userId = useSelector<ReduxState, string>((state) => state.userId);
   if (hiveData == undefined) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -48,17 +52,17 @@ export default () => {
     const finalHiveData = hiveData.reduce((data, value) => {
       const clonedValue = _.cloneDeep(value);
 
-      clonedValue.data[0] = clonedValue.data[0].filter(templateData => {
+      clonedValue.data[0] = clonedValue.data[0].filter((templateData) => {
         if (templateData.type == 'Checklist') {
           return (
             _.includes(
               templateData.title.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             ) ||
-            !!templateData.items.filter(item => {
+            !!templateData.items.filter((item) => {
               return _.includes(
                 item.title.toLowerCase(),
-                searchText.toLowerCase(),
+                searchText.toLowerCase()
               );
             }).length
           );
@@ -66,23 +70,28 @@ export default () => {
           return (
             _.includes(
               templateData.title.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             ) ||
             _.includes(
               templateData.description.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             )
           );
         } else if (templateData.type == 'Goal') {
           return (
             _.includes(
               templateData.title.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             ) ||
             _.includes(
               templateData.description.toLowerCase(),
-              searchText.toLowerCase(),
+              searchText.toLowerCase()
             )
+          );
+        } else if (templateData.type == 'Habit') {
+          return _.includes(
+            templateData.title.toLowerCase(),
+            searchText.toLowerCase()
           );
         }
       });
@@ -124,7 +133,6 @@ export default () => {
   // useEffect(() => {
   //   sharedGeoNotificationService.initialize();
   // }, []);
-
   const resultsView =
     hiveData.length && !finalHiveData.length ? (
       <HiveText style={styles.noResultsLabel}>{'No results.'}</HiveText>
@@ -132,7 +140,7 @@ export default () => {
       <SectionList
         sections={finalHiveData}
         showsVerticalScrollIndicator={false}
-        keyExtractor={item => {
+        keyExtractor={(item) => {
           return `section-${item[0].id}`;
         }}
         keyboardDismissMode={'on-drag'}
@@ -153,16 +161,20 @@ export default () => {
             </View>
           );
         }}
-        renderItem={e => {
+        renderItem={(e) => {
           const title = e.section.title as string;
           const item = e.item;
-          const numColumns = title === 'Goal' ? 1 : 3;
-          console.log(e);
+          let numColumns = 3;
+
+          if (title === 'Goal' || title === 'Habit') {
+            numColumns = 1;
+          }
+
           return (
             <FlatList
               numColumns={numColumns}
               data={[...item]}
-              keyExtractor={item => {
+              keyExtractor={(item) => {
                 return item.id;
               }}
               style={{ paddingHorizontal: 16, paddingVertical: 16 }}
@@ -253,7 +265,7 @@ export default () => {
 
                     return (
                       <TouchableOpacity
-                        style={[styles.taskItem]}
+                        style={styles.fullRowCardStyle}
                         onPress={() =>
                           sharedNavigationService.navigate({
                             page: 'GoalTemplate',
@@ -312,48 +324,104 @@ export default () => {
                       </TouchableOpacity>
                     );
                   }
+                  case 'Habit':
+                    // month starts at index 0
+                    const today = `${moment()
+                      .year()
+                      .toString()}-${moment()
+                      .month()
+                      .toString()}-${moment().date().toString()}}`;
+
+                    const savedTime = moment(
+                      item.streak.latestTimestamp,
+                      'YYYY-MM-DD'
+                    );
+                    let currentStreak = item.streak.currentStreak;
+                    let bestStreak = item.streak.bestStreak;
+                    let latestTimestamp = item.streak.latestTimestamp;
+                    let updatedStreak;
+
+                    const updateStreak = () => {
+                      const convertedToday = moment(today, 'YYYY-MM-DD');
+                      const distanceInDays = moment
+                        .duration(convertedToday.diff(savedTime))
+                        .asDays();
+
+                      // more than a day has passed
+                      if (distanceInDays > 1) {
+                        updatedStreak = 0;
+                      }
+
+                      // if one day has passed, increment streak
+                      else if (distanceInDays == 1) {
+                        updatedStreak = currentStreak + 1;
+
+                        if (updatedStreak > bestStreak) {
+                          bestStreak = updatedStreak;
+                        }
+                      }
+                      latestTimestamp = today;
+                    };
+
+                    const updateHabitCount = async () => {
+                      updateStreak();
+                      try {
+                        await updateHabit({
+                          id: item.id,
+                          title: item.title,
+                          count: item.count + 1,
+                          timestamp: item.timestamp,
+                          streak: {
+                            currentStreak: updatedStreak,
+                            bestStreak: bestStreak,
+                            latestTimestamp: latestTimestamp,
+                          },
+                          userId,
+                        });
+                      } catch (error) {
+                        Alert.alert(
+                          'Uh oh!',
+                          `Couldn't increment habit. ${error.message}`
+                        );
+                      }
+                    };
+
+                    return (
+                      <View style={styles.habitContainer}>
+                        <TouchableOpacity
+                          style={styles.partialRowLeftStyle}
+                          onPress={() =>
+                            sharedNavigationService.navigate({
+                              page: 'HabitTemplate',
+                              props: { habit: item },
+                            })
+                          }
+                        >
+                          <View style={styles.habitTitleContainer}>
+                            <HiveText
+                              style={styles.habitTitleLabel}
+                              variant={'medium'}
+                            >
+                              {item.title}
+                            </HiveText>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.partialRowRightStyle}
+                          onPress={updateHabitCount}
+                        >
+                          <View style={styles.habitCountContainer}>
+                            <HiveText
+                              variant={'medium'}
+                              style={styles.habitCountLabel}
+                            >
+                              {item.count}
+                            </HiveText>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    );
                 }
-                // return (
-                //   <TouchableOpacity
-                //     style={[styles.cardStyle, { marginHorizontal }]}
-                //     onPress={() => {
-                //       console.log(item);
-                //       switch (item.type) {
-                //         case 'Idea':
-                //           {
-                //             sharedNavigationService.navigate({
-                //               page: 'IdeaTemplate',
-                //               props: { idea: item },
-                //             });
-                //           }
-                //           break;
-                //         case 'Checklist':
-                //           {
-                //             sharedNavigationService.navigate({
-                //               page: 'ChecklistTemplate',
-                //               props: { checklist: item },
-                //             });
-                //           }
-                //           break;
-                //         case 'Goal':
-                //           {
-                //             sharedNavigationService.navigate({
-                //               page: 'GoalTemplate',
-                //               props: { goal: item },
-                //             });
-                //           }
-                //           break;
-                //       }
-                //     }}
-                //   >
-                //     <HiveText
-                //       style={{ textAlign: 'center' }}
-                //       variant={'medium'}
-                //     >
-                //       {item.title}
-                //     </HiveText>
-                //   </TouchableOpacity>
-                // );
               }}
             />
           );
@@ -368,7 +436,6 @@ export default () => {
           <View style={{ paddingHorizontal: 16 }}>
             <View
               style={{
-                // paddingTop: 16,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -444,7 +511,7 @@ const styles = StyleSheet.create({
       height: 1,
     },
   },
-  taskItem: {
+  fullRowCardStyle: {
     shadowColor: colors.offBlack,
     shadowRadius: 4,
     shadowOpacity: 0.2,
@@ -457,6 +524,27 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 10,
     marginBottom: 12,
+  },
+  partialRowLeftStyle: {
+    padding: 16,
+    backgroundColor: colors.white,
+    marginBottom: 12,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    justifyContent: 'center',
+    flex: 1,
+  },
+  partialRowRightStyle: {
+    padding: 16,
+    paddingBottom: 20,
+    backgroundColor: colors.white,
+    marginBottom: 12,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    borderLeftWidth: 1,
+    borderLeftColor: colors.lightGray,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   taskItemProgressBarContainer: {
     height: 10,
@@ -505,5 +593,34 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  habitContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+  },
+  habitTitleContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+  },
+  habitTitleLabel: {
+    alignSelf: 'stretch',
+    fontSize: 18,
+  },
+  habitCountContainer: {
+    width: 50,
+  },
+  habitCountLabel: {
+    fontSize: 26,
+    color: colors.skyBlue,
+    textAlign: 'center',
   },
 });

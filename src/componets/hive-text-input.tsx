@@ -6,7 +6,6 @@ import {
   TextInputProps,
   TouchableOpacity,
   Image,
-  ImageSourcePropType,
 } from 'react-native';
 import colors from '../utils/colors';
 import * as _ from 'lodash';
@@ -40,7 +39,6 @@ const HiveTextInput = (props: Props) => {
       <HiveText style={styles.titleLabel}>{title}</HiveText>
       <View style={styles.textInputContainer}>
         <TextInput
-          // placeholderTextColor={colors.darkGray}
           selectionColor={colors.salmonRed}
           style={[styles.textInput as any, style]}
           {...finalProps}

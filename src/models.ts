@@ -9,18 +9,16 @@ export interface ReduxState {
   tempGoal: Goal;
 }
 
-export type TemplateData = Checklist | Idea | Goal;
+export type TemplateData = Checklist | Idea | Goal | Habit;
 
-export type JsonHiveData = {
-  [key in TemplateType]: TemplateData[];
-};
+export type JsonHiveData = { [key in TemplateType]: TemplateData[] };
 
 export type HiveData = {
   title: TemplateType;
   data: TemplateData[][];
 }[];
 
-export type TemplateType = 'Idea' | 'Checklist' | 'Goal';
+export type TemplateType = 'Idea' | 'Checklist' | 'Goal' | 'Habit';
 
 export interface Idea {
   id: string;
@@ -53,11 +51,25 @@ export interface Goal {
   type: 'Goal';
 }
 
-export type Templates = Idea | Checklist | Goal;
+export interface Habit {
+  id: string;
+  title: string;
+  timestamp: string;
+  count: number;
+  streak: {
+    currentStreak: number;
+    bestStreak: number;
+    latestTimestamp: string;
+  };
+  type: 'Habit';
+}
+
+export type Templates = Idea | Checklist | Goal | Habit;
 
 export type Ideas = Idea[];
 export type Checklists = Checklist[];
 export type Goals = Goal[];
+export type Habits = Habit[];
 
 //---------Actions-related interfaces-----------//
 
@@ -101,11 +113,10 @@ export type PageName =
   | 'GoalTemplate'
   | 'GoalTaskCreation'
   | 'GoalTaskDetails'
+  | 'HabitTemplate'
   | 'ActionSheet';
 
-export const Page: {
-  [key in PageName]: PageName;
-} = {
+export const Page: { [key in PageName]: PageName } = {
   Home: 'Home',
   HomeReset: 'HomeReset',
   Splash: 'Splash',
@@ -120,6 +131,7 @@ export const Page: {
   GoalTemplate: 'GoalTemplate',
   GoalTaskDetails: 'GoalTaskDetails',
   GoalTaskCreation: 'GoalTaskCreation',
+  HabitTemplate: 'HabitTemplate',
   ActionSheet: 'ActionSheet',
 };
 
@@ -199,6 +211,15 @@ export interface GoalTaskDetailsPage extends BasePageInterface {
   props: GoalTaskDetailsOwnProps;
 }
 
+export interface HabitTemplateOwnProps {
+  habit: Habit | null;
+}
+
+export interface HabitTemplatePage extends BasePageInterface {
+  page: 'HabitTemplate';
+  props: HabitTemplateOwnProps;
+}
+
 export interface ActionSheetOwnProps {
   options: {
     onPress: () => void;
@@ -229,6 +250,7 @@ export type NavigationActions =
   | GoalTemplatePage
   | GoalTaskDetailsPage
   | GoalTaskCreationPage
+  | HabitTemplatePage
   | ActionSheetPage
   | SignupPage;
 
@@ -238,6 +260,7 @@ export type RouteParamsList = {
   GoalTemplate: GoalTemplateOwnProps;
   GoalTaskDetails: GoalTaskDetailsOwnProps;
   GoalTaskCreation: GoalTaskCreationOwnProps;
+  HabitTemplate: HabitTemplateOwnProps;
   ActionSheet: ActionSheetOwnProps;
 };
 
@@ -271,6 +294,10 @@ export interface GoalTaskDetailsProps extends NavigationProps {
 
 export interface GoalTaskCreationProps extends NavigationProps {
   route: RouteProp<RouteParamsList, 'GoalTaskCreation'>;
+}
+
+export interface HabitTemplateProps extends NavigationProps {
+  route: RouteProp<RouteParamsList, 'HabitTemplate'>;
 }
 
 export interface ActionSheetProps extends NavigationProps {

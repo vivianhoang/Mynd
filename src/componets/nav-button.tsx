@@ -14,12 +14,13 @@ interface IconOptions {
 
 const icons: IconOptions = {
   back: require('../assets/back-icon.png'),
+  subMenu: require('../assets/ellipsis-icon.png'),
 };
 
 export interface NavButtonProps {
   onPress: () => void;
   title?: string;
-  icon?: 'back';
+  icon?: 'back' | 'subMenu';
   position: 'left' | 'right';
   color?: string;
   isDisabled?: boolean;
@@ -41,7 +42,10 @@ export default (props: NavButtonProps) => {
       {props.title}
     </HiveText>
   ) : icon ? (
-    <Image source={icons[icon]} style={styles.icon} />
+    <Image
+      source={icons[icon]}
+      style={[styles.icon, { tintColor: color || colors.offBlack }]}
+    />
   ) : null;
   return (
     <TouchableOpacity
@@ -64,6 +68,10 @@ const styles = StyleSheet.create({
   rightButton: {
     alignItems: 'flex-end',
     paddingRight: 16,
+    height: 36,
+    width: 36,
+    marginLeft: 8,
+    justifyContent: 'center',
   },
   label: {
     fontSize: 18,

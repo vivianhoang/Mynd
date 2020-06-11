@@ -11,4 +11,5 @@ export default {
   salmonRed: '#FF6969',
   teal: '#5ce6ba',
   white: '#ffffff',
+  skyBlue: '#339DFF',
 };

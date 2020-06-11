@@ -32,10 +32,10 @@ import store from './services/redux-service';
 import { Page, GoalTemplateProps } from './models';
 import colors from './utils/colors';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import HiveText from './componets/hive-text';
 import { BottomTabNavigationEventMap } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 import { bottomSpace } from './utils/layout';
 import ActionSheet from './screens/main-flow/action-sheet';
+import HabitTemplate from './screens/main-flow/habit-template';
 const hiveIcon = require('./assets/hive-icon.png');
 const settingsIcon = require('./assets/settings-icon.png');
 
@@ -160,11 +160,11 @@ function GoalStackFlow(props: GoalTemplateProps) {
         name={'GoalStackFlow'}
         component={GoalTemplate}
         initialParams={props.route.params}
-      ></GoalStack.Screen>
+      />
       <GoalStack.Screen
         name={Page.GoalTaskDetails}
         component={GoalTaskDetails}
-      ></GoalStack.Screen>
+      />
     </GoalStack.Navigator>
   );
 }
@@ -225,20 +225,18 @@ function MainFlow() {
         options={{
           headerShown: false,
         }}
-      ></MainStack.Screen>
-      <MainStack.Screen
-        name={Page.IdeaTemplate}
-        component={IdeaTemplate}
-      ></MainStack.Screen>
+      />
+      <MainStack.Screen name={Page.IdeaTemplate} component={IdeaTemplate} />
       <MainStack.Screen
         name={Page.ChecklistTemplate}
         component={ChecklistTemplate}
-      ></MainStack.Screen>
+      />
       <MainStack.Screen
         options={{ headerShown: false }}
         name={Page.GoalTemplate}
         component={GoalFlow}
-      ></MainStack.Screen>
+      />
+      <MainStack.Screen name={Page.HabitTemplate} component={HabitTemplate} />
     </MainStack.Navigator>
   );
 }
@@ -256,21 +254,15 @@ function AuthFlow() {
         name={Page.Splash}
         component={Splash}
         options={{ headerShown: false }}
-      ></AuthStack.Screen>
+      />
       <AuthStack.Screen
         name={Page.Landing}
         component={Landing}
         options={{ headerShown: false }}
-      ></AuthStack.Screen>
-      <AuthStack.Screen name={Page.Login} component={login}></AuthStack.Screen>
-      <AuthStack.Screen
-        name={Page.ForgotPassword}
-        component={ForgotPassword}
-      ></AuthStack.Screen>
-      <AuthStack.Screen
-        name={Page.Signup}
-        component={signup}
-      ></AuthStack.Screen>
+      />
+      <AuthStack.Screen name={Page.Login} component={login} />
+      <AuthStack.Screen name={Page.ForgotPassword} component={ForgotPassword} />
+      <AuthStack.Screen name={Page.Signup} component={signup} />
     </AuthStack.Navigator>
   );
 }
@@ -288,21 +280,24 @@ function TemplateSelectionFlow() {
         name="TemplateSelectionNOTUSED"
         component={templateSelection}
         options={{ headerShown: false }}
-      ></TemplateSelectionStack.Screen>
+      />
       <TemplateSelectionStack.Screen
         name={Page.IdeaTemplate}
         component={IdeaTemplate}
-      ></TemplateSelectionStack.Screen>
+      />
       <TemplateSelectionStack.Screen
         name={Page.ChecklistTemplate}
         component={ChecklistTemplate}
-      ></TemplateSelectionStack.Screen>
-      {/*
+      />
+      <TemplateSelectionStack.Screen
+        name={Page.HabitTemplate}
+        component={HabitTemplate}
+      />
       <TemplateSelectionStack.Screen
         name="GoalTemplate"
-        component={goalTemplate}
+        component={GoalFlow}
         options={{ headerShown: false }}
-      ></TemplateSelectionStack.Screen> */}
+      />
     </TemplateSelectionStack.Navigator>
   );
 }

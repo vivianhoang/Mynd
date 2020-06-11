@@ -8,18 +8,17 @@ import React, {
 } from 'react';
 import {
   View,
-  Platform,
   StyleSheet,
   Image,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
   Alert,
 } from 'react-native';
 import {
   ChecklistTemplateProps,
   ChecklistItem,
   ReduxState,
+  ActionSheetOwnProps,
 } from '../../models';
 import NavButton from '../../componets/nav-button';
 import sharedNavigationService from '../../services/navigation-service';
@@ -31,11 +30,11 @@ import {
   createChecklist,
   updateChecklist,
 } from '../../services/firebase-service';
-import { topSpace } from '../../utils/layout';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import HiveText from '../../componets/hive-text';
 import { TapGestureHandler, State } from 'react-native-gesture-handler';
+import DoneButton from '../../componets/done-button';
 
 const CheckListRow = (props: {
   item: ChecklistItem;
@@ -58,7 +57,7 @@ const CheckListRow = (props: {
         defaultValue={title}
         onChangeText={props.onChangeText}
         enableNewLine={false}
-        onSubmitEditing={e => {
+        onSubmitEditing={(e) => {
           props.onSubmitEditing(e.nativeEvent.text);
         }}
         selectionColor={colors.salmonRed}
@@ -66,7 +65,7 @@ const CheckListRow = (props: {
         multiline={true}
         scrollEnabled={false}
         blurOnSubmit={false}
-        onEndEditing={e => props.onEndEditing(e.nativeEvent.text)}
+        onEndEditing={(e) => props.onEndEditing(e.nativeEvent.text)}
       />
       <TouchableOpacity style={styles.checkBox} onPress={props.onToggle}>
         <View
@@ -84,13 +83,18 @@ const CheckListRow = (props: {
 
 export default (props: ChecklistTemplateProps) => {
   const existingChecklist = props.route.params?.checklist;
-  // const dispatch = useDispatch<DispatchAction>();
 
   const [checklistTitle, setChecklistTitle] = useState(
     existingChecklist?.title || '',
   );
   const dummyChecklistItems: ChecklistItem[] = [
-    { title: '', checked: false, timestamp: new Date().getTime().toString() },
+    {
+      title: '',
+      checked: false,
+      timestamp: new Date()
+        .getTime()
+        .toString(),
+    },
     {
       title: '',
       checked: false,
@@ -100,7 +104,7 @@ export default (props: ChecklistTemplateProps) => {
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
     existingChecklist?.items.concat(dummyChecklistItems) || dummyChecklistItems,
   );
-  const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
   let inputRefList = useRef(checklistItems.map(() => createRef<TextInput>()));
   let swipeableRefList = useRef(
@@ -111,7 +115,7 @@ export default (props: ChecklistTemplateProps) => {
 
   let savedIndex: number = undefined;
 
-  const userId = useSelector<ReduxState, string>(state => state.userId);
+  const userId = useSelector<ReduxState, string>((state) => state.userId);
 
   useEffect(() => {
     inputRefList.current = checklistItems.map(() => createRef<TextInput>());
@@ -149,7 +153,7 @@ export default (props: ChecklistTemplateProps) => {
     }
 
     // Remove all empty items on save
-    newItems = _.filter(newItems, item => !!item.title);
+    newItems = _.filter(newItems, (item) => !!item.title);
 
     return { newTitle, newItems };
   };
@@ -196,6 +200,50 @@ export default (props: ChecklistTemplateProps) => {
     }
   };
 
+  const triggerDeleteChecklist = () => {
+    Alert.alert(
+      'Are you sure you want to delete this checklist?',
+      'This action cannot be undone.',
+      [
+        { text: 'Cancel' },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            sharedNavigationService.navigate({ page: 'Loader' });
+            try {
+              await deleteChecklist({
+                id: existingChecklist.id,
+                userId,
+              });
+              sharedNavigationService.navigate({
+                page: 'HomeReset',
+              });
+            } catch (error) {
+              // Same as dismissing loader
+              sharedNavigationService.navigate({
+                page: 'ChecklistTemplate',
+                props: {
+                  checklist: existingChecklist || null,
+                },
+              });
+              Alert.alert('Uh oh!', `Couldn't delete list. ${error.message}`);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const subMenuOptions: ActionSheetOwnProps = {
+    options: [
+      {
+        onPress: triggerDeleteChecklist,
+        buttonType: 'third',
+        title: 'Delete Checklist',
+      },
+    ],
+  };
+
   props.navigation.setOptions({
     headerTitle: () => (
       <Image
@@ -214,7 +262,7 @@ export default (props: ChecklistTemplateProps) => {
 
           if (_.isEqual(initialTitleAndItems, finalTitleAndItems)) {
             sharedNavigationService.navigate({ page: 'HomeReset' });
-          } else
+          } else {
             Alert.alert(
               'It looks like you have some unsaved changes',
               'Do you wish to continue?',
@@ -229,6 +277,7 @@ export default (props: ChecklistTemplateProps) => {
                 },
               ],
             );
+          }
         }}
         title={'Cancel'}
         position={'left'}
@@ -237,45 +286,14 @@ export default (props: ChecklistTemplateProps) => {
     headerRight: existingChecklist
       ? () => (
           <NavButton
-            onPress={() => {
-              Alert.alert(
-                'Are you sure you want to delete this checklist?',
-                'This action cannot be undone.',
-                [
-                  { text: 'Cancel' },
-                  {
-                    text: 'Delete',
-                    onPress: async () => {
-                      sharedNavigationService.navigate({ page: 'Loader' });
-                      try {
-                        await deleteChecklist({
-                          id: existingChecklist.id,
-                          userId,
-                        });
-                        sharedNavigationService.navigate({
-                          page: 'HomeReset',
-                        });
-                      } catch (error) {
-                        // Same as dismissing loader
-                        sharedNavigationService.navigate({
-                          page: 'ChecklistTemplate',
-                          props: {
-                            checklist: existingChecklist || null,
-                          },
-                        });
-                        Alert.alert(
-                          'Uh oh!',
-                          `Couldn't delete list. ${error.message}`,
-                        );
-                      }
-                    },
-                  },
-                ],
-              );
-            }}
-            title={'Delete'}
+            onPress={() =>
+              sharedNavigationService.navigate({
+                page: 'ActionSheet',
+                props: subMenuOptions,
+              })
+            }
+            icon={'subMenu'}
             position={'right'}
-            color={'red'}
           />
         )
       : null,
@@ -310,7 +328,7 @@ export default (props: ChecklistTemplateProps) => {
             style={styles.titleInput}
             placeholder={'Untitled'}
             value={checklistTitle}
-            onChangeText={text => setChecklistTitle(text)}
+            onChangeText={(text) => setChecklistTitle(text)}
             ref={newTitleInputRef}
             blurOnSubmit={true}
             onSubmitEditing={() => {
@@ -328,7 +346,7 @@ export default (props: ChecklistTemplateProps) => {
             return (
               <TapGestureHandler
                 key={key}
-                onHandlerStateChange={event => {
+                onHandlerStateChange={(event) => {
                   switch (event.nativeEvent.state) {
                     case State.BEGAN:
                       // Close all
@@ -341,12 +359,12 @@ export default (props: ChecklistTemplateProps) => {
                   <Swipeable
                     ref={swipeableRef}
                     overshootRight={false}
+                    enabled={!isNewInput}
                     shouldCancelWhenOutside={true}
                     onSwipeableWillOpen={() => {
                       saveItemIndex(index);
                     }}
-                    renderRightActions={() => (
-                      <TouchableOpacity
+                    renderRightActions={() => ((<TouchableOpacity
                         style={styles.delete}
                         onPress={() => {
                           let newItems = [...checklistItems];
@@ -358,7 +376,7 @@ export default (props: ChecklistTemplateProps) => {
                           {'Delete'}
                         </HiveText>
                       </TouchableOpacity>
-                    )}
+                    ))}
                     overshootLeft={false}
                     friction={1}
                   >
@@ -366,7 +384,7 @@ export default (props: ChecklistTemplateProps) => {
                       inputRef={ref}
                       item={item}
                       isLastRow={checklistItems.length - 1 == index}
-                      onSubmitEditing={latestText => {
+                      onSubmitEditing={(latestText) => {
                         const nextInputRef = inputRefList?.current[index + 1];
                         if (nextInputRef && nextInputRef.current) {
                           if (
@@ -384,7 +402,7 @@ export default (props: ChecklistTemplateProps) => {
                         newItems[index] = { ...item, checked: !item.checked };
                         setChecklistItems(newItems);
                       }}
-                      onEndEditing={text => {
+                      onEndEditing={(text) => {
                         // When clicking out
                         let newItems = [...checklistItems];
                         if (isNewInput) {
@@ -395,7 +413,9 @@ export default (props: ChecklistTemplateProps) => {
                             newItems.push({
                               title: '',
                               checked: false,
-                              timestamp: new Date().getTime().toString(),
+                              timestamp: new Date()
+                                .getTime()
+                                .toString(),
                             });
                             setChecklistItems(newItems);
                           }
@@ -415,21 +435,7 @@ export default (props: ChecklistTemplateProps) => {
           })}
         </View>
       </KeyboardAwareScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.select({ ios: 'position', android: undefined })}
-        keyboardVerticalOffset={44 + topSpace()}
-      >
-        <TouchableOpacity
-          onPress={updateOrCreateList}
-          style={styles.saveButton}
-        >
-          <Image
-            style={styles.icon}
-            source={require('../../assets/check-icon.png')}
-            resizeMode={'contain'}
-          />
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+      <DoneButton onPress={updateOrCreateList} />
     </View>
   );
 };
@@ -490,29 +496,6 @@ const styles = StyleSheet.create({
     width: 22,
     borderRadius: 12,
     backgroundColor: colors.salmonRed,
-  },
-  icon: {
-    height: 44,
-    width: 44,
-    tintColor: colors.white,
-  },
-  saveButton: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
-    backgroundColor: colors.honeyOrange,
-    height: 60,
-    width: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.offBlack,
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
   },
   delete: {
     width: 100,

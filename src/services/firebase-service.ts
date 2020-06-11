@@ -9,8 +9,10 @@ import {
   ChecklistItem,
   Goal,
   Goals,
+  Habit,
 } from '../models';
 import * as _ from 'lodash';
+import moment from 'moment';
 
 let subscriptionById = {};
 
@@ -22,7 +24,7 @@ export const subscribeToHive = (
   const subscription = FirebaseFirestore()
     .collection(path)
     .onSnapshot(
-      snapshot => {
+      (snapshot) => {
         console.log(snapshot);
         if (!snapshot.empty) {
           const jsonHiveData = _.reduce(
@@ -32,7 +34,7 @@ export const subscribeToHive = (
               const existingData = finalHiveData[templateData.type] || [];
               finalHiveData[templateData.type] = _.orderBy(
                 [...existingData, templateData],
-                data => {
+                (data) => {
                   return data.timestamp;
                 },
                 ['asc'],
@@ -51,19 +53,101 @@ export const subscribeToHive = (
           ).sort((a, b) => {
             return a.title > b.title ? 1 : -1;
           });
-          // console.log(hiveData);
           onTrigger(hiveData);
         } else {
           console.log('EMPTY');
           onTrigger([]);
         }
       },
-      error => {
+      (error) => {
         console.log('ERROR!', error);
       },
     );
   // Store subscription for unsubscribing on logout
   subscriptionById['hive'] = subscription;
+};
+
+export const createHabit = async (params: {
+  title: string;
+  count: number;
+  userId: string;
+}) => {
+  const { title, count, userId } = params;
+  const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
+  const habitId = hiveRef.doc().id;
+
+  // month starts at index 0
+  const today = `${moment()
+    .year()
+    .toString()}-${moment().month().toString()}-${moment().date().toString()}`;
+
+  const newHabit: Habit = {
+    id: habitId,
+    title: title,
+    count: count,
+    timestamp: new Date()
+      .getTime()
+      .toString(),
+    streak: {
+      currentStreak: 0,
+      bestStreak: 0,
+      latestTimestamp: today,
+    },
+    type: 'Habit',
+  };
+
+  try {
+    await hiveRef.doc(habitId).set(newHabit);
+  } catch (error) {
+    console.log('Failed to create habit!', error.message);
+  }
+};
+
+export const updateHabit = async (params: {
+  id: string;
+  title: string;
+  count: number;
+  timestamp: string;
+  streak: {
+    currentStreak: number;
+    bestStreak: number;
+    latestTimestamp: string;
+  };
+  userId: string;
+}) => {
+  const { id, title, count, timestamp, streak, userId } = params;
+  const { currentStreak, bestStreak, latestTimestamp } = streak;
+  const habitRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
+
+  const updatedHabit: Habit = {
+    id,
+    title,
+    count,
+    timestamp,
+    streak: {
+      currentStreak,
+      bestStreak,
+      latestTimestamp,
+    },
+    type: 'Habit',
+  };
+
+  try {
+    await habitRef.update(updatedHabit);
+  } catch (error) {
+    console.log('Failed to update habit!', error.message);
+  }
+};
+
+export const deleteHabit = async (params: { id: string; userId: string }) => {
+  const { id, userId } = params;
+  const habitRef = FirebaseFirestore().doc(`users/${userId}/hive/${id}`);
+
+  try {
+    habitRef.delete();
+  } catch (error) {
+    console.log('Failed to delete habit!', error.message);
+  }
 };
 
 export const createIdea = async (params: {
@@ -74,13 +158,17 @@ export const createIdea = async (params: {
   const { title, description, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const ideaId = hiveRef.doc().id;
+
   const newIdea: Idea = {
     id: ideaId,
     title: title,
     description: description,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
     type: 'Idea',
   };
+
   try {
     await hiveRef.doc(ideaId).set(newIdea);
   } catch (error) {
@@ -132,13 +220,17 @@ export const createChecklist = async (params: {
   const { title, items, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const checklistId = hiveRef.doc().id;
+
   const newChecklist: Checklist = {
     id: checklistId,
     title: title,
     items,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
     type: 'Checklist',
   };
+
   try {
     await hiveRef.doc(checklistId).set(newChecklist);
   } catch (error) {
@@ -195,16 +287,19 @@ export const createGoal = async (params: {
   const { title, description, tasks, completed, userId } = params;
   const hiveRef = FirebaseFirestore().collection(`users/${userId}/hive`);
   const goalId = hiveRef.doc().id;
+
   const newGoal: Goal = {
     id: goalId,
     title: title,
     description,
     tasks,
     completed,
-    timestamp: new Date().getTime().toString(),
+    timestamp: new Date()
+      .getTime()
+      .toString(),
     type: 'Goal',
   };
-  console.log('createGoal');
+
   try {
     await hiveRef.doc(goalId).set(newGoal);
   } catch (error) {

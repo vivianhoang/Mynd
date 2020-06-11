@@ -35,15 +35,6 @@ import { FlatList } from 'react-native-gesture-handler';
 
 export default (props: GoalTemplateProps) => {
   const existingGoal = props.route.params?.goal;
-  // const tempGoal = existingGoal ||
-  // const [_goalTitle, setGoalTitle] = useState(existingGoal?.title || '');
-  // const [_goalDescription, setGoalDescription] = useState(
-  //   existingGoal?.description || '',
-  // );
-  // const [_goalTask, setGoalTasks] = useState<Goals>(existingGoal?.tasks || []);
-  // const [_goalCompleted, setGoalCompleted] = useState(
-  //   existingGoal?.completed || false,
-  // );
   const dispatch = useDispatch<DispatchAction>();
   const defaultGoal: Goal = {
     id: 'temp-goal-id',
@@ -176,8 +167,6 @@ export default (props: GoalTemplateProps) => {
 
   const getTasksProgress = (
     tasks: Goals,
-    // totalTasks: number,
-    // totalComplete: number,
   ) => {
     let totalTasks = 0;
     let totalComplete = 0;
@@ -277,23 +266,6 @@ export default (props: GoalTemplateProps) => {
             type: 'UPDATE_TEMP_GOAL',
             goal: newGoal,
           });
-
-          // else {
-          // sharedNavigationService.navigate({ page: 'Loader' });
-          // try {
-          //   await deleteGoal({ id: existingGoal.id, userId });
-          //   goBackAndResetTempGoal();
-          // } catch (error) {
-          //   // Same as dismissing loader
-          //   sharedNavigationService.navigate({
-          //     page: 'GoalTemplate',
-          //     props: {
-          //       goal: existingGoal || null,
-          //     },
-          //   });
-          //   Alert.alert('Uh oh!', `Couldn't delete idea. ${error.message}`);
-          // }
-          // }
         },
       },
     ]);
@@ -334,7 +306,7 @@ export default (props: GoalTemplateProps) => {
   const progress = getGoalProgress(tempGoal);
   const isCompleted = goalTasks.length
     ? progress.totalTasks === progress.totalComplete
-    : goalCompleted; //getCompleteStatusFromGoal();
+    : goalCompleted;
 
   const renderStatusLabel = () => {
     return goalTasks.length ? (
@@ -484,14 +456,6 @@ export default (props: GoalTemplateProps) => {
             }}
           />
         </View>
-        {/* <View style={styles.progressContainer}>
-          <View style={styles.progressLabelsContainer}>
-            <HiveText>{'Progress'}</HiveText>
-          </View>
-          <View style={styles.barBackground}>
-            <View style={styles.barForeground}></View>
-          </View>
-        </View> */}
       </TouchableOpacity>
     );
   };
@@ -627,7 +591,7 @@ export default (props: GoalTemplateProps) => {
               selectionColor={colors.salmonRed}
               placeholderTextColor={colors.lightPurple}
               style={styles.titleInput}
-              placeholder={'Goal'}
+              placeholder={'Goal Title'}
               defaultValue={goalTitle}
               onEndEditing={e => {
                 let text = _.trim(e.nativeEvent.text);
@@ -640,7 +604,6 @@ export default (props: GoalTemplateProps) => {
                 };
                 dispatch({ type: 'UPDATE_TEMP_GOAL', goal: newTask });
               }}
-              // onChangeText={text => setGoalTitle(text)}
               onSubmitEditing={() => {
                 descriptionInputRef.current.focus();
               }}
@@ -682,7 +645,6 @@ export default (props: GoalTemplateProps) => {
             multiline={true}
             placeholder={'Describe this goal...'}
             defaultValue={goalDescription}
-            // onChangeText={text => setGoalDescription(text)}
           />
           {renderProgressSection()}
         </View>
@@ -868,13 +830,11 @@ const styles = StyleSheet.create({
   completeGoalButton: {
     width: 32,
     marginLeft: 8,
-    // backgroundColor: '#F1EBF3',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   completeGoalButtonIcon: {
-    // tintColor: '#CBC0D3',
     height: 26,
     width: 26,
   },

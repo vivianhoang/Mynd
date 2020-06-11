@@ -655,7 +655,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kudasai.mynd;
 				PRODUCT_NAME = Mynd;
-				PROVISIONING_PROFILE_SPECIFIER = "Mynd Adhoc";
+				PROVISIONING_PROFILE_SPECIFIER = MyndAdhocProfile;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -679,7 +679,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kudasai.mynd;
 				PRODUCT_NAME = Mynd;
-				PROVISIONING_PROFILE_SPECIFIER = "Mynd Adhoc";
+				PROVISIONING_PROFILE_SPECIFIER = MyndAdhocProfile;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -805,7 +805,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kudasai.mynd.dev;
 				PRODUCT_NAME = "Mynd Dev";
-				PROVISIONING_PROFILE_SPECIFIER = "Mynd Dev";
+				PROVISIONING_PROFILE_SPECIFIER = MyndDevProfile;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -829,7 +829,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.kudasai.mynd.dev;
 				PRODUCT_NAME = "Mynd Dev";
-				PROVISIONING_PROFILE_SPECIFIER = "Mynd Dev";
+				PROVISIONING_PROFILE_SPECIFIER = MyndDevProfile;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

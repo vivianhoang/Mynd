@@ -526,13 +526,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   partialRowLeftStyle: {
-    shadowColor: colors.offBlack,
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
     padding: 16,
     backgroundColor: colors.white,
     marginBottom: 12,
@@ -542,13 +535,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   partialRowRightStyle: {
-    shadowColor: colors.offBlack,
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
     padding: 16,
     paddingBottom: 20,
     backgroundColor: colors.white,
@@ -556,7 +542,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
     borderLeftWidth: 1,
-    borderLeftColor: colors.inactiveGray,
+    borderLeftColor: colors.lightGray,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -612,6 +598,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'stretch',
+    shadowColor: colors.offBlack,
+    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
   },
   habitTitleContainer: {
     justifyContent: 'center',

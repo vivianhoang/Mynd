@@ -12,6 +12,7 @@ import HiveText from '../../componets/hive-text';
 import colors from '../../utils/colors';
 import sharedAuthService from '../../services/auth-service';
 import { topSpace } from '../../utils/layout';
+import Config from 'react-native-config';
 
 type OptionAction = 'signout';
 
@@ -34,7 +35,9 @@ export default () => {
   const versionSection = () => {
     return (
       <View style={styles.versionSection}>
-        <HiveText style={styles.versionLabel}>{'v1.0'}</HiveText>
+        <HiveText
+          style={styles.versionLabel}
+        >{`v${Config.IOS_VERSION_NUMBER}`}</HiveText>
       </View>
     );
   };
@@ -46,7 +49,7 @@ export default () => {
       </HiveText>
       <FlatList
         data={settingsOptions}
-        keyExtractor={item => `${item.title}-${item.description}`}
+        keyExtractor={(item) => `${item.title}-${item.description}`}
         ListFooterComponent={versionSection}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         renderItem={({ item }) => {

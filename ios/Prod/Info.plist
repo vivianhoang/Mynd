@@ -38,11 +38,11 @@
 		</dict>
 	</dict>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>To let you know when you&apos;ve left and arrived</string>
+	<string>To let you know when you've left and arrived</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>To let you know when you&apos;ve left and arrived</string>
+	<string>To let you know when you've left and arrived</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>To let you know when you&apos;ve left and arrived</string>
+	<string>To let you know when you've left and arrived</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>PulpDisplay-RegularItalic.ttf</string>
